@@ -1,0 +1,16 @@
+plugins {
+    // root 不直接套 spring boot，避免所有 module 被當成 boot app
+    id "org.springframework.boot" version "3.4.1" apply false
+    id "io.spring.dependency-management" version "1.1.6" apply false
+}
+
+allprojects {
+    group = (findProperty("group") ?: "com.merdeleine").toString()
+    version = (findProperty("version") ?: "0.1.0-SNAPSHOT").toString()
+
+    repositories { mavenCentral() }
+}
+
+subprojects {
+    // 讓每個 module 都能用 version catalog
+}

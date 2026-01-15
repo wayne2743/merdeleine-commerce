@@ -1,0 +1,10 @@
+plugins {
+    id "com.merdeleine.java-library-conventions"
+}
+
+dependencies {
+    api "org.springframework.kafka:spring-kafka"
+    api "com.fasterxml.jackson.core:jackson-databind"
+
+    testImplementation "org.springframework.kafka:spring-kafka-test"
+}

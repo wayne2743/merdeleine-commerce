@@ -1,0 +1,19 @@
+[versions]
+java = "17"
+springBoot = "3.4.1"
+springDepMgmt = "1.1.6"
+
+[libraries]
+springBootWeb = { module = "org.springframework.boot:spring-boot-starter-web" }
+springBootActuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+springBootValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+springBootTest = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+springKafka = { module = "org.springframework.kafka:spring-kafka" }
+springKafkaTest = { module = "org.springframework.kafka:spring-kafka-test" }
+
+jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+
+[plugins]
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+springDepMgmt = { id = "io.spring.dependency-management", version.ref = "springDepMgmt" }

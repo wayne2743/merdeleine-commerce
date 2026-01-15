@@ -1,0 +1,7 @@
+plugins {
+    id "com.merdeleine.java-library-conventions"
+}
+
+dependencies {
+    // 依需要加入
+}

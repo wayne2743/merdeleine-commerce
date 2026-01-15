@@ -1,0 +1,9 @@
+rootProject.name = "merdeleine-commerce"
+
+include(
+        "libs:common-domain",
+        "libs:common-kafka",
+        "services:order-service",
+        "services:production-service",
+        "services:notification-service"
+)
