@@ -12,3 +12,11 @@
 ```commandline
 ./gradlew build
 ```
+
+
+## DB
+```
+  POSTGRES_USER: merdeleine
+  POSTGRES_PASSWORD: merdeleine_pw
+  POSTGRES_DB: postgres
+```
