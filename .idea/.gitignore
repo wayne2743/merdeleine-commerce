@@ -1,0 +1,103 @@
+####################################
+# OS / Editor
+####################################
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+####################################
+# Build output
+####################################
+/build/
+/out/
+/target/
+
+####################################
+# Gradle
+####################################
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+####################################
+# Maven
+####################################
+.mvn/wrapper/maven-wrapper.jar
+
+####################################
+# Logs
+####################################
+*.log
+logs/
+log/
+
+####################################
+# Spring Boot
+####################################
+# Local override config
+application-local.yml
+application-local.yaml
+application-dev.yml
+application-dev.yaml
+
+# PID / runtime
+*.pid
+
+####################################
+# Test / Coverage
+####################################
+/coverage/
+/jacoco/
+*.exec
+
+####################################
+# Docker
+####################################
+# Container runtime data
+docker-data/
+docker-volume/
+docker-compose.override.yml
+
+####################################
+# Database
+####################################
+*.db
+*.sqlite
+*.h2.db
+*.mv.db
+
+####################################
+# Environment / Secrets
+####################################
+.env
+.env.*
+secrets/
+*.pem
+*.key
+*.crt
+*.jks
+*.p12
+
+####################################
+# Node (if frontend included)
+####################################
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+####################################
+# Temporary files
+####################################
+*.tmp
+*.temp
+*.swp
+*~
+
+####################################
+# IntelliJ HTTP Client
+####################################
+.http/
