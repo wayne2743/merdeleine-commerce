@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="61175c6c-a985-42b3-8928-d332de43ea2f" name="Changes" comment="add gitignore file">
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/checksums/checksums.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/checksums/md5-checksums.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/checksums/sha1-checksums.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/dependencies-accessors/79e2cee8108cdf744781ae116ecbb135e94d5435/classes/org/gradle/accessors/dm/LibrariesForLibs$BundleAccessors.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/dependencies-accessors/79e2cee8108cdf744781ae116ecbb135e94d5435/classes/org/gradle/accessors/dm/LibrariesForLibs$PluginAccessors.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/dependencies-accessors/79e2cee8108cdf744781ae116ecbb135e94d5435/classes/org/gradle/accessors/dm/LibrariesForLibs$VersionAccessors.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/dependencies-accessors/79e2cee8108cdf744781ae116ecbb135e94d5435/classes/org/gradle/accessors/dm/LibrariesForLibs.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/dependencies-accessors/79e2cee8108cdf744781ae116ecbb135e94d5435/sources/org/gradle/accessors/dm/LibrariesForLibs.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/dependencies-accessors/dependencies-accessors.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/dependencies-accessors/executionHistory.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/dependencies-accessors/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/fileChanges/last-build.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/fileHashes/fileHashes.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/7.6/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.0.0/checksums/md5-checksums.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.0.0/checksums/sha1-checksums.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.0.0/executionHistory/executionHistory.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.0.0/fileChanges/last-build.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/fileHashes.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.0.0/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.2.0/checksums/checksums.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.2.0/fileChanges/last-build.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.2.0/fileHashes/fileHashes.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.2.0/fileHashes/fileHashes.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.2.0/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/9.2.0/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/noVersion/buildLogic.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/vcs-1/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.metals/metals.lock.db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.metals/metals.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.metals/metals.mv.db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/reports/problems/problems-report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/7.6/executionHistory/executionHistory.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/7.6/executionHistory/executionHistory.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/9.0.0/executionHistory/executionHistory.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/9.2.0/executionHistory/executionHistory.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/9.2.0/executionHistory/executionHistory.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/file-system.probe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/noVersion/buildSrc.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/java/main/ComMerdeleineJavaLibraryConventionsPlugin.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/adapter-src/ComMerdeleineJavaLibraryConventionsPlugin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/adapter-src/ComMerdeleineSpringServiceConventionsPlugin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineJavaLibraryConventions$_run_closure1$_closure3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineJavaLibraryConventions$_run_closure1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineJavaLibraryConventions$_run_closure2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineJavaLibraryConventions.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineSpringServiceConventions$_run_closure1$_closure4.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineSpringServiceConventions$_run_closure1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineSpringServiceConventions$_run_closure2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineSpringServiceConventions$_run_closure3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-classes/precompiled_ComMerdeleineSpringServiceConventions.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests-staging/cp_precompiled_ComMerdeleineJavaLibraryConventions$_run_closure1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests-staging/cp_precompiled_ComMerdeleineJavaLibraryConventions.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests-staging/cp_precompiled_ComMerdeleineSpringServiceConventions$_run_closure1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests-staging/cp_precompiled_ComMerdeleineSpringServiceConventions.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests/com.merdeleine.java-library-conventions/cp_precompiled_ComMerdeleineJavaLibraryConventions$_run_closure1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests/com.merdeleine.java-library-conventions/cp_precompiled_ComMerdeleineJavaLibraryConventions.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests/com.merdeleine.java-library-conventions/metadata.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests/com.merdeleine.spring-service-conventions/cp_precompiled_ComMerdeleineSpringServiceConventions$_run_closure1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests/com.merdeleine.spring-service-conventions/cp_precompiled_ComMerdeleineSpringServiceConventions.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/output/plugin-requests/com.merdeleine.spring-service-conventions/metadata.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.java-library-conventions/precompiled_ComMerdeleineJavaLibraryConventions$_run_closure1$_closure3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.java-library-conventions/precompiled_ComMerdeleineJavaLibraryConventions$_run_closure1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.java-library-conventions/precompiled_ComMerdeleineJavaLibraryConventions$_run_closure2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.java-library-conventions/precompiled_ComMerdeleineJavaLibraryConventions.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.spring-service-conventions/precompiled_ComMerdeleineSpringServiceConventions$_run_closure1$_closure4.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.spring-service-conventions/precompiled_ComMerdeleineSpringServiceConventions$_run_closure1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.spring-service-conventions/precompiled_ComMerdeleineSpringServiceConventions$_run_closure2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.spring-service-conventions/precompiled_ComMerdeleineSpringServiceConventions$_run_closure3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/classes/com.merdeleine.spring-service-conventions/precompiled_ComMerdeleineSpringServiceConventions.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/metadata/com.merdeleine.java-library-conventions/metadata.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/groovy-dsl-plugins/work/metadata/com.merdeleine.spring-service-conventions/metadata.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/libs/buildSrc.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/pluginDescriptors/com.merdeleine.java-library-conventions.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/pluginDescriptors/com.merdeleine.spring-service-conventions.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/pluginUnderTestMetadata/plugin-under-test-metadata.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/reports/plugin-development/validation-report.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/resources/main/META-INF/gradle-plugins/com.merdeleine.java-library-conventions.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/resources/main/META-INF/gradle-plugins/com.merdeleine.spring-service-conventions.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/common-domain/build/libs/common-domain-0.1.0-SNAPSHOT.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/common-domain/build/tmp/jar/MANIFEST.MF" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/common-kafka/build/tmp/jar/MANIFEST.MF" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/classes/java/main/com/merdeleine/notification/NotificationServiceApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/classes/java/main/com/merdeleine/notification/entity/NotificationJob.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/classes/java/main/com/merdeleine/notification/enums/NotificationChannel.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/classes/java/main/com/merdeleine/notification/enums/NotificationStatus.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/classes/java/main/com/merdeleine/notification/repository/NotificationJobRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/resolvedMainClassName" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/resources/main/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/tmp/bootJar/MANIFEST.MF" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification-service/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/classes/java/main/com/merdeleine/order/OrderServiceApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/classes/java/main/com/merdeleine/order/entity/Order.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/classes/java/main/com/merdeleine/order/entity/OrderItem.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/classes/java/main/com/merdeleine/order/entity/OutboxEvent.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/classes/java/main/com/merdeleine/order/enums/OrderStatus.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/classes/java/main/com/merdeleine/order/enums/OutboxEventStatus.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/classes/java/main/com/merdeleine/order/repository/OrderItemRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/classes/java/main/com/merdeleine/order/repository/OutboxEventRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/resources/main/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/src/main/java/com/merdeleine/order/entity/OrderItem.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/src/main/java/com/merdeleine/order/entity/OutboxEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/src/main/java/com/merdeleine/order/enums/OrderStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/src/main/java/com/merdeleine/order/enums/OutboxEventStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/src/main/java/com/merdeleine/order/repository/OrderItemRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/src/main/java/com/merdeleine/order/repository/OrderRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/order-service/src/main/java/com/merdeleine/order/repository/OutboxEventRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/entity/OutboxEvent.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/entity/Payment.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/entity/PaymentTxn.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/enums/OutboxEventStatus.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/enums/PaymentProvider.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/enums/PaymentStatus.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/enums/PaymentTxnAction.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/enums/PaymentTxnResult.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/repository/OutboxEventRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/build/classes/java/main/com/merdeleine/catalog/repository/PaymentTxnRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/entity/OutboxEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/entity/Payment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/entity/PaymentTxn.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/enums/OutboxEventStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/enums/PaymentProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/enums/PaymentStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/enums/PaymentTxnResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/repository/OutboxEventRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/repository/PaymentRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/src/main/java/com/merdeleine/catalog/repository/PaymentTxnRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/classes/java/main/com/merdeleine/production/ProductionPlanningServiceApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/classes/java/main/com/merdeleine/production/entity/Batch.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/classes/java/main/com/merdeleine/production/entity/BatchOrderLink.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/classes/java/main/com/merdeleine/production/entity/BatchSchedule.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/classes/java/main/com/merdeleine/production/enums/BatchStatus.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/classes/java/main/com/merdeleine/production/repository/BatchOrderLinkRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/classes/java/main/com/merdeleine/production/repository/BatchRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/classes/java/main/com/merdeleine/production/repository/BatchScheduleRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/build/tmp/compileJava/compileTransaction/stash-dir/ProductionServiceApplication.class.uniqueId0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/src/main/java/com/merdeleine/production/entity/Batch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/src/main/java/com/merdeleine/production/entity/BatchOrderLink.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/src/main/java/com/merdeleine/production/entity/BatchSchedule.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/src/main/java/com/merdeleine/production/repository/BatchOrderLinkRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/src/main/java/com/merdeleine/production/repository/BatchRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-planning-service/src/main/java/com/merdeleine/production/repository/BatchScheduleRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-service/build/classes/java/main/com/merdeleine/production/ProductionServiceApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-service/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-service/src/main/java/com/merdeleine/production/entity/WorkOrder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-service/src/main/java/com/merdeleine/production/enums/WorkOrderStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-service/src/main/java/com/merdeleine/production/enums/WorkStepStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/production-service/src/main/java/com/merdeleine/production/repository/WorkOrderRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/threshold-service/src/main/java/com/merdeleine/production/entity/BatchCounter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/threshold-service/src/main/java/com/merdeleine/production/entity/CounterEventLog.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/threshold-service/src/main/java/com/merdeleine/production/enums/BatchCounterStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/threshold-service/src/main/java/com/merdeleine/production/repository/BatchCounterRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/threshold-service/src/main/java/com/merdeleine/production/repository/CounterEventLogRepository.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Coding/repository/merdeleine-commerce" value="38R6vKqIVR4l2flcnzEPQiW6GDV" />
+    </persistenceIdMap>
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;wayne2743&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/wayne2743/merdeleine-commerce.git&quot;,
+    &quot;accountId&quot;: &quot;be0c23d7-f378-4541-bb88-f460410c7439&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="38R6vKqIVR4l2flcnzEPQiW6GDV" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Coding/repository/merdeleine-commerce/services&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Coding\repository\merdeleine-commerce\services" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.NotificationServiceApplication">
+    <configuration name="CatalogServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="merdeleine-commerce.services.catalog-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.merdeleine.catalog.CatalogServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NotificationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="merdeleine-commerce.services.notification-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.merdeleine.notification.NotificationServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OrderServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="merdeleine-commerce.services.order-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.merdeleine.order.OrderServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PaymentServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="merdeleine-commerce.services.payment-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.merdeleine.catalog.PaymentServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ProductionPlanningServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="merdeleine-commerce.services.production-planning-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.merdeleine.production.ProductionPlanningServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ProductionServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="merdeleine-commerce.services.production-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.merdeleine.production.ProductionServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ThresholdServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="merdeleine-commerce.services.threshold-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.merdeleine.production.ThresholdServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="61175c6c-a985-42b3-8928-d332de43ea2f" name="Changes" comment="" />
+      <created>1768750265677</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1768750265677</updated>
+      <workItem from="1768750266817" duration="4709000" />
+      <workItem from="1768984308588" duration="7104000" />
+      <workItem from="1769015089194" duration="6035000" />
+      <workItem from="1769056349410" duration="1254000" />
+      <workItem from="1769063412804" duration="8495000" />
+    </task>
+    <task id="LOCAL-00001" summary="construct db fundamental function.">
+      <option name="closed" value="true" />
+      <created>1769075081193</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1769075081193</updated>
+    </task>
+    <task id="LOCAL-00002" summary="add gitignore file">
+      <option name="closed" value="true" />
+      <created>1769075226817</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1769075226817</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="construct db fundamental function." />
+    <MESSAGE value="add gitignore file" />
+    <option name="LAST_COMMIT_MESSAGE" value="add gitignore file" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

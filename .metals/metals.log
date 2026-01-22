@@ -1,0 +1,51 @@
+2026.01.22 16:44:09 INFO  Started: Metals version 1.6.4 in folders 'C:\Coding\repository\merdeleine-commerce' for client Cursor 1.105.1.
+2026.01.22 16:44:09 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.01.22 16:50:19 WARN  no build target for: C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OutboxEvent.java
+2026.01.22 16:51:16 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\enums\OrderStatus.java. Using fallback presentation compiler.
+2026.01.22 16:51:17 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\enums\OrderStatus.java. Using fallback presentation compiler.
+2026.01.22 16:51:26 WARN  no build target for: C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\enums\OrderStatus.java
+2026.01.22 16:51:26 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\enums\OrderStatus.java. Using fallback presentation compiler.
+2026.01.22 16:51:27 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\enums\OrderStatus.java. Using fallback presentation compiler.
+1月 22, 2026 4:51:27 下午 org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+警告: Unmatched cancel notification for request id 12
+2026.01.22 16:51:27 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\enums\OutboxEventStatus.java. Using fallback presentation compiler.
+1月 22, 2026 4:51:27 下午 org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+警告: Unmatched cancel notification for request id 17
+2026.01.22 16:51:27 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\enums\OutboxEventStatus.java. Using fallback presentation compiler.
+2026.01.22 16:51:27 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\Order.java. Using fallback presentation compiler.
+2026.01.22 16:51:27 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\Order.java. Using fallback presentation compiler.
+2026.01.22 16:51:28 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OrderItem.java. Using fallback presentation compiler.
+2026.01.22 16:51:28 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OrderItem.java. Using fallback presentation compiler.
+2026.01.22 16:51:30 WARN  no build target for: C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OutboxEvent.java
+2026.01.22 16:51:30 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OutboxEvent.java. Using fallback presentation compiler.
+2026.01.22 16:51:30 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OutboxEvent.java. Using fallback presentation compiler.
+2026.01.22 16:51:30 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\repository\OrderRepository.java. Using fallback presentation compiler.
+2026.01.22 16:51:31 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\repository\OrderRepository.java. Using fallback presentation compiler.
+2026.01.22 16:51:31 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\repository\OrderItemRepository.java. Using fallback presentation compiler.
+2026.01.22 16:51:32 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\repository\OrderItemRepository.java. Using fallback presentation compiler.
+2026.01.22 16:51:33 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\repository\OutboxEventRepository.java. Using fallback presentation compiler.
+2026.01.22 16:51:33 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\repository\OutboxEventRepository.java. Using fallback presentation compiler.
+2026.01.22 16:52:16 WARN  no build target for: C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OutboxEvent.java
+2026.01.22 16:52:16 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OutboxEvent.java. Using fallback presentation compiler.
+2026.01.22 16:52:16 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OutboxEvent.java. Using fallback presentation compiler.
+2026.01.22 16:52:17 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\OutboxEvent.java. Using fallback presentation compiler.
+1月 22, 2026 4:52:27 下午 org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+警告: Unmatched cancel notification for request id 86
+1月 22, 2026 4:52:27 下午 org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+警告: Unmatched cancel notification for request id 87
+2026.01.22 16:52:41 WARN  no build target for: C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\Order.java
+2026.01.22 16:52:41 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\Order.java. Using fallback presentation compiler.
+2026.01.22 16:52:41 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\order-service\src\main\java\com\merdeleine\order\entity\Order.java. Using fallback presentation compiler.
+2026.01.22 16:59:40 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentStatus.java. Using fallback presentation compiler.
+2026.01.22 16:59:40 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentStatus.java. Using fallback presentation compiler.
+2026.01.22 16:59:49 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentProvider.java. Using fallback presentation compiler.
+2026.01.22 16:59:49 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentProvider.java. Using fallback presentation compiler.
+2026.01.22 17:00:02 WARN  no build target for: C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentStatus.java
+2026.01.22 17:00:02 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentStatus.java. Using fallback presentation compiler.
+2026.01.22 17:00:02 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentStatus.java. Using fallback presentation compiler.
+2026.01.22 17:00:03 WARN  no build target for: C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentProvider.java
+2026.01.22 17:00:02 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentProvider.java. Using fallback presentation compiler.
+2026.01.22 17:00:03 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentProvider.java. Using fallback presentation compiler.
+2026.01.22 17:00:06 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentTxnAction.java. Using fallback presentation compiler.
+2026.01.22 17:00:06 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentTxnAction.java. Using fallback presentation compiler.
+2026.01.22 17:33:56 INFO  no build target found for C:\Coding\repository\merdeleine-commerce\services\payment-service\src\main\java\com\merdeleine\catalog\enums\PaymentTxnAction.java. Using fallback presentation compiler.
