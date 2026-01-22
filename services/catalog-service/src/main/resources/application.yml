@@ -1,13 +1,13 @@
 server:
-  port: 8083
+  port: 8081
 
 spring:
   application:
-    name: order-service
+    name: catalog-service
   kafka:
     bootstrap-servers: localhost:9092
   datasource:
-    url: jdbc:postgresql://localhost:5432/order_db
+    url: jdbc:postgresql://localhost:5432/notification_db
     username: merdeleine
     password: merdeleine_pw
     driver-class-name: org.postgresql.Driver

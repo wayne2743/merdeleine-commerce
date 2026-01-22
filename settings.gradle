@@ -3,7 +3,11 @@ rootProject.name = "merdeleine-commerce"
 include(
         "libs:common-domain",
         "libs:common-kafka",
+        "services:catalog-service",
+        "services:notification-service",
         "services:order-service",
+        "services:payment-service",
+        "services:production-planning-service",
         "services:production-service",
-        "services:notification-service"
+        "services:threshold-service"
 )
