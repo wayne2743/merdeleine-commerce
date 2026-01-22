@@ -12,14 +12,14 @@ Thumbs.db
 ####################################
 # Build output
 ####################################
-/build/
+**/build/
 /out/
 /target/
 
 ####################################
 # Gradle
 ####################################
-.gradle/
+**/.gradle/
 !gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
 
