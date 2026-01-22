@@ -1,8 +1,0 @@
-server:
-  port: 8081
-
-spring:
-  application:
-    name: catalog-service
-  kafka:
-    bootstrap-servers: localhost:9092
