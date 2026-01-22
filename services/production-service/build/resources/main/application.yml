@@ -1,13 +1,13 @@
 server:
-  port: 8087
+  port: 8086
 
 spring:
   application:
-    name: threshold-service
+    name: production-service
   kafka:
     bootstrap-servers: localhost:9092
   datasource:
-    url: jdbc:postgresql://localhost:5432/threshold_db
+    url: jdbc:postgresql://localhost:5432/production_db
     username: merdeleine
     password: merdeleine_pw
     driver-class-name: org.postgresql.Driver
