@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16-alpine:///testdb
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop

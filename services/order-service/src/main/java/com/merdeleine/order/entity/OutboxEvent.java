@@ -1,8 +1,11 @@
 package com.merdeleine.order.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.merdeleine.order.enums.OutboxEventStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -26,8 +29,9 @@ public class OutboxEvent {
     @Column(name = "event_type", nullable = false, length = 100)
     private String eventType;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "payload", nullable = false, columnDefinition = "JSONB")
-    private String payload;
+    private JsonNode payload;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
@@ -45,7 +49,7 @@ public class OutboxEvent {
     }
 
     public OutboxEvent(UUID id, String aggregateType, UUID aggregateId, 
-                       String eventType, String payload, OutboxEventStatus status) {
+                       String eventType, JsonNode payload, OutboxEventStatus status) {
         this.id = id;
         this.aggregateType = aggregateType;
         this.aggregateId = aggregateId;
@@ -55,6 +59,7 @@ public class OutboxEvent {
     }
 
     // Getters and Setters
+
     public UUID getId() {
         return id;
     }
@@ -87,11 +92,11 @@ public class OutboxEvent {
         this.eventType = eventType;
     }
 
-    public String getPayload() {
+    public JsonNode getPayload() {
         return payload;
     }
 
-    public void setPayload(String payload) {
+    public void setPayload(JsonNode payload) {
         this.payload = payload;
     }
 
