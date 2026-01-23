@@ -7,7 +7,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
   datasource:
-    url: jdbc:postgresql://localhost:5432/notification_db
+    url: jdbc:postgresql://localhost:5432/catalog_db
     username: merdeleine
     password: merdeleine_pw
     driver-class-name: org.postgresql.Driver
