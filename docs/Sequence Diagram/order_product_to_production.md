@@ -15,15 +15,23 @@ sequenceDiagram
   participant NOTI as Notification
   participant PRD as Production
 
-  Customer->>GW: 瀏覽商品/檔期
-  GW->>CAT: GET /products /sell-windows
-  CAT-->>GW: 商品+門檻規則
-  GW-->>Customer: 顯示商品
+  Admin->>+GW: 建立商品/檔期
+  GW->>+CAT: POST /products /sell-windows
+  CAT->>+K: publish threshold.created
+  K-->>-CAT: threshold_id
+  CAT-->>-GW: 建立成功/失敗
+  GW-->>-Admin: 建立成功/失敗
 
-  Customer->>GW: 下單(不付款) 預約名額
-  GW->>ORD: POST /orders (RESERVED)
-  ORD-->>GW: order_id
-  ORD->>K: publish order.reserved
+  Customer->>+GW: 瀏覽商品/檔期
+  GW->>+CAT: GET /products /sell-windows
+  CAT-->>-GW: 商品+門檻規則
+  GW-->>-Customer: 顯示商品
+
+  Customer->>+GW: 下單(不付款) 預約名額
+  GW->>+ORD: POST /orders (RESERVED)
+  ORD->>+K: publish order.reserved
+  ORD->>-GW: order_id
+  GW->>-Customer: 下單完成
 
   K-->>AGG: order.reserved
   AGG->>AGG: 聚合 reserved_qty / 判斷門檻
@@ -37,9 +45,11 @@ sequenceDiagram
     AGG-->>AGG: 繼續累積
   end
 
-  Admin->>GW: 後台確認接單/排程
-  GW->>PLN: POST /batches/{id}/confirm
+  Admin->>+GW: 後台確認接單/排程
+  GW->>+PLN: POST /batches/{id}/confirm
   PLN->>K: publish batch.confirmed
+  PLN->>-GW: ok
+  GW-->>-Admin: 已確認
 
   K-->>ORD: batch.confirmed
   ORD->>K: publish payment.requested (付款期限/連結)
@@ -53,6 +63,7 @@ sequenceDiagram
 
   K-->>PRD: order.paid
   PRD->>PRD: 建工單/開始生產
+  PRD-->>K:
 
 ```
 
