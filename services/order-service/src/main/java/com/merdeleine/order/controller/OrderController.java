@@ -1,13 +1,12 @@
 package com.merdeleine.order.controller;
 
-import com.merdeleine.order.dto.*;
+import com.merdeleine.order.dto.CreateOrderRequest;
+import com.merdeleine.order.dto.OrderResponse;
+import com.merdeleine.order.dto.UpdateOrderRequest;
 import com.merdeleine.order.service.OrderService;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,31 +20,25 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponse> create(@RequestBody @Valid OrderCreateRequest req) {
-        OrderResponse res = orderService.create(req);
-        return ResponseEntity
-                .created(URI.create("/api/orders/" + res.id()))
-                .body(res);
+    public OrderResponse create(@Valid @RequestBody CreateOrderRequest request) {
+        return orderService.create(request);
     }
 
-    @GetMapping("/{id}")
-    public OrderResponse get(@PathVariable UUID id) {
-        return orderService.get(id);
+    @GetMapping("/{orderId}")
+    public OrderResponse get(@PathVariable UUID orderId) {
+        return orderService.get(orderId);
     }
 
-    @GetMapping
-    public List<OrderResponse> list() {
-        return orderService.list();
+    @PutMapping("/{orderId}")
+    public OrderResponse update(
+            @PathVariable UUID orderId,
+            @Valid @RequestBody UpdateOrderRequest request
+    ) {
+        return orderService.update(orderId, request);
     }
 
-    @PutMapping("/{id}")
-    public OrderResponse update(@PathVariable UUID id, @RequestBody @Valid OrderUpdateRequest req) {
-        return orderService.update(id, req);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        orderService.delete(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/{orderId}")
+    public void cancel(@PathVariable UUID orderId) {
+        orderService.cancel(orderId);
     }
 }

@@ -1,7 +1,6 @@
 package com.merdeleine.messaging;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public record OrderEvent(
@@ -9,8 +8,8 @@ public record OrderEvent(
         String eventType,            // "order.quantity_committed.v1"
         UUID orderId,
         UUID sellWindowId,
-        List<Line> lines,
+        UUID productId,
+        UUID variantId,
+        int quantity,
         OffsetDateTime occurredAt
-) {
-    public record Line(UUID productId, UUID variantId, int quantity) {}
-}
+) {}

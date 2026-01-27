@@ -11,11 +11,9 @@ public class OrderEventMapper {
                 "order.quantity_committed.v1",
                 order.getId(),
                 order.getSellWindowId(),
-                order.getItems().stream().map(item -> new OrderEvent.Line(
-                        item.getProductId(),
-                        item.getVariantId(),
-                        item.getQuantity()
-                )).toList(),
+                order.getItem().getProductId(),
+                order.getItem().getVariantId(),
+                order.getItem().getQuantity(),
                 java.time.OffsetDateTime.now()
         );
     }

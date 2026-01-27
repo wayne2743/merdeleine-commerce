@@ -6,8 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -57,8 +55,13 @@ public class Order {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items = new ArrayList<>();
+    @OneToOne(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private OrderItem item;
 
     // Constructors
     public Order() {
@@ -74,12 +77,27 @@ public class Order {
         this.currency = currency;
     }
 
-    public void clearItems() {
-        for (OrderItem item : items) item.setOrder(null);
-        items.clear();
+    /* ---------- domain methods ---------- */
+
+    public void setItem(OrderItem item) {
+        if (this.item != null) {
+            this.item.setOrder(null);
+        }
+        this.item = item;
+        if (item != null) {
+            item.setOrder(this);
+        }
     }
 
-    // Getters and Setters
+    public void clearItem() {
+        if (this.item != null) {
+            this.item.setOrder(null);
+            this.item = null;
+        }
+    }
+
+    /* ---------- getters / setters ---------- */
+
     public UUID getId() {
         return id;
     }
@@ -184,21 +202,7 @@ public class Order {
         this.updatedAt = updatedAt;
     }
 
-    public List<OrderItem> getItems() {
-        return items;
-    }
-
-    public void setItems(List<OrderItem> items) {
-        this.items = items;
-    }
-
-    public void addItem(OrderItem item) {
-        items.add(item);
-        item.setOrder(this);
-    }
-
-    public void removeItem(OrderItem item) {
-        items.remove(item);
-        item.setOrder(null);
+    public OrderItem getItem() {
+        return item;
     }
 }

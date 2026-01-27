@@ -12,8 +12,12 @@ public class OrderItem {
     @Column(name = "id", columnDefinition = "UUID")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false, foreignKey = @ForeignKey(name = "fk_order_item_order"))
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "order_id",
+            nullable = false,
+            unique = true   //  一張 order 只能對一筆 item
+    )
     private Order order;
 
     @Column(name = "product_id", nullable = false, columnDefinition = "UUID")

@@ -1,22 +1,25 @@
 package com.merdeleine.order.dto;
 
+import com.merdeleine.order.enums.OrderStatus;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public record OrderResponse(
-        UUID id,
+
+        UUID orderId,
         String orderNo,
-        UUID customerId,
+        OrderStatus status,
+
         UUID sellWindowId,
-        String status,
+
+        UUID productId,
+        UUID variantId,
+        Integer quantity,
+        Integer unitPriceCents,
+        Integer subtotalCents,
+
         Integer totalAmountCents,
         String currency,
-        String contactName,
-        String contactPhone,
-        String contactEmail,
-        String shippingAddress,
-        OffsetDateTime createdAt,
-        OffsetDateTime updatedAt,
-        List<OrderItemResponse> items
+
+        OffsetDateTime createdAt
 ) {}
