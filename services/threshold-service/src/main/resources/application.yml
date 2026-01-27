@@ -10,8 +10,8 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.value.default.type: com.merdeleine.production.messaging.OrderEvent
-        spring.json.trusted.packages: com.merdeleine.production.messaging
+        spring.json.value.default.type: com.merdeleine.messaging.OrderEvent
+        spring.json.trusted.packages: com.merdeleine.messaging
       group-id: order-consumer-group
       auto-offset-reset: earliest
       enable-auto-commit: false

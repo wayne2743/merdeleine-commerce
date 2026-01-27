@@ -25,6 +25,10 @@ spring:
   jackson:
     time-zone: UTC
 
+threshold-service:
+  base-url: http://localhost:8087
+
+
 logging:
   level:
     org.hibernate.SQL: debug

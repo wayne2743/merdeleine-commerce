@@ -1,8 +1,10 @@
 package com.merdeleine.catalog.service;
 
+import com.merdeleine.catalog.client.ThresholdServiceClient;
 import com.merdeleine.catalog.domain.ProductSellWindow;
 import com.merdeleine.catalog.domain.SellWindow;
 import com.merdeleine.catalog.dto.ProductSellWindowDto;
+import com.merdeleine.catalog.dto.threshold.BatchCounterRequest;
 import com.merdeleine.catalog.entity.Product;
 import com.merdeleine.catalog.exception.BadRequestException;
 import com.merdeleine.catalog.exception.NotFoundException;
@@ -22,13 +24,15 @@ public class ProductSellWindowService {
     private final ProductSellWindowRepository pswRepository;
     private final SellWindowRepository sellWindowRepository;
     private final EntityManager entityManager;
+    private final ThresholdServiceClient thresholdClient;
 
     public ProductSellWindowService(ProductSellWindowRepository pswRepository,
                                     SellWindowRepository sellWindowRepository,
-                                    EntityManager entityManager) {
+                                    EntityManager entityManager, ThresholdServiceClient thresholdClient) {
         this.pswRepository = pswRepository;
         this.sellWindowRepository = sellWindowRepository;
         this.entityManager = entityManager;
+        this.thresholdClient = thresholdClient;
     }
 
     @Transactional
@@ -67,6 +71,7 @@ public class ProductSellWindowService {
             e.setEnabled(req.getEnabled());
         }
 
+        onProductSellWindowCreated(req.getSellWindowId(), req.getProductId(), req.getThresholdQty());
         return toResponse(pswRepository.save(e));
     }
 
@@ -135,5 +140,17 @@ public class ProductSellWindowService {
                 e.getShipDays(),
                 e.isEnabled()
         );
+    }
+
+
+    private void onProductSellWindowCreated(UUID sellWindowId, UUID productId, int thresholdQty) {
+
+        BatchCounterRequest req = new BatchCounterRequest();
+        req.setSellWindowId(sellWindowId);
+        req.setProductId(productId);
+        req.setThresholdQty(thresholdQty);
+        req.setStatus("OPEN");
+
+        thresholdClient.createBatchCounter(req);
     }
 }
