@@ -74,6 +74,11 @@ public class Order {
         this.currency = currency;
     }
 
+    public void clearItems() {
+        for (OrderItem item : items) item.setOrder(null);
+        items.clear();
+    }
+
     // Getters and Setters
     public UUID getId() {
         return id;
