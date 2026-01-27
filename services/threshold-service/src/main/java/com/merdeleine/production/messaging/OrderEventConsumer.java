@@ -27,8 +27,8 @@ public class OrderEventConsumer {
     public void onMessage(OrderEvent orderEvent, Acknowledgment ack) {
         log.info("orderEvent:" +orderEvent.toString());
 
-        counterEventLogRepository.saveFromOrderEvent(orderEvent);
-        batchCounterRepository.save();
+//        counterEventLogRepository.saveFromOrderEvent(orderEvent);
+//        batchCounterRepository.save();
         ack.acknowledge();
     }
 }
