@@ -3,6 +3,9 @@ plugins {
 }
 
 dependencies {
+
+    // ✅ 讓 common-kafka 也吃到 Spring Boot 的版本管理（跟 services 一致）
+    api platform("org.springframework.boot:spring-boot-dependencies:3.4.1")
     api "org.springframework.kafka:spring-kafka"
     api "com.fasterxml.jackson.core:jackson-databind"
 

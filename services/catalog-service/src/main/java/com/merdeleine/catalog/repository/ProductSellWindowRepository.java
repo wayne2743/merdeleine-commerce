@@ -16,4 +16,7 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
     List<ProductSellWindow> findBySellWindowId(UUID sellWindowId);
     Optional<ProductSellWindow> findByProductIdAndSellWindowId(UUID productId, UUID sellWindowId);
     List<ProductSellWindow> findByEnabled(boolean enabled);
+    Optional<ProductSellWindow> findByProduct_IdAndSellWindow_Id(UUID productId, UUID sellWindowId);
+    List<ProductSellWindow> findByProduct_Id(UUID productId);
+    List<ProductSellWindow> findBySellWindow_Id(UUID sellWindowId);
 }

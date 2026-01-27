@@ -3,8 +3,6 @@ package com.merdeleine.production.repository;
 import com.merdeleine.production.entity.BatchCounter;
 import com.merdeleine.production.enums.BatchCounterStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,4 +19,6 @@ public interface BatchCounterRepository extends JpaRepository<BatchCounter, UUID
     List<BatchCounter> findByProductId(UUID productId);
 
     List<BatchCounter> findByStatus(BatchCounterStatus status);
+
+    boolean existsBySellWindowIdAndProductId(UUID sellWindowId, UUID productId);
 }

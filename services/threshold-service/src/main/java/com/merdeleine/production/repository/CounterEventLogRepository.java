@@ -16,4 +16,8 @@ public interface CounterEventLogRepository extends JpaRepository<CounterEventLog
 
     @Query("SELECT cel FROM CounterEventLog cel WHERE cel.sourceEventId = :sourceEventId")
     List<CounterEventLog> findBySourceEventId(@Param("sourceEventId") UUID sourceEventId);
+
+    boolean existsBySourceEventId(UUID sourceEventId);
+
+    List<CounterEventLog> findByCounter_IdOrderByCreatedAtAsc(UUID counterId);
 }

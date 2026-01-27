@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface SellWindowRepository extends JpaRepository<SellWindow, UUID> {
     Optional<SellWindow> findByName(String name);
+    boolean existsByName(String name);
 }
