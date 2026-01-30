@@ -1,18 +1,18 @@
 package com.merdeleine.production.mapper;
 
-import com.merdeleine.messaging.OrderEvent;
+import com.merdeleine.messaging.OrderAccumulatedEvent;
 import com.merdeleine.production.entity.CounterEventLog;
 
 import java.util.UUID;
 
 public class CounterEventLogMapper {
 
-    public CounterEventLog toCounterEventLog(OrderEvent orderEvent) {
+    public CounterEventLog toCounterEventLog(OrderAccumulatedEvent orderAccumulatedEvent) {
         return new CounterEventLog(
                 UUID.randomUUID(),
-                orderEvent.eventType(),
-                orderEvent.eventId(),
-                orderEvent.quantity()
+                orderAccumulatedEvent.eventType(),
+                orderAccumulatedEvent.eventId(),
+                orderAccumulatedEvent.quantity()
         );
     }
 }

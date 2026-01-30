@@ -1,16 +1,22 @@
 package com.merdeleine.production.messaging;
 
-import com.merdeleine.messaging.OrderEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merdeleine.messaging.OrderAccumulatedEvent;
 import com.merdeleine.production.entity.BatchCounter;
+import com.merdeleine.production.entity.OutboxEvent;
+import com.merdeleine.production.enums.OutboxEventStatus;
 import com.merdeleine.production.mapper.CounterEventLogMapper;
 import com.merdeleine.production.repository.BatchCounterRepository;
 import com.merdeleine.production.repository.CounterEventLogRepository;
+import com.merdeleine.production.repository.OutboxEventRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class OrderEventConsumer {
@@ -19,32 +25,55 @@ public class OrderEventConsumer {
 
     private final BatchCounterRepository batchCounterRepository;
     private final CounterEventLogRepository counterEventLogRepository;
+    private final OutboxEventRepository outboxEventRepository;
+    private final ObjectMapper objectMapper;
 
 
-    public OrderEventConsumer(BatchCounterRepository batchCounterRepository, CounterEventLogRepository counterEventLogRepository) {
+
+    public OrderEventConsumer(BatchCounterRepository batchCounterRepository, CounterEventLogRepository counterEventLogRepository, OutboxEventRepository outboxEventRepository, ObjectMapper objectMapper) {
         this.batchCounterRepository = batchCounterRepository;
         this.counterEventLogRepository = counterEventLogRepository;
+        this.outboxEventRepository = outboxEventRepository;
+        this.objectMapper = objectMapper;
     }
 
     @KafkaListener(topics = "${kafka.topic.order-events:order.events.v1}")
     @Transactional
-    public void onMessage(OrderEvent orderEvent, Acknowledgment ack) {
-        log.info("orderEvent:" +orderEvent.toString());
+    public void onMessage(OrderAccumulatedEvent orderAccumulatedEvent, Acknowledgment ack) {
+        log.info("orderEvent:" + orderAccumulatedEvent.toString());
 
 
-        counterEventLogRepository.save(new CounterEventLogMapper().toCounterEventLog(orderEvent));
+        counterEventLogRepository.save(new CounterEventLogMapper().toCounterEventLog(orderAccumulatedEvent));
         BatchCounter batchCounter = batchCounterRepository
-                .findBySellWindowIdAndProductId(orderEvent.sellWindowId(), orderEvent.productId())
+                .findBySellWindowIdAndProductId(orderAccumulatedEvent.sellWindowId(), orderAccumulatedEvent.productId())
                 .orElseThrow(() -> new IllegalStateException(
                         String.format(
                             "BatchCounter not found for sellWindowId=%s, productId=%s",
-                            orderEvent.sellWindowId(),
-                            orderEvent.productId()
+                            orderAccumulatedEvent.sellWindowId(),
+                            orderAccumulatedEvent.productId()
                         )
                     )
                 );
-        batchCounter.setPaidQty(batchCounter.getPaidQty() + orderEvent.quantity());
+        batchCounter.setPaidQty(batchCounter.getPaidQty() + orderAccumulatedEvent.quantity());
 
         ack.acknowledge();
+    }
+
+
+
+    private void writeOutbox(String aggregateType, UUID aggregateId, String eventType, Object payloadObj) {
+        try {
+            OutboxEvent evt = new OutboxEvent();
+            evt.setId(UUID.randomUUID());
+            evt.setAggregateType(aggregateType);
+            evt.setAggregateId(aggregateId);
+            evt.setEventType(eventType);
+            evt.setPayload(objectMapper.valueToTree(payloadObj));
+            evt.setStatus(OutboxEventStatus.NEW);
+            outboxEventRepository.save(evt);
+        } catch (Exception e) {
+            // 讓 transaction rollback，確保「業務寫入 + outbox」同生共死
+            throw new RuntimeException("Failed to write outbox event", e);
+        }
     }
 }

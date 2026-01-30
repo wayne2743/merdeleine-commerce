@@ -1,7 +1,7 @@
 package com.merdeleine.production.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.merdeleine.order.enums.OutboxEventStatus;
+import com.merdeleine.production.enums.OutboxEventStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
