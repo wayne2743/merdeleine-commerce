@@ -36,19 +36,15 @@ CREATE TABLE product_sell_window (
                                      id UUID PRIMARY KEY,
                                      product_id UUID NOT NULL,
                                      sell_window_id UUID NOT NULL,
-
-                                     threshold_qty INTEGER NOT NULL CHECK (threshold_qty >= 0),
+                                     min_total_qty INTEGER NOT NULL CHECK (min_total_qty >= 0),
                                      max_total_qty INTEGER,
                                      lead_days INTEGER,
                                      ship_days INTEGER,
-                                     enabled BOOLEAN NOT NULL DEFAULT true,
-
+                                     is_closed BOOLEAN NOT NULL DEFAULT true,
                                      CONSTRAINT fk_psw_product
                                          FOREIGN KEY (product_id) REFERENCES product(id),
-
                                      CONSTRAINT fk_psw_sell_window
                                          FOREIGN KEY (sell_window_id) REFERENCES sell_window(id),
-
                                      CONSTRAINT uq_product_sell_window
                                          UNIQUE (product_id, sell_window_id)
 );

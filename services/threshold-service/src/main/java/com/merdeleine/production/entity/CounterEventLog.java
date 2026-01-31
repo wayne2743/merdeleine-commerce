@@ -35,8 +35,9 @@ public class CounterEventLog {
     public CounterEventLog() {
     }
 
-    public CounterEventLog(UUID id, String sourceEventType, UUID sourceEventId, Integer deltaQty) {
+    public CounterEventLog(UUID id, BatchCounter batchCounter, String sourceEventType, UUID sourceEventId, Integer deltaQty) {
         this.id = id;
+        this.counter = batchCounter;
         this.sourceEventType = sourceEventType;
         this.sourceEventId = sourceEventId;
         this.deltaQty = deltaQty;

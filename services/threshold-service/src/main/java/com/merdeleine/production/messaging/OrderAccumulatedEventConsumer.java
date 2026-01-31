@@ -2,10 +2,13 @@ package com.merdeleine.production.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.messaging.OrderAccumulatedEvent;
+import com.merdeleine.messaging.ThresholdReachedEvent;
 import com.merdeleine.production.entity.BatchCounter;
 import com.merdeleine.production.entity.OutboxEvent;
+import com.merdeleine.production.enums.BatchCounterStatus;
 import com.merdeleine.production.enums.OutboxEventStatus;
 import com.merdeleine.production.mapper.CounterEventLogMapper;
+import com.merdeleine.production.mapper.ThresholdEventMapper;
 import com.merdeleine.production.repository.BatchCounterRepository;
 import com.merdeleine.production.repository.CounterEventLogRepository;
 import com.merdeleine.production.repository.OutboxEventRepository;
@@ -19,9 +22,9 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class OrderEventConsumer {
+public class OrderAccumulatedEventConsumer {
 
-    private static final Logger log = LoggerFactory.getLogger(OrderEventConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderAccumulatedEventConsumer.class);
 
     private final BatchCounterRepository batchCounterRepository;
     private final CounterEventLogRepository counterEventLogRepository;
@@ -30,20 +33,25 @@ public class OrderEventConsumer {
 
 
 
-    public OrderEventConsumer(BatchCounterRepository batchCounterRepository, CounterEventLogRepository counterEventLogRepository, OutboxEventRepository outboxEventRepository, ObjectMapper objectMapper) {
+    public OrderAccumulatedEventConsumer(BatchCounterRepository batchCounterRepository, CounterEventLogRepository counterEventLogRepository, OutboxEventRepository outboxEventRepository, ObjectMapper objectMapper) {
         this.batchCounterRepository = batchCounterRepository;
         this.counterEventLogRepository = counterEventLogRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "${kafka.topic.order-events:order.events.v1}")
+    @KafkaListener(topics = "${kafka.topic.order-events:order.accumulated.events.v1}")
     @Transactional
     public void onMessage(OrderAccumulatedEvent orderAccumulatedEvent, Acknowledgment ack) {
-        log.info("orderEvent:" + orderAccumulatedEvent.toString());
+        log.info("OrderAccumulatedEvent:" + orderAccumulatedEvent.toString());
+
+        if(counterEventLogRepository.existsBySourceEventId(orderAccumulatedEvent.eventId())){
+            log.info("Duplicate event detected, skipping processing for eventId: " + orderAccumulatedEvent.eventId());
+            ack.acknowledge();
+            return;
+        }
 
 
-        counterEventLogRepository.save(new CounterEventLogMapper().toCounterEventLog(orderAccumulatedEvent));
         BatchCounter batchCounter = batchCounterRepository
                 .findBySellWindowIdAndProductId(orderAccumulatedEvent.sellWindowId(), orderAccumulatedEvent.productId())
                 .orElseThrow(() -> new IllegalStateException(
@@ -54,8 +62,21 @@ public class OrderEventConsumer {
                         )
                     )
                 );
-        batchCounter.setPaidQty(batchCounter.getPaidQty() + orderAccumulatedEvent.quantity());
 
+        counterEventLogRepository
+                .save(new CounterEventLogMapper().toCounterEventLog(orderAccumulatedEvent, batchCounter));
+
+        int newPaidQty = batchCounter.getPaidQty() + orderAccumulatedEvent.quantity();
+        batchCounter.setPaidQty(newPaidQty);
+        if(newPaidQty >= batchCounter.getThresholdQty()){
+            batchCounter.setStatus(BatchCounterStatus.REACHED);
+            writeOutbox(
+                    "BATCHCOUNTER",
+                    batchCounter.getId(),
+                    "threshold.reached.v1",
+                    new ThresholdEventMapper().toThresholdReachedEvent()
+            );
+        }
         ack.acknowledge();
     }
 

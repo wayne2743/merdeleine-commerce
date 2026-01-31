@@ -25,6 +25,14 @@ spring:
   jackson:
     time-zone: UTC
 
+ app:
+  kafka:
+    topic:
+      order-events: order.accumulated.events.v1
+  outbox:
+    publish-interval-ms: 5000
+
+
 logging:
   level:
     org.hibernate.SQL: debug

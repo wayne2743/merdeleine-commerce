@@ -25,7 +25,7 @@ public class OutboxPublisher {
             OutboxEventRepository outboxRepo,
             OrderEventProducer producer,
             ObjectMapper objectMapper,
-            @Value("${app.kafka.topic.order-events:order.events.v1}") String topic
+            @Value("${app.kafka.topic.order-events:order.accumulated.events.v1}") String topic
     ) {
         this.outboxRepo = outboxRepo;
         this.producer = producer;

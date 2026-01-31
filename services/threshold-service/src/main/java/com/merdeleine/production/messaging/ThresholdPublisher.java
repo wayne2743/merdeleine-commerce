@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class ThresholdPublisher {
@@ -37,7 +36,7 @@ public class ThresholdPublisher {
     @Scheduled(fixedDelayString = "${app.outbox.publish-interval-ms:1000}")
     @Transactional
     public void publish() {
-        List<OutboxEvent> events = outboxEventRepository.findTop100ByStatusOrderByCreatedAtAsc(OutboxEventStatus.NEW);
+        List<OutboxEvent> events = outboxEventRepository.findTop100ByStatusAndEventTypeOrderByCreatedAtAsc(OutboxEventStatus.NEW, "threshold.reached.v1");
 
         for (OutboxEvent e : events) {
             try {
