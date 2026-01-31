@@ -25,7 +25,7 @@ spring:
   jackson:
     time-zone: UTC
 
- app:
+app:
   kafka:
     topic:
       order-events: order.accumulated.events.v1

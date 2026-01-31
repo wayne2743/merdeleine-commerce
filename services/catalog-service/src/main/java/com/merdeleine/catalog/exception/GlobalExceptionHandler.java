@@ -2,6 +2,8 @@ package com.merdeleine.catalog.exception;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,7 +14,7 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 
     @ExceptionHandler(NotFoundException.class)
@@ -32,20 +34,18 @@ public class GlobalExceptionHandler {
 
         List<ApiErrorResponse.FieldViolation> errors =
                 ex.getBindingResult().getFieldErrors().stream()
-                        .map(err -> new ApiErrorResponse.FieldViolation(err.getField(), err.getDefaultMessage()))
+                        .map(err -> new ApiErrorResponse.FieldViolation(
+                                err.getField(),
+                                err.getDefaultMessage()
+                        ))
                         .toList();
-
-        // 如果你也有 class-level 的 @Valid 驗證（例如 A <= B）
-        List<ApiErrorResponse.FieldViolation> globalErrors =
-                ex.getBindingResult().getGlobalErrors().stream()
-                        .map(err -> new ApiErrorResponse.FieldViolation(err.getObjectName(), err.getDefaultMessage()))
-                        .toList();
-
-        List<ApiErrorResponse.FieldViolation> all = new java.util.ArrayList<>(errors);
-        all.addAll(globalErrors);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiErrorResponse.of("VALIDATION_ERROR", "Validation failed", all));
+                .body(ApiErrorResponse.of(
+                        "VALIDATION_ERROR",
+                        "Validation failed",
+                        errors
+                ));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -61,6 +61,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception ex) {
+        log.error("Unhandled exception", ex); // <--- 這行會把真正原因印出來
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiErrorResponse.of("INTERNAL_ERROR", "Unexpected error"));
     }

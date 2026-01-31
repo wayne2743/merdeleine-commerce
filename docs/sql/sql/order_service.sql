@@ -54,3 +54,28 @@ CREATE TABLE outbox_event (
 
 CREATE INDEX idx_outbox_event_status
     ON outbox_event (status, created_at);
+
+
+CREATE TABLE sell_window_quota (
+                                   id UUID PRIMARY KEY,
+                                   sell_window_id UUID NOT NULL,
+                                   product_id UUID NOT NULL,
+                                   variant_id UUID NOT NULL,
+
+                                   min_qty INT NOT NULL DEFAULT 0,
+                                   max_qty INT NOT NULL,
+
+                                   sold_qty INT NOT NULL DEFAULT 0,
+
+                                   status VARCHAR(20) NOT NULL DEFAULT 'OPEN'
+                                       CHECK (status IN ('OPEN', 'CLOSED')),
+
+                                   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+                                   CONSTRAINT uq_quota UNIQUE (sell_window_id, product_id, variant_id),
+                                   CONSTRAINT ck_qty_nonneg CHECK (sold_qty >= 0),
+                                   CONSTRAINT ck_max_positive CHECK (max_qty > 0)
+);
+
+CREATE INDEX idx_quota_lookup
+    ON sell_window_quota (sell_window_id, product_id, variant_id);

@@ -23,15 +23,26 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
+    private final QuotaService quotaService;
 
-    public OrderService(OrderRepository orderRepository, OutboxEventRepository outboxEventRepository, ObjectMapper objectMapper) {
+    public OrderService(OrderRepository orderRepository, OutboxEventRepository outboxEventRepository, ObjectMapper objectMapper, QuotaService quotaService) {
         this.orderRepository = orderRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.objectMapper = objectMapper;
+        this.quotaService = quotaService;
     }
 
     @Transactional
     public OrderResponse create(CreateOrderRequest request) {
+
+        // 1) 先原子扣額度（防超賣）
+        quotaService.reserveOrThrow(
+                request.sellWindowId(),
+                request.productId(),
+                request.variantId(),
+                request.quantity()
+        );
+
         Order order = OrderMapper.toEntity(request);
         Order saved = orderRepository.save(order);
         writeOutbox(

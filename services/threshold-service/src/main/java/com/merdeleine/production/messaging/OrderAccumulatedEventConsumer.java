@@ -2,7 +2,6 @@ package com.merdeleine.production.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.messaging.OrderAccumulatedEvent;
-import com.merdeleine.messaging.ThresholdReachedEvent;
 import com.merdeleine.production.entity.BatchCounter;
 import com.merdeleine.production.entity.OutboxEvent;
 import com.merdeleine.production.enums.BatchCounterStatus;
@@ -74,7 +73,7 @@ public class OrderAccumulatedEventConsumer {
                     "BATCHCOUNTER",
                     batchCounter.getId(),
                     "threshold.reached.v1",
-                    new ThresholdEventMapper().toThresholdReachedEvent()
+                    new ThresholdEventMapper().toThresholdReachedEvent(batchCounter)
             );
         }
         ack.acknowledge();
