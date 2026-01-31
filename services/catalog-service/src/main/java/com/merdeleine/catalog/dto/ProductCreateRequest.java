@@ -1,6 +1,7 @@
 package com.merdeleine.catalog.dto;
 
-import com.merdeleine.catalog.domain.ProductStatus;
+
+import com.merdeleine.catalog.enums.ProductStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 

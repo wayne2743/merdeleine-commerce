@@ -1,6 +1,5 @@
-package com.merdeleine.catalog.domain;
+package com.merdeleine.catalog.entity;
 
-import com.merdeleine.catalog.entity.Product;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -19,10 +18,10 @@ public class ProductSellWindow {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sell_window_id", nullable = false)
-    private com.merdeleine.catalog.domain.SellWindow sellWindow;
+    private SellWindow sellWindow;
 
     @Column(nullable = false)
-    private int thresholdQty;
+    private int minTotalQty;
 
     @Column
     private Integer maxTotalQty;
@@ -34,7 +33,7 @@ public class ProductSellWindow {
     private Integer shipDays;
 
     @Column(nullable = false)
-    private boolean enabled = true;
+    private boolean isClosed = true;
 
     @PrePersist
     void prePersist() {
@@ -42,6 +41,7 @@ public class ProductSellWindow {
     }
 
     // getters / setters
+
 
     public UUID getId() {
         return id;
@@ -59,20 +59,20 @@ public class ProductSellWindow {
         this.product = product;
     }
 
-    public com.merdeleine.catalog.domain.SellWindow getSellWindow() {
+    public SellWindow getSellWindow() {
         return sellWindow;
     }
 
-    public void setSellWindow(com.merdeleine.catalog.domain.SellWindow sellWindow) {
+    public void setSellWindow(SellWindow sellWindow) {
         this.sellWindow = sellWindow;
     }
 
-    public int getThresholdQty() {
-        return thresholdQty;
+    public int getMinTotalQty() {
+        return minTotalQty;
     }
 
-    public void setThresholdQty(int thresholdQty) {
-        this.thresholdQty = thresholdQty;
+    public void setMinTotalQty(int minTotalQty) {
+        this.minTotalQty = minTotalQty;
     }
 
     public Integer getMaxTotalQty() {
@@ -99,11 +99,11 @@ public class ProductSellWindow {
         this.shipDays = shipDays;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public boolean isClosed() {
+        return isClosed;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setClosed(boolean closed) {
+        isClosed = closed;
     }
 }

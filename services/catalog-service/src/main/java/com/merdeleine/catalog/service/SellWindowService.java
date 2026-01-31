@@ -1,7 +1,8 @@
 package com.merdeleine.catalog.service;
 
-import com.merdeleine.catalog.domain.SellWindow;
+
 import com.merdeleine.catalog.dto.SellWindowDto;
+import com.merdeleine.catalog.entity.SellWindow;
 import com.merdeleine.catalog.exception.BadRequestException;
 import com.merdeleine.catalog.exception.NotFoundException;
 import com.merdeleine.catalog.repository.SellWindowRepository;

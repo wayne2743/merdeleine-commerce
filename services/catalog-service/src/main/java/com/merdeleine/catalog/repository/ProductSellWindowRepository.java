@@ -1,8 +1,9 @@
 package com.merdeleine.catalog.repository;
 
-import com.merdeleine.catalog.domain.ProductSellWindow;
+
 import com.merdeleine.catalog.entity.Product;
-import com.merdeleine.catalog.domain.SellWindow;
+import com.merdeleine.catalog.entity.ProductSellWindow;
+import com.merdeleine.catalog.entity.SellWindow;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
     List<ProductSellWindow> findBySellWindow(SellWindow sellWindow);
     List<ProductSellWindow> findBySellWindowId(UUID sellWindowId);
     Optional<ProductSellWindow> findByProductIdAndSellWindowId(UUID productId, UUID sellWindowId);
-    List<ProductSellWindow> findByEnabled(boolean enabled);
+    List<ProductSellWindow> findByIsClosed(boolean isClosed);
     Optional<ProductSellWindow> findByProduct_IdAndSellWindow_Id(UUID productId, UUID sellWindowId);
     List<ProductSellWindow> findByProduct_Id(UUID productId);
     List<ProductSellWindow> findBySellWindow_Id(UUID sellWindowId);

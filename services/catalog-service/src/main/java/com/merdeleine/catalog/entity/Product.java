@@ -1,8 +1,7 @@
 package com.merdeleine.catalog.entity;
 
+import com.merdeleine.catalog.enums.ProductStatus;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -24,7 +23,7 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private com.merdeleine.catalog.domain.ProductStatus status;
+    private ProductStatus status;
 
     @Column(nullable = false)
     private OffsetDateTime createdAt;
@@ -38,7 +37,7 @@ public class Product {
     @PrePersist
     void prePersist() {
         if (id == null) id = UUID.randomUUID();
-        if (status == null) status = com.merdeleine.catalog.domain.ProductStatus.DRAFT;
+        if (status == null) status = ProductStatus.DRAFT;
         createdAt = OffsetDateTime.now();
         updatedAt = createdAt;
     }
@@ -73,11 +72,11 @@ public class Product {
         this.description = description;
     }
 
-    public com.merdeleine.catalog.domain.ProductStatus getStatus() {
+    public ProductStatus getStatus() {
         return status;
     }
 
-    public void setStatus(com.merdeleine.catalog.domain.ProductStatus status) {
+    public void setStatus(ProductStatus status) {
         this.status = status;
     }
 

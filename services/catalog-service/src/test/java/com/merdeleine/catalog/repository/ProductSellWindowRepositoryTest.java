@@ -1,9 +1,10 @@
 package com.merdeleine.catalog.repository;
 
-import com.merdeleine.catalog.domain.ProductSellWindow;
-import com.merdeleine.catalog.domain.SellWindow;
+
 import com.merdeleine.catalog.entity.Product;
-import com.merdeleine.catalog.domain.ProductStatus;
+import com.merdeleine.catalog.entity.ProductSellWindow;
+import com.merdeleine.catalog.entity.SellWindow;
+import com.merdeleine.catalog.enums.ProductStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,20 +87,20 @@ class ProductSellWindowRepositoryTest {
         psw.setId(UUID.randomUUID());
         psw.setProduct(testProduct);
         psw.setSellWindow(testSellWindow);
-        psw.setThresholdQty(100);
+        psw.setMinTotalQty(100);
         psw.setMaxTotalQty(500);
         psw.setLeadDays(7);
         psw.setShipDays(14);
-        psw.setEnabled(true);
+        psw.setClosed(true);
         
         ProductSellWindow saved = productSellWindowRepository.saveAndFlush(psw);
         
         assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getThresholdQty()).isEqualTo(100);
+        assertThat(saved.getMinTotalQty()).isEqualTo(100);
         assertThat(saved.getMaxTotalQty()).isEqualTo(500);
         assertThat(saved.getLeadDays()).isEqualTo(7);
         assertThat(saved.getShipDays()).isEqualTo(14);
-        assertThat(saved.isEnabled()).isTrue();
+        assertThat(saved.isClosed()).isTrue();
     }
 
     @Test
@@ -114,7 +115,7 @@ class ProductSellWindowRepositoryTest {
         List<ProductSellWindow> psws = productSellWindowRepository.findByProductId(productId);
         
         assertThat(psws).hasSize(2);
-        assertThat(psws).extracting(ProductSellWindow::getThresholdQty)
+        assertThat(psws).extracting(ProductSellWindow::getMinTotalQty)
                 .containsExactlyInAnyOrder(100, 200);
     }
 
@@ -141,16 +142,16 @@ class ProductSellWindowRepositoryTest {
                 .findByProductIdAndSellWindowId(productId, sellWindowId);
         
         assertThat(found).isPresent();
-        assertThat(found.get().getThresholdQty()).isEqualTo(100);
+        assertThat(found.get().getMinTotalQty()).isEqualTo(100);
     }
 
     @Test
     void testFindByEnabled() {
         ProductSellWindow enabledPsw = createProductSellWindow(testProduct, testSellWindow, 100);
-        enabledPsw.setEnabled(true);
+        enabledPsw.setClosed(true);
         
         ProductSellWindow disabledPsw = createProductSellWindow(testProduct, createSellWindow("Disabled"), 200);
-        disabledPsw.setEnabled(false);
+        disabledPsw.setClosed(false);
         
         entityManager.persistAndFlush(enabledPsw);
         entityManager.persistAndFlush(disabledPsw);
@@ -158,7 +159,7 @@ class ProductSellWindowRepositoryTest {
         List<ProductSellWindow> enabledPsws = productSellWindowRepository.findByEnabled(true);
         
         assertThat(enabledPsws).hasSize(1);
-        assertThat(enabledPsws.get(0).isEnabled()).isTrue();
+        assertThat(enabledPsws.get(0).isClosed()).isTrue();
     }
 
     @Test
@@ -178,11 +179,11 @@ class ProductSellWindowRepositoryTest {
         psw.setId(UUID.randomUUID());
         psw.setProduct(product);
         psw.setSellWindow(sellWindow);
-        psw.setThresholdQty(thresholdQty);
+        psw.setMinTotalQty(thresholdQty);
         psw.setMaxTotalQty(500);
         psw.setLeadDays(7);
         psw.setShipDays(14);
-        psw.setEnabled(true);
+        psw.setClosed(true);
         return psw;
     }
 

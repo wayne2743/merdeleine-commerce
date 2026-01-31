@@ -1,7 +1,7 @@
 package com.merdeleine.catalog.repository;
 
 import com.merdeleine.catalog.entity.Product;
-import com.merdeleine.catalog.domain.ProductStatus;
+import com.merdeleine.catalog.enums.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

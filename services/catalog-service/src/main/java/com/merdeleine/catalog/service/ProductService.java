@@ -1,10 +1,11 @@
 package com.merdeleine.catalog.service;
 
-import com.merdeleine.catalog.domain.ProductStatus;
+
 import com.merdeleine.catalog.dto.ProductCreateRequest;
 import com.merdeleine.catalog.dto.ProductResponse;
 import com.merdeleine.catalog.dto.ProductUpdateRequest;
 import com.merdeleine.catalog.entity.Product;
+import com.merdeleine.catalog.enums.ProductStatus;
 import com.merdeleine.catalog.exception.ProductNotFoundException;
 import com.merdeleine.catalog.repository.ProductRepository;
 import org.springframework.stereotype.Service;

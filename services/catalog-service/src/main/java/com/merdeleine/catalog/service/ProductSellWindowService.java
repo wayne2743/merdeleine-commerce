@@ -1,11 +1,11 @@
 package com.merdeleine.catalog.service;
 
 import com.merdeleine.catalog.client.ThresholdServiceClient;
-import com.merdeleine.catalog.domain.ProductSellWindow;
-import com.merdeleine.catalog.domain.SellWindow;
 import com.merdeleine.catalog.dto.ProductSellWindowDto;
 import com.merdeleine.catalog.dto.threshold.BatchCounterRequest;
 import com.merdeleine.catalog.entity.Product;
+import com.merdeleine.catalog.entity.ProductSellWindow;
+import com.merdeleine.catalog.entity.SellWindow;
 import com.merdeleine.catalog.exception.BadRequestException;
 import com.merdeleine.catalog.exception.NotFoundException;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
@@ -41,8 +41,8 @@ public class ProductSellWindowService {
         if (req.getSellWindowId() == null) throw new BadRequestException("sellWindowId is required");
         if (req.getLeadDays() != null && req.getLeadDays() < 0) throw new BadRequestException("leadDays must be >= 0");
         if (req.getShipDays() != null && req.getShipDays() < 0) throw new BadRequestException("shipDays must be >= 0");
-        if (req.getMaxTotalQty() != null && req.getMaxTotalQty() < req.getThresholdQty()) {
-            throw new BadRequestException("maxTotalQty must be >= thresholdQty");
+        if (req.getMaxTotalQty() != null && req.getMaxTotalQty() < req.getMinTotalQty()) {
+            throw new BadRequestException("maxTotalQty must be >= minTotalQty");
         }
 
         // 防重：同一個 product + sellWindow 只能一筆
@@ -63,15 +63,15 @@ public class ProductSellWindowService {
         ProductSellWindow e = new ProductSellWindow();
         e.setProduct(product);
         e.setSellWindow(sellWindow);
-        e.setThresholdQty(req.getThresholdQty());
+        e.setMinTotalQty(req.getMinTotalQty());
         e.setMaxTotalQty(req.getMaxTotalQty());
         e.setLeadDays(req.getLeadDays());
         e.setShipDays(req.getShipDays());
-        if (req.getEnabled() != null) {
-            e.setEnabled(req.getEnabled());
+        if (req.isClosed() != null) {
+            e.setClosed(req.isClosed());
         }
 
-        onProductSellWindowCreated(req.getSellWindowId(), req.getProductId(), req.getThresholdQty());
+        onProductSellWindowCreated(req.getSellWindowId(), req.getProductId(), req.getMinTotalQty());
         return toResponse(pswRepository.save(e));
     }
 
@@ -100,22 +100,22 @@ public class ProductSellWindowService {
 
     @Transactional
     public ProductSellWindowDto.Response update(UUID id, ProductSellWindowDto.UpdateRequest req) {
-        if (req.getThresholdQty() <= 0) throw new BadRequestException("thresholdQty must be >= 1");
+        if (req.getMinTotalQty() <= 0) throw new BadRequestException("minTotalQty must be > 0");
         if (req.getLeadDays() != null && req.getLeadDays() < 0) throw new BadRequestException("leadDays must be >= 0");
         if (req.getShipDays() != null && req.getShipDays() < 0) throw new BadRequestException("shipDays must be >= 0");
-        if (req.getMaxTotalQty() != null && req.getMaxTotalQty() < req.getThresholdQty()) {
+        if (req.getMaxTotalQty() != null && req.getMaxTotalQty() < req.getMinTotalQty()) {
             throw new BadRequestException("maxTotalQty must be >= thresholdQty");
         }
 
         ProductSellWindow e = pswRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("ProductSellWindow not found: " + id));
 
-        e.setThresholdQty(req.getThresholdQty());
+        e.setMinTotalQty(req.getMinTotalQty());
         e.setMaxTotalQty(req.getMaxTotalQty());
         e.setLeadDays(req.getLeadDays());
         e.setShipDays(req.getShipDays());
         if (req.getEnabled() != null) {
-            e.setEnabled(req.getEnabled());
+            e.setClosed(!req.getEnabled());
         }
 
         return toResponse(pswRepository.save(e));
@@ -134,11 +134,11 @@ public class ProductSellWindowService {
                 e.getId(),
                 e.getProduct().getId(),
                 e.getSellWindow().getId(),
-                e.getThresholdQty(),
+                e.getMinTotalQty(),
                 e.getMaxTotalQty(),
                 e.getLeadDays(),
                 e.getShipDays(),
-                e.isEnabled()
+                e.isClosed()
         );
     }
 

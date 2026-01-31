@@ -1,6 +1,7 @@
 package com.merdeleine.catalog.repository;
 
-import com.merdeleine.catalog.domain.SellWindow;
+
+import com.merdeleine.catalog.entity.SellWindow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

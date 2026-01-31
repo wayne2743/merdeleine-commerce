@@ -17,7 +17,7 @@ public final class ProductSellWindowDto {
         private UUID sellWindowId;
 
         @Min(1)
-        private int thresholdQty;
+        private int minTotalQty;
 
         private Integer maxTotalQty;
 
@@ -27,7 +27,7 @@ public final class ProductSellWindowDto {
         @Min(0)
         private Integer shipDays;
 
-        private Boolean enabled;
+        private Boolean isClosed;
 
         public CreateRequest() {}
 
@@ -37,8 +37,13 @@ public final class ProductSellWindowDto {
         public UUID getSellWindowId() { return sellWindowId; }
         public void setSellWindowId(UUID sellWindowId) { this.sellWindowId = sellWindowId; }
 
-        public int getThresholdQty() { return thresholdQty; }
-        public void setThresholdQty(int thresholdQty) { this.thresholdQty = thresholdQty; }
+        public int getMinTotalQty() {
+            return minTotalQty;
+        }
+
+        public void setMinTotalQty(int minTotalQty) {
+            this.minTotalQty = minTotalQty;
+        }
 
         public Integer getMaxTotalQty() { return maxTotalQty; }
         public void setMaxTotalQty(Integer maxTotalQty) { this.maxTotalQty = maxTotalQty; }
@@ -49,13 +54,13 @@ public final class ProductSellWindowDto {
         public Integer getShipDays() { return shipDays; }
         public void setShipDays(Integer shipDays) { this.shipDays = shipDays; }
 
-        public Boolean getEnabled() { return enabled; }
-        public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+        public Boolean isClosed() { return isClosed; }
+        public void setIsClosed(Boolean isClosed) { this.isClosed = isClosed; }
     }
 
     public static final class UpdateRequest {
         @Min(1)
-        private int thresholdQty;
+        private int minTotalQty;
 
         private Integer maxTotalQty;
 
@@ -65,12 +70,12 @@ public final class ProductSellWindowDto {
         @Min(0)
         private Integer shipDays;
 
-        private Boolean enabled;
+        private Boolean isClosed;
 
         public UpdateRequest() {}
 
-        public int getThresholdQty() { return thresholdQty; }
-        public void setThresholdQty(int thresholdQty) { this.thresholdQty = thresholdQty; }
+        public int getMinTotalQty() { return minTotalQty; }
+        public void setMinTotalQty(int minTotalQty) { this.minTotalQty = minTotalQty; }
 
         public Integer getMaxTotalQty() { return maxTotalQty; }
         public void setMaxTotalQty(Integer maxTotalQty) { this.maxTotalQty = maxTotalQty; }
@@ -81,8 +86,8 @@ public final class ProductSellWindowDto {
         public Integer getShipDays() { return shipDays; }
         public void setShipDays(Integer shipDays) { this.shipDays = shipDays; }
 
-        public Boolean getEnabled() { return enabled; }
-        public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+        public Boolean getEnabled() { return isClosed; }
+        public void setEnabled(Boolean isClosed) { this.isClosed = isClosed; }
     }
 
     public static final class Response {

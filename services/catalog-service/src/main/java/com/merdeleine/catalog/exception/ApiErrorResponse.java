@@ -1,31 +1,33 @@
 package com.merdeleine.catalog.exception;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public class ApiErrorResponse {
 
     private String code;
     private String message;
     private OffsetDateTime timestamp;
+    private List<FieldViolation> errors;
 
     public ApiErrorResponse() {}
 
-    public ApiErrorResponse(String code, String message, OffsetDateTime timestamp) {
-        this.code = code;
-        this.message = message;
-        this.timestamp = timestamp;
+    public static ApiErrorResponse of(String code, String message, List<FieldViolation> errors) {
+        ApiErrorResponse r = new ApiErrorResponse();
+        r.code = code;
+        r.message = message;
+        r.timestamp = OffsetDateTime.now();
+        r.errors = errors;
+        return r;
     }
 
     public static ApiErrorResponse of(String code, String message) {
-        return new ApiErrorResponse(code, message, OffsetDateTime.now());
+        ApiErrorResponse r = new ApiErrorResponse();
+        r.code = code;
+        r.message = message;
+        r.timestamp = OffsetDateTime.now();
+        return r;
     }
 
-    public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
-
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
-
-    public OffsetDateTime getTimestamp() { return timestamp; }
-    public void setTimestamp(OffsetDateTime timestamp) { this.timestamp = timestamp; }
+    public record FieldViolation(String field, String message) {}
 }

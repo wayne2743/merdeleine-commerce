@@ -1,6 +1,7 @@
 package com.merdeleine.catalog.repository;
 
-import com.merdeleine.catalog.domain.SellWindow;
+
+import com.merdeleine.catalog.entity.SellWindow;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

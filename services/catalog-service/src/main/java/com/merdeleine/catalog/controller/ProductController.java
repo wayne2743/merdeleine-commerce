@@ -1,9 +1,9 @@
 package com.merdeleine.catalog.controller;
 
-import com.merdeleine.catalog.domain.ProductStatus;
 import com.merdeleine.catalog.dto.ProductCreateRequest;
 import com.merdeleine.catalog.dto.ProductResponse;
 import com.merdeleine.catalog.dto.ProductUpdateRequest;
+import com.merdeleine.catalog.enums.ProductStatus;
 import com.merdeleine.catalog.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

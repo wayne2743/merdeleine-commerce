@@ -1,4 +1,4 @@
-package com.merdeleine.catalog.domain;
+package com.merdeleine.catalog.entity;
 
 import jakarta.persistence.*;
 
