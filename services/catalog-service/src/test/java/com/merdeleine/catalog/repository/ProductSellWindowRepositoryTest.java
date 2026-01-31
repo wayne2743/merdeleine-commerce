@@ -156,7 +156,7 @@ class ProductSellWindowRepositoryTest {
         entityManager.persistAndFlush(enabledPsw);
         entityManager.persistAndFlush(disabledPsw);
         
-        List<ProductSellWindow> enabledPsws = productSellWindowRepository.findByEnabled(true);
+        List<ProductSellWindow> enabledPsws = productSellWindowRepository.findByIsClosed(true);
         
         assertThat(enabledPsws).hasSize(1);
         assertThat(enabledPsws.get(0).isClosed()).isTrue();
