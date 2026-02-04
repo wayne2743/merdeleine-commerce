@@ -51,12 +51,10 @@ class OrderItemRepositoryTest {
 
     private Order testOrder;
     private UUID productId;
-    private UUID variantId;
 
     @BeforeEach
     void setUp() {
         productId = UUID.randomUUID();
-        variantId = UUID.randomUUID();
 
         testOrder = new Order();
         testOrder.setId(UUID.randomUUID());
@@ -74,7 +72,6 @@ class OrderItemRepositoryTest {
         item.setId(UUID.randomUUID());
         item.setOrder(testOrder);
         item.setProductId(productId);
-        item.setVariantId(variantId);
         item.setQuantity(2);
         item.setUnitPriceCents(5000);
         item.setSubtotalCents(10000);
@@ -88,7 +85,7 @@ class OrderItemRepositoryTest {
 
     @Test
     void testFindByOrderId() {
-        OrderItem item1 = createOrderItem(testOrder, productId, variantId, 2);
+        OrderItem item1 = createOrderItem(testOrder, 2);
         OrderItem item2 = createOrderItem(testOrder, UUID.randomUUID(), UUID.randomUUID(), 1);
         
         entityManager.persistAndFlush(item1);
@@ -101,7 +98,7 @@ class OrderItemRepositoryTest {
 
     @Test
     void testFindByProductId() {
-        OrderItem item1 = createOrderItem(testOrder, productId, variantId, 2);
+        OrderItem item1 = createOrderItem(testOrder, productId, 2);
         Order order2 = createTestOrder("ORD-002");
         OrderItem item2 = createOrderItem(order2, productId, UUID.randomUUID(), 1);
         
@@ -114,20 +111,10 @@ class OrderItemRepositoryTest {
         assertThat(items).extracting(OrderItem::getProductId).containsOnly(productId);
     }
 
-    @Test
-    void testFindByVariantId() {
-        OrderItem item = createOrderItem(testOrder, productId, variantId, 2);
-        entityManager.persistAndFlush(item);
-        
-        List<OrderItem> items = orderItemRepository.findByVariantId(variantId);
-        
-        assertThat(items).hasSize(1);
-        assertThat(items.get(0).getVariantId()).isEqualTo(variantId);
-    }
 
     @Test
     void testDeleteOrderItem() {
-        OrderItem item = createOrderItem(testOrder, productId, variantId, 2);
+        OrderItem item = createOrderItem(testOrder, productId, 2);
         OrderItem saved = entityManager.persistAndFlush(item);
         UUID itemId = saved.getId();
         

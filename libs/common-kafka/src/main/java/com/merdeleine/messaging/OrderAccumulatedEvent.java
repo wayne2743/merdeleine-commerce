@@ -9,7 +9,6 @@ public record OrderAccumulatedEvent(
         UUID orderId,
         UUID sellWindowId,
         UUID productId,
-        UUID variantId,
         int quantity,
         OffsetDateTime occurredAt
 ) {}

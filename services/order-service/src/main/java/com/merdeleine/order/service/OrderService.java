@@ -39,7 +39,6 @@ public class OrderService {
         quotaService.reserveOrThrow(
                 request.sellWindowId(),
                 request.productId(),
-                request.variantId(),
                 request.quantity()
         );
 

@@ -32,7 +32,6 @@ public class OrderMapper {
         OrderItem item = new OrderItem(
                 UUID.randomUUID(),
                 req.productId(),
-                req.variantId(),
                 req.quantity(),
                 req.unitPriceCents(),
                 subtotal
@@ -53,7 +52,6 @@ public class OrderMapper {
                 order.getStatus(),
                 order.getSellWindowId(),
                 item.getProductId(),
-                item.getVariantId(),
                 item.getQuantity(),
                 item.getUnitPriceCents(),
                 item.getSubtotalCents(),

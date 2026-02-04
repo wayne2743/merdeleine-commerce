@@ -18,11 +18,10 @@ public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota
             status = CASE WHEN sold_qty + :qty >= max_qty THEN 'CLOSED' ELSE status END
         WHERE sell_window_id = :sellWindowId
           AND product_id = :productId
-          AND variant_id = :variantId
           AND status = 'OPEN'
           AND sold_qty + :qty <= max_qty
         """, nativeQuery = true)
-    int tryReserve(UUID sellWindowId, UUID productId, UUID variantId, int qty);
+    int tryReserve(UUID sellWindowId, UUID productId, int qty);
 
     @Modifying
     @Query(value = """
@@ -32,8 +31,46 @@ public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota
             status = CASE WHEN sold_qty - :qty < max_qty THEN 'OPEN' ELSE status END
         WHERE sell_window_id = :sellWindowId
           AND product_id = :productId
-          AND variant_id = :variantId
           AND sold_qty - :qty >= 0
         """, nativeQuery = true)
-    int release(UUID sellWindowId, UUID productId, UUID variantId, int qty);
+    int release(UUID sellWindowId, UUID productId, int qty);
+
+
+    @Modifying
+    @Query(value = """
+        INSERT INTO sell_window_quota (
+            id,
+            sell_window_id,
+            product_id,
+            min_qty,
+            max_qty,
+            sold_qty,
+            status,
+            updated_at
+        )
+        VALUES (
+            :id,
+            :sellWindowId,
+            :productId,
+            :minQty,
+            :maxQty,
+            0,
+            'OPEN',
+            NOW()
+        )
+        ON CONFLICT (sell_window_id, product_id)
+        DO UPDATE SET
+            min_qty = EXCLUDED.min_qty,
+            max_qty = EXCLUDED.max_qty,
+            updated_at = NOW()
+        """, nativeQuery = true)
+    void upsert(
+            UUID id,
+            UUID sellWindowId,
+            UUID productId,
+            int minQty,
+            int maxQty
+    );
+
+    boolean existsBySellWindowIdAndProductId(UUID sellWindowId, UUID productId);
 }

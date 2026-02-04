@@ -1,5 +1,6 @@
 package com.merdeleine.messaging;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record SellWindowQuotaConfiguredEvent (
@@ -7,7 +8,7 @@ public record SellWindowQuotaConfiguredEvent (
         String eventType,
         UUID sellWindowId,
         UUID productId,
-        UUID variantId,
         int minQty,
-        int maxQty
+        int maxQty,
+        OffsetDateTime occurredAt
 ){}

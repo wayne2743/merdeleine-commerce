@@ -26,7 +26,6 @@ CREATE TABLE order_item (
                             order_id UUID NOT NULL,
 
                             product_id UUID NOT NULL,
-                            variant_id UUID NOT NULL,
 
                             quantity INTEGER NOT NULL CHECK (quantity > 0),
                             unit_price_cents INTEGER NOT NULL CHECK (unit_price_cents >= 0),
@@ -60,7 +59,6 @@ CREATE TABLE sell_window_quota (
                                    id UUID PRIMARY KEY,
                                    sell_window_id UUID NOT NULL,
                                    product_id UUID NOT NULL,
-                                   variant_id UUID NOT NULL,
 
                                    min_qty INT NOT NULL DEFAULT 0,
                                    max_qty INT NOT NULL,
@@ -72,10 +70,10 @@ CREATE TABLE sell_window_quota (
 
                                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-                                   CONSTRAINT uq_quota UNIQUE (sell_window_id, product_id, variant_id),
+                                   CONSTRAINT uq_quota UNIQUE (sell_window_id, product_id),
                                    CONSTRAINT ck_qty_nonneg CHECK (sold_qty >= 0),
                                    CONSTRAINT ck_max_positive CHECK (max_qty > 0)
 );
 
 CREATE INDEX idx_quota_lookup
-    ON sell_window_quota (sell_window_id, product_id, variant_id);
+    ON sell_window_quota (sell_window_id, product_id);

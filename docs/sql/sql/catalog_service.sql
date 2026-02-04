@@ -48,3 +48,23 @@ CREATE TABLE product_sell_window (
                                      CONSTRAINT uq_product_sell_window
                                          UNIQUE (product_id, sell_window_id)
 );
+
+
+CREATE TABLE outbox_event (
+                              id UUID PRIMARY KEY,
+
+                              aggregate_type VARCHAR(50) NOT NULL,   -- e.g. PRODUCT_SELL_WINDOW
+                              aggregate_id UUID NOT NULL,             -- product_sell_window.id
+
+                              event_type VARCHAR(100) NOT NULL,       -- sell_window.quota_configured.v1
+                              payload JSONB NOT NULL,
+
+                              status VARCHAR(20) NOT NULL
+                                  CHECK (status IN ('NEW', 'SENT', 'FAILED')),
+
+                              created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                              sent_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_outbox_event_status
+    ON outbox_event (status, created_at);

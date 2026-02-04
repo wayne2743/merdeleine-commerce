@@ -6,6 +6,10 @@ spring:
     name: catalog-service
   kafka:
     bootstrap-servers: localhost:9092
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
   datasource:
     url: jdbc:postgresql://localhost:5432/catalog_db
     username: merdeleine
@@ -27,6 +31,11 @@ spring:
 
 threshold-service:
   base-url: http://localhost:8087
+
+merdeleine:
+  kafka:
+    topics:
+      sell-window-quota-configured: sell-window.quota.configured.v1
 
 
 logging:

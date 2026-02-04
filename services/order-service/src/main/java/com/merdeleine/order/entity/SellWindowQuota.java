@@ -24,9 +24,6 @@ public class SellWindowQuota {
     @Column(name = "product_id", nullable = false, columnDefinition = "UUID")
     private UUID productId;
 
-    @Column(name = "variant_id", nullable = false, columnDefinition = "UUID")
-    private UUID variantId;
-
     @Column(name = "min_qty", nullable = false)
     private Integer minQty;
 
@@ -43,5 +40,69 @@ public class SellWindowQuota {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    // getters/setters 省略（或用 Lombok）
+    // Getters and Setters
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getSellWindowId() {
+        return sellWindowId;
+    }
+
+    public void setSellWindowId(UUID sellWindowId) {
+        this.sellWindowId = sellWindowId;
+    }
+
+    public UUID getProductId() {
+        return productId;
+    }
+
+    public void setProductId(UUID productId) {
+        this.productId = productId;
+    }
+
+    public Integer getMinQty() {
+        return minQty;
+    }
+
+    public void setMinQty(Integer minQty) {
+        this.minQty = minQty;
+    }
+
+    public Integer getMaxQty() {
+        return maxQty;
+    }
+
+    public void setMaxQty(Integer maxQty) {
+        this.maxQty = maxQty;
+    }
+
+    public Integer getSoldQty() {
+        return soldQty;
+    }
+
+    public void setSoldQty(Integer soldQty) {
+        this.soldQty = soldQty;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

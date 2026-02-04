@@ -15,9 +15,6 @@ public record CreateOrderRequest(
         UUID productId,
 
         @NotNull
-        UUID variantId,
-
-        @NotNull
         @Min(1)
         Integer quantity,
 

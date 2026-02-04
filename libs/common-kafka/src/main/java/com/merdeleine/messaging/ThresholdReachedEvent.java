@@ -7,5 +7,7 @@ public record ThresholdReachedEvent(
         String eventType,            // "threshold.reached.v1"
         UUID productId,
         UUID sellWindowId,
-        int totalQuantity
+        UUID counterId,
+        int totalQuantity,
+        int targetQuantity
 ){}

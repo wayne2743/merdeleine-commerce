@@ -12,7 +12,6 @@ public class OrderEventMapper {
                 order.getId(),
                 order.getSellWindowId(),
                 order.getItem().getProductId(),
-                order.getItem().getVariantId(),
                 order.getItem().getQuantity(),
                 java.time.OffsetDateTime.now()
         );

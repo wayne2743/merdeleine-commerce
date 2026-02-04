@@ -2,15 +2,14 @@ package com.merdeleine.production.repository;
 
 import com.merdeleine.production.entity.BatchOrderLink;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface BatchOrderLinkRepository extends JpaRepository<BatchOrderLink, UUID> {
-
-    List<BatchOrderLink> findByBatchId(UUID batchId);
-
-    List<BatchOrderLink> findByOrderId(UUID orderId);
+    List<BatchOrderLink> findByBatch_Id(UUID batchId);
+    Optional<BatchOrderLink> findByIdAndBatch_Id(UUID id, UUID batchId);
+    void deleteByIdAndBatch_Id(UUID id, UUID batchId);
+    boolean existsByIdAndBatch_Id(UUID id, UUID batchId);
 }

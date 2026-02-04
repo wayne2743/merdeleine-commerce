@@ -1,5 +1,6 @@
 package com.merdeleine.catalog.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.merdeleine.catalog.dto.ProductSellWindowDto;
 import com.merdeleine.catalog.service.ProductSellWindowService;
 import jakarta.validation.Valid;
@@ -21,7 +22,7 @@ public class ProductSellWindowController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProductSellWindowDto.Response create(@Valid @RequestBody ProductSellWindowDto.CreateRequest req) {
+    public ProductSellWindowDto.Response create(@Valid @RequestBody ProductSellWindowDto.CreateRequest req) throws JsonProcessingException {
         return pswService.create(req);
     }
 

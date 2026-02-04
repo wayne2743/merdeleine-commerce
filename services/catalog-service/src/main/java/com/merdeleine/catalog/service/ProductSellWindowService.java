@@ -1,13 +1,19 @@
 package com.merdeleine.catalog.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.catalog.client.ThresholdServiceClient;
 import com.merdeleine.catalog.dto.ProductSellWindowDto;
 import com.merdeleine.catalog.dto.threshold.BatchCounterRequest;
+import com.merdeleine.catalog.entity.OutboxEvent;
 import com.merdeleine.catalog.entity.Product;
 import com.merdeleine.catalog.entity.ProductSellWindow;
 import com.merdeleine.catalog.entity.SellWindow;
+import com.merdeleine.catalog.enums.OutboxEventStatus;
 import com.merdeleine.catalog.exception.BadRequestException;
 import com.merdeleine.catalog.exception.NotFoundException;
+import com.merdeleine.catalog.mapper.SellWindowQuotaEventMapper;
+import com.merdeleine.catalog.repository.OutboxEventRepository;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
 import com.merdeleine.catalog.repository.SellWindowRepository;
 import jakarta.persistence.EntityManager;
@@ -25,18 +31,22 @@ public class ProductSellWindowService {
     private final SellWindowRepository sellWindowRepository;
     private final EntityManager entityManager;
     private final ThresholdServiceClient thresholdClient;
+    private final ObjectMapper objectMapper;
+    private final OutboxEventRepository outboxEventRepository;
 
     public ProductSellWindowService(ProductSellWindowRepository pswRepository,
                                     SellWindowRepository sellWindowRepository,
-                                    EntityManager entityManager, ThresholdServiceClient thresholdClient) {
+                                    EntityManager entityManager, ThresholdServiceClient thresholdClient, ObjectMapper objectMapper, OutboxEventRepository outboxEventRepository) {
         this.pswRepository = pswRepository;
         this.sellWindowRepository = sellWindowRepository;
         this.entityManager = entityManager;
         this.thresholdClient = thresholdClient;
+        this.objectMapper = objectMapper;
+        this.outboxEventRepository = outboxEventRepository;
     }
 
     @Transactional
-    public ProductSellWindowDto.Response create(ProductSellWindowDto.CreateRequest req) {
+    public ProductSellWindowDto.Response create(ProductSellWindowDto.CreateRequest req) throws JsonProcessingException {
         if (req.getProductId() == null) throw new BadRequestException("productId is required");
         if (req.getSellWindowId() == null) throw new BadRequestException("sellWindowId is required");
         if (req.getLeadDays() != null && req.getLeadDays() < 0) throw new BadRequestException("leadDays must be >= 0");
@@ -60,19 +70,30 @@ public class ProductSellWindowService {
         // 這裡用 getReference (lazy proxy)，但先 exists 檢查避免 FK 爆炸
         Product product = entityManager.getReference(Product.class, req.getProductId());
 
-        ProductSellWindow e = new ProductSellWindow();
-        e.setProduct(product);
-        e.setSellWindow(sellWindow);
-        e.setMinTotalQty(req.getMinTotalQty());
-        e.setMaxTotalQty(req.getMaxTotalQty());
-        e.setLeadDays(req.getLeadDays());
-        e.setShipDays(req.getShipDays());
+        ProductSellWindow psw = new ProductSellWindow();
+        psw.setProduct(product);
+        psw.setSellWindow(sellWindow);
+        psw.setMinTotalQty(req.getMinTotalQty());
+        psw.setMaxTotalQty(req.getMaxTotalQty());
+        psw.setLeadDays(req.getLeadDays());
+        psw.setShipDays(req.getShipDays());
         if (req.isClosed() != null) {
-            e.setClosed(req.isClosed());
+            psw.setClosed(req.isClosed());
         }
 
-        onProductSellWindowCreated(req.getSellWindowId(), req.getProductId(), req.getMinTotalQty());
-        return toResponse(pswRepository.save(e));
+        ProductSellWindow saved = pswRepository.save(psw);
+                ;
+
+        writeOutbox(
+                "PRODUCTSELLWINDOW",
+                saved.getId(),
+                "sell_window.quota_configured.v1",
+                new SellWindowQuotaEventMapper().toSellWindowQuotaConfiguredEvent(saved)
+        );
+
+        onProductSellWindowCreated(saved.getSellWindow().getId(), saved.getProduct().getId(), saved.getMinTotalQty());
+
+        return toResponse(saved);
     }
 
     @Transactional(readOnly = true)
@@ -142,7 +163,6 @@ public class ProductSellWindowService {
         );
     }
 
-
     private void onProductSellWindowCreated(UUID sellWindowId, UUID productId, int thresholdQty) {
 
         BatchCounterRequest req = new BatchCounterRequest();
@@ -153,4 +173,21 @@ public class ProductSellWindowService {
 
         thresholdClient.createBatchCounter(req);
     }
+
+    private void writeOutbox(String aggregateType, UUID aggregateId, String eventType, Object payloadObj) {
+        try {
+            OutboxEvent evt = new OutboxEvent();
+            evt.setId(UUID.randomUUID());
+            evt.setAggregateType(aggregateType);
+            evt.setAggregateId(aggregateId);
+            evt.setEventType(eventType);
+            evt.setPayload(objectMapper.valueToTree(payloadObj));
+            evt.setStatus(OutboxEventStatus.NEW);
+            outboxEventRepository.save(evt);
+        } catch (Exception e) {
+            // 讓 transaction rollback，確保「業務寫入 + outbox」同生共死
+            throw new RuntimeException("Failed to write outbox event", e);
+        }
+    }
+
 }

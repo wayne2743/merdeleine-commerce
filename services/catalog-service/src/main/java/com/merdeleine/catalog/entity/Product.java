@@ -4,7 +4,6 @@ import com.merdeleine.catalog.enums.ProductStatus;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -30,9 +29,6 @@ public class Product {
 
     @Column(nullable = false)
     private OffsetDateTime updatedAt;
-
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    private List<ProductVariant> variants;
 
     @PrePersist
     void prePersist() {
@@ -96,11 +92,4 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
-    public List<ProductVariant> getVariants() {
-        return variants;
-    }
-
-    public void setVariants(List<ProductVariant> variants) {
-        this.variants = variants;
-    }
 }

@@ -23,9 +23,6 @@ public class OrderItem {
     @Column(name = "product_id", nullable = false, columnDefinition = "UUID")
     private UUID productId;
 
-    @Column(name = "variant_id", nullable = false, columnDefinition = "UUID")
-    private UUID variantId;
-
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
@@ -39,11 +36,10 @@ public class OrderItem {
     public OrderItem() {
     }
 
-    public OrderItem(UUID id, UUID productId, UUID variantId, Integer quantity, 
+    public OrderItem(UUID id, UUID productId, Integer quantity,
                      Integer unitPriceCents, Integer subtotalCents) {
         this.id = id;
         this.productId = productId;
-        this.variantId = variantId;
         this.quantity = quantity;
         this.unitPriceCents = unitPriceCents;
         this.subtotalCents = subtotalCents;
@@ -72,14 +68,6 @@ public class OrderItem {
 
     public void setProductId(UUID productId) {
         this.productId = productId;
-    }
-
-    public UUID getVariantId() {
-        return variantId;
-    }
-
-    public void setVariantId(UUID variantId) {
-        this.variantId = variantId;
     }
 
     public Integer getQuantity() {
