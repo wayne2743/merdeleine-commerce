@@ -83,7 +83,8 @@ class WorkOrderRepositoryTest {
         List<WorkOrder> workOrders = workOrderRepository.findByBatchId(batchId);
         
         assertThat(workOrders).hasSize(2);
-        assertThat(workOrders).extracting(WorkOrder::getBatchId).containsOnly(batchId);
+        assertThat(workOrders).extracting(WorkOrder::getStatus)
+                .containsExactlyInAnyOrder(WorkOrderStatus.READY, WorkOrderStatus.IN_PROGRESS);
     }
 
     @Test

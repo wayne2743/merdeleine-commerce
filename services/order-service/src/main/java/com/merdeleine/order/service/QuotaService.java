@@ -22,7 +22,7 @@ public class QuotaService {
     public void reserveOrThrow(UUID sellWindowId, UUID productId, int qty) {
         int updated = quotaRepository.tryReserve(sellWindowId, productId, qty);
         if (updated == 0) {
-            throw new SoldOutException("Sold out or quota closed");
+            throw new SoldOutException("Sold out or quota closed or no quota for sellWindowId:" + sellWindowId + ", productId:" + productId);
         }
     }
 

@@ -25,7 +25,7 @@ public class ThresholdPublisher {
             OutboxEventRepository outboxEventRepository,
             ThresholdEventProducer producer,
             ObjectMapper objectMapper,
-            @Value("${app.kafka.topic.threshold-events:threshold.events.v1}") String topic
+            @Value("${app.kafka.topic.threshold-reached-events:threshold.reached.v1}") String topic
     ) {
         this.outboxEventRepository = outboxEventRepository;
         this.producer = producer;

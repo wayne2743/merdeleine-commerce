@@ -1,5 +1,6 @@
 package com.merdeleine.catalog.entity;
 
+import com.merdeleine.catalog.enums.SellWindowStatus;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
@@ -25,50 +26,47 @@ public class SellWindow {
     @Column(nullable = false, length = 50)
     private String timezone;
 
+    // NEW
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private SellWindowStatus status = SellWindowStatus.DRAFT;
+
+    // NEW
+    @Column(name = "closed_at")
+    private OffsetDateTime closedAt;
+
+    // NEW
+    @Version
+    @Column(nullable = false)
+    private long version;
+
     @PrePersist
     void prePersist() {
         if (id == null) id = UUID.randomUUID();
+        if (status == null) status = SellWindowStatus.DRAFT;
     }
 
     // getters / setters
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public UUID getId() {
-        return id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    public OffsetDateTime getStartAt() { return startAt; }
+    public void setStartAt(OffsetDateTime startAt) { this.startAt = startAt; }
 
-    public String getName() {
-        return name;
-    }
+    public OffsetDateTime getEndAt() { return endAt; }
+    public void setEndAt(OffsetDateTime endAt) { this.endAt = endAt; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getTimezone() { return timezone; }
+    public void setTimezone(String timezone) { this.timezone = timezone; }
 
-    public OffsetDateTime getStartAt() {
-        return startAt;
-    }
+    public SellWindowStatus getStatus() { return status; }
+    public void setStatus(SellWindowStatus status) { this.status = status; }
 
-    public void setStartAt(OffsetDateTime startAt) {
-        this.startAt = startAt;
-    }
+    public OffsetDateTime getClosedAt() { return closedAt; }
+    public void setClosedAt(OffsetDateTime closedAt) { this.closedAt = closedAt; }
 
-    public OffsetDateTime getEndAt() {
-        return endAt;
-    }
-
-    public void setEndAt(OffsetDateTime endAt) {
-        this.endAt = endAt;
-    }
-
-    public String getTimezone() {
-        return timezone;
-    }
-
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
-    }
+    public long getVersion() { return version; }
 }

@@ -8,5 +8,6 @@ public record BatchCreatedNotificationEvent(
         UUID batchId,
         UUID productId,
         UUID sellWindowId,
-        int quantity
+        int totalQuantity,
+        int targetQuantity
 ){}

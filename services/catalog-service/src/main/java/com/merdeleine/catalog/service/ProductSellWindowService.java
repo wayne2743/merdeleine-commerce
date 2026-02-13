@@ -17,6 +17,7 @@ import com.merdeleine.catalog.repository.OutboxEventRepository;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
 import com.merdeleine.catalog.repository.SellWindowRepository;
 import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,16 +34,22 @@ public class ProductSellWindowService {
     private final ThresholdServiceClient thresholdClient;
     private final ObjectMapper objectMapper;
     private final OutboxEventRepository outboxEventRepository;
+    private final String sellWindowQuotaConfiguredTopic;
 
     public ProductSellWindowService(ProductSellWindowRepository pswRepository,
                                     SellWindowRepository sellWindowRepository,
-                                    EntityManager entityManager, ThresholdServiceClient thresholdClient, ObjectMapper objectMapper, OutboxEventRepository outboxEventRepository) {
+                                    EntityManager entityManager,
+                                    ThresholdServiceClient thresholdClient,
+                                    ObjectMapper objectMapper,
+                                    OutboxEventRepository outboxEventRepository,
+                                    @Value("${merdeleine.kafka.topics.sell-window-quota-configured}") String sellWindowQuotaConfiguredTopic) {
         this.pswRepository = pswRepository;
         this.sellWindowRepository = sellWindowRepository;
         this.entityManager = entityManager;
         this.thresholdClient = thresholdClient;
         this.objectMapper = objectMapper;
         this.outboxEventRepository = outboxEventRepository;
+        this.sellWindowQuotaConfiguredTopic = sellWindowQuotaConfiguredTopic;
     }
 
     @Transactional
@@ -85,10 +92,10 @@ public class ProductSellWindowService {
                 ;
 
         writeOutbox(
-                "PRODUCTSELLWINDOW",
+                "ProductSellWindow",
                 saved.getId(),
-                "sell_window.quota_configured.v1",
-                new SellWindowQuotaEventMapper().toSellWindowQuotaConfiguredEvent(saved)
+                sellWindowQuotaConfiguredTopic,
+                new SellWindowQuotaEventMapper().toSellWindowQuotaConfiguredEvent(saved, sellWindowQuotaConfiguredTopic)
         );
 
         onProductSellWindowCreated(saved.getSellWindow().getId(), saved.getProduct().getId(), saved.getMinTotalQty());
@@ -180,9 +187,10 @@ public class ProductSellWindowService {
             evt.setId(UUID.randomUUID());
             evt.setAggregateType(aggregateType);
             evt.setAggregateId(aggregateId);
+            evt.setIdempotencyKey(eventType + ":" + aggregateId); // 簡單的 idempotency key，實際可根據需求調整
             evt.setEventType(eventType);
             evt.setPayload(objectMapper.valueToTree(payloadObj));
-            evt.setStatus(OutboxEventStatus.NEW);
+            evt.setStatus(OutboxEventStatus.PENDING);
             outboxEventRepository.save(evt);
         } catch (Exception e) {
             // 讓 transaction rollback，確保「業務寫入 + outbox」同生共死

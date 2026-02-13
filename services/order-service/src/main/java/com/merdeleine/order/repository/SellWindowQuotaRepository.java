@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota, UUID> {
@@ -73,4 +74,16 @@ public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota
     );
 
     boolean existsBySellWindowIdAndProductId(UUID sellWindowId, UUID productId);
+
+
+    @Modifying
+    @Query("""
+        update SellWindowQuota q
+        set q.status = :closedStatus, q.updatedAt = :now
+        where q.sellWindowId = :sellWindowId
+          and q.productId = :productId
+          and q.status <> :closedStatus
+    """)
+    int close(UUID sellWindowId, UUID productId, String closedStatus, OffsetDateTime now);
+
 }

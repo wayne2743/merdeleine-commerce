@@ -7,10 +7,10 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public class SellWindowQuotaEventMapper {
-    public  SellWindowQuotaConfiguredEvent toSellWindowQuotaConfiguredEvent(ProductSellWindow productSellWindow) {
+    public  SellWindowQuotaConfiguredEvent toSellWindowQuotaConfiguredEvent(ProductSellWindow productSellWindow, String eventType) {
         return new SellWindowQuotaConfiguredEvent(
                 UUID.randomUUID(),
-                "sell_window.quota_configured.v1",
+                eventType,
                 productSellWindow.getSellWindow().getId(),
                 productSellWindow.getProduct().getId(),
                 productSellWindow.getMinTotalQty(),

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.catalog.entity.OutboxEvent;
 import com.merdeleine.catalog.enums.OutboxEventStatus;
 import com.merdeleine.catalog.repository.OutboxEventRepository;
+import com.merdeleine.messaging.SellWindowClosedEvent;
 import com.merdeleine.messaging.SellWindowQuotaConfiguredEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,32 +22,40 @@ public class SellWindowQuotaOutboxPublisher {
     private final OutboxEventRepository outboxRepo;
     private final SellWindowQuotaConfiguredEventProducer producer;
     private final ObjectMapper objectMapper;
-    private final String topic;
     private final static Logger log = LoggerFactory.getLogger(SellWindowQuotaOutboxPublisher.class);
+    private final String sellWindowClosedTopic;
+    private final String sellWindowQuotaConfiguredTopic;
 
     public SellWindowQuotaOutboxPublisher(
             OutboxEventRepository outboxRepo,
             SellWindowQuotaConfiguredEventProducer producer,
             ObjectMapper objectMapper,
-            @Value("${app.kafka.topic.sell-window-quota-configured:sell-window.quota.configured.v1}") String topic
+            @Value("${merdeleine.kafka.topics.sell-window-closed}") String sellWindowClosedTopic,
+            @Value("${merdeleine.kafka.topics.sell-window-quota-configured}") String sellWindowQuotaConfiguredTopic
     ) {
         this.outboxRepo = outboxRepo;
         this.producer = producer;
         this.objectMapper = objectMapper;
-        this.topic = topic;
+        this.sellWindowClosedTopic = sellWindowClosedTopic;
+        this.sellWindowQuotaConfiguredTopic = sellWindowQuotaConfiguredTopic;
     }
 
     @Scheduled(fixedDelayString = "${app.outbox.publish-interval-ms:1000}")
     @Transactional
     public void publish() {
-        List<OutboxEvent> events = outboxRepo.findTop100ByStatusOrderByCreatedAtAsc(OutboxEventStatus.NEW);
+        List<OutboxEvent> events = outboxRepo.findTop100ByStatusOrderByCreatedAtAsc(OutboxEventStatus.PENDING);
 
         for (OutboxEvent e : events) {
             try {
-                SellWindowQuotaConfiguredEvent event = objectMapper.treeToValue(e.getPayload(), SellWindowQuotaConfiguredEvent.class);
+                Object event = null;
+                log.info("Publishing OutboxEvent id={}, type={}", e.getId(), e.getEventType());
+                if(e.getEventType().equals(sellWindowQuotaConfiguredTopic)) {
+                    event = objectMapper.treeToValue(e.getPayload(), SellWindowQuotaConfiguredEvent.class);
+                }else if (e.getEventType().equals(sellWindowClosedTopic)) {
+                    event = objectMapper.treeToValue(e.getPayload(), SellWindowClosedEvent.class);
+                }
                 String key = e.getAggregateId().toString();
-                producer.publish(topic, key, event);
-
+                producer.publish(e.getEventType(), key, event);
                 e.setStatus(OutboxEventStatus.SENT);
                 e.setSentAt(OffsetDateTime.now());
             } catch (Exception ex) {

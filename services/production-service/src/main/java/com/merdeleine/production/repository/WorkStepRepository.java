@@ -11,4 +11,9 @@ import java.util.UUID;
 public interface WorkStepRepository extends JpaRepository<WorkStep, UUID> {
 
     List<WorkStep> findByWorkOrderId(UUID workOrderId);
+
+
+    List<WorkStep> findByWorkOrder_Id(UUID workOrderId);
+
+    void deleteByWorkOrder_Id(UUID workOrderId);
 }

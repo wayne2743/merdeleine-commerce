@@ -58,6 +58,17 @@ public class NotificationJob {
         if (this.status == null) this.status = NotificationStatus.REQUESTED;
     }
 
+    public NotificationJob() {}
+
+    public NotificationJob(NotificationChannel channel, String recipient, String templateKey, Map<String, Object> payload, int retryCount, OffsetDateTime sentAt) {
+        this.channel = channel;
+        this.recipient = recipient;
+        this.templateKey = templateKey;
+        this.payload = payload;
+        this.retryCount = retryCount;
+        this.sentAt = sentAt;
+    }
+
     // ===== getter/setter =====
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }

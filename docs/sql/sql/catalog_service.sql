@@ -24,11 +24,12 @@ CREATE TABLE product_variant (
 
 
 CREATE TABLE sell_window (
-                             id UUID PRIMARY KEY,
-                             name VARCHAR(100) NOT NULL,
-                             start_at TIMESTAMPTZ NOT NULL,
-                             end_at TIMESTAMPTZ NOT NULL,
-                             timezone VARCHAR(50) NOT NULL
+                                    id uuid NOT NULL,
+                                    "name" varchar(100) NOT NULL,
+                                    start_at timestamptz NOT NULL,
+                                    end_at timestamptz NOT NULL,
+                                    timezone varchar(50) NOT NULL,
+                                    CONSTRAINT sell_window_pkey PRIMARY KEY (id)
 );
 
 
@@ -50,21 +51,18 @@ CREATE TABLE product_sell_window (
 );
 
 
-CREATE TABLE outbox_event (
-                              id UUID PRIMARY KEY,
-
-                              aggregate_type VARCHAR(50) NOT NULL,   -- e.g. PRODUCT_SELL_WINDOW
-                              aggregate_id UUID NOT NULL,             -- product_sell_window.id
-
-                              event_type VARCHAR(100) NOT NULL,       -- sell_window.quota_configured.v1
-                              payload JSONB NOT NULL,
-
-                              status VARCHAR(20) NOT NULL
-                                  CHECK (status IN ('NEW', 'SENT', 'FAILED')),
-
-                              created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                              sent_at TIMESTAMPTZ
+CREATE TABLE public.outbox_event (
+                                     id uuid NOT NULL,
+                                     aggregate_type varchar(50) NOT NULL,
+                                     aggregate_id uuid NOT NULL,
+                                     event_type varchar(100) NOT NULL,
+                                     idempotency_key varchar(200) NOT NULL,
+                                     payload jsonb NOT NULL,
+                                     status varchar(20) NOT NULL,
+                                     created_at timestamptz DEFAULT now() NOT NULL,
+                                     sent_at timestamptz NULL,
+                                     CONSTRAINT ck_outbox_status CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'SENT'::character varying, 'FAILED'::character varying])::text[]))),
+	                                 CONSTRAINT outbox_event_pkey PRIMARY KEY (id)
 );
-
-CREATE INDEX idx_outbox_event_status
-    ON outbox_event (status, created_at);
+CREATE INDEX idx_outbox_status_created_at ON public.outbox_event USING btree (status, created_at);
+CREATE UNIQUE INDEX uk_outbox_idempotency_key ON public.outbox_event USING btree (idempotency_key);

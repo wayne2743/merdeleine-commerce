@@ -45,6 +45,8 @@ app:
     topic:
       order-events: order.accumulated.events.v1
       sell-window-quota-configured: sell-window.quota.configured.v1
+      batch-confirm-events: batch.confirmed.v1
+      payment-requested-events: payment.requested.v1
   outbox:
     publish-interval-ms: 5000
 

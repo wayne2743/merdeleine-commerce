@@ -13,6 +13,7 @@ import com.merdeleine.order.mapper.OrderMapper;
 import com.merdeleine.order.repository.OrderRepository;
 import com.merdeleine.order.repository.OutboxEventRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -24,12 +25,18 @@ public class OrderService {
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
     private final QuotaService quotaService;
+    private final String sellWindowQuotaConfiguredTopic;
 
-    public OrderService(OrderRepository orderRepository, OutboxEventRepository outboxEventRepository, ObjectMapper objectMapper, QuotaService quotaService) {
+    public OrderService(OrderRepository orderRepository,
+                        OutboxEventRepository outboxEventRepository,
+                        ObjectMapper objectMapper,
+                        QuotaService quotaService,
+                        @Value("${app.outbox.event-types.sell-window-quota-configured:sell-window.quota.configured}") String sellWindowQuotaConfiguredTopic) {
         this.orderRepository = orderRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.objectMapper = objectMapper;
         this.quotaService = quotaService;
+        this.sellWindowQuotaConfiguredTopic = sellWindowQuotaConfiguredTopic;
     }
 
     @Transactional
@@ -47,7 +54,7 @@ public class OrderService {
         writeOutbox(
                 "Order",
                 saved.getId(),
-                "order.created.v1",
+                sellWindowQuotaConfiguredTopic,
                 new OrderEventMapper().toOrderEvent(saved)
         );
 

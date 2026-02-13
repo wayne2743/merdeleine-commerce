@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>預定到量通知</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC",
+            "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        h2 {
+            color: #8B5E3C;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f6f2ef;
+            width: 160px;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #B02A37;
+        }
+        .footer {
+            margin-top: 32px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h2>📦 生產預定到量通知</h2>
+
+    <p>
+        以下商品已達到預定生產數量門檻，<br/>
+        請評估並安排後續生產作業。
+    </p>
+
+    <table>
+        <tr>
+            <th>商品名稱</th>
+            <td th:text="${productName}">經典檸檬瑪德蓮</td>
+        </tr>
+        <tr>
+            <th>Sell Window</th>
+            <td th:text="${sellWindowName}">2026_CNY</td>
+        </tr>
+        <tr>
+            <th>批次編號</th>
+            <td th:text="${batchId}">BATCH-20260201-001</td>
+        </tr>
+        <tr>
+            <th>目前訂購數量</th>
+            <td>
+                <span class="highlight" th:text="${currentQty}">120</span>
+            </td>
+        </tr>
+        <tr>
+            <th>預定門檻數量</th>
+            <td th:text="${thresholdQty}">100</td>
+        </tr>
+        <tr>
+            <th>到量時間</th>
+            <td th:text="${reachedAt}">2026-02-05 14:32</td>
+        </tr>
+    </table>
+
+    <p>
+        📌 建議事項：
+    </p>
+    <ul>
+        <li>確認原料庫存與製作時程</li>
+        <li>評估是否需追加生產或備料</li>
+        <li>如有異常，請回報系統管理者</li>
+    </ul>
+
+    <div class="footer">
+        <p>
+            本通知由系統自動發送，請勿直接回覆。<br/>
+            merdeleine production system
+        </p>
+    </div>
+
+</div>
+</body>
+</html>

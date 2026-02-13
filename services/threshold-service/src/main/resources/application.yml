@@ -41,6 +41,7 @@ app:
   kafka:
     topic:
       order-events: order.accumulated.events.v1
+      threshold-reached-events: threshold.reached.v1
 
 
 logging:

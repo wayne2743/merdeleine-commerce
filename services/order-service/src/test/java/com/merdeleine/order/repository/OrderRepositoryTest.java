@@ -159,7 +159,6 @@ class OrderRepositoryTest {
         OrderItem item1 = new OrderItem();
         item1.setOrder(saved);
         item1.setProductId(UUID.randomUUID());
-        item1.setVariantId(UUID.randomUUID());
         item1.setQuantity(2);
         item1.setUnitPriceCents(5000);
         item1.setSubtotalCents(10000);
@@ -168,7 +167,6 @@ class OrderRepositoryTest {
         OrderItem item2 = new OrderItem();
         item2.setOrder(saved);
         item2.setProductId(UUID.randomUUID());
-        item2.setVariantId(UUID.randomUUID());
         item2.setQuantity(1);
         item2.setUnitPriceCents(3000);
         item2.setSubtotalCents(3000);

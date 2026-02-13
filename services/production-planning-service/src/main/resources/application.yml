@@ -6,6 +6,14 @@ spring:
     name: production-planning-service
   kafka:
     bootstrap-servers: localhost:9092
+    listener:
+      ack-mode: manual_immediate
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.merdeleine.messaging"
+        spring.json.value.default.type: "com.merdeleine.messaging.ThresholdReachedEvent"
   datasource:
     url: jdbc:postgresql://localhost:5432/production_planning_db
     username: merdeleine
@@ -24,6 +32,20 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   jackson:
     time-zone: UTC
+
+app:
+  kafka:
+    topic:
+      notification-events: batch.created.notification.v1
+      threshold-reached-events: threshold.reached.v1
+      batch-confirm-events: batch.confirmed.v1
+    consumer:
+      group-id: production-planning-service-group
+
+services:
+  order-service:
+    base-url: http://localhost:8083   # local 可換成 http://localhost:8083
+    timeout-ms: 3000
 
 logging:
   level:

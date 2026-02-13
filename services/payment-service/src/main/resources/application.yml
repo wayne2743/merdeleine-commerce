@@ -25,6 +25,29 @@ spring:
   jackson:
     time-zone: UTC
 
+app:
+  kafka:
+    consumer:
+      group-id: payment-service-group
+    topic:
+      payment-requested-events: payment.requested.v1
+      payment-created-events: payment.created.v1
+  outbox:
+    publish-interval-ms: 5000
+
+ecpay:
+  env: stage   # stage | prod
+#  merchant-id: "3490805"     # 測試用 MerchantID（你也可換成自己後台的）
+#  hash-key: "VJvftkDaKOK9hjaF"
+#  hash-iv: "a514fnShdyMpnwYx"
+  merchant-id: "2000132"     # ECPay 提供的測試 MerchantID
+  hash-key: "5294y06JbISpM5x9"
+  hash-iv: "v77hoKGq4kWx8wYH"
+
+  stage-url: "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"
+  prod-url:  "https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5"
+  public-base-url: "https://abcd-1234.ngrok-free.app"  # 換成你的 ngrok 網址
+
 logging:
   level:
     org.hibernate.SQL: debug
