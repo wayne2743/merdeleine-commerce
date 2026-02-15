@@ -33,8 +33,12 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
+          batch_size: 50 # 批次大小，根據實際情況調整
         # 建議明確指定 dialect（Hibernate 6 通常可自動判斷，不寫也行）
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        order_updates: true # 確保更新操作按順序執行，避免死鎖
+        order_inserts: true #` 確保插入操作按順序執行，避免死鎖
+
   jackson:
     time-zone: UTC
 

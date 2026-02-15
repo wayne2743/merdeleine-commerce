@@ -4,7 +4,7 @@ import com.merdeleine.production.dto.BatchCounterDto;
 import com.merdeleine.production.dto.CounterEventLogDto;
 import com.merdeleine.production.entity.BatchCounter;
 import com.merdeleine.production.entity.CounterEventLog;
-import com.merdeleine.production.enums.BatchCounterStatus;
+import com.merdeleine.production.enums.CounterStatus;
 import com.merdeleine.production.exception.BadRequestException;
 import com.merdeleine.production.exception.ConflictException;
 import com.merdeleine.production.exception.NotFoundException;
@@ -183,7 +183,7 @@ public class BatchCounterService {
      * 你可以把它改成：
      *   return BatchCounterStatus.THRESHOLD_REACHED;
      */
-    private BatchCounterStatus guessReachedStatus(BatchCounterStatus current) {
+    private CounterStatus guessReachedStatus(CounterStatus current) {
         // TODO: 請依你的 enum 實際值調整
         return current;
     }

@@ -17,7 +17,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Component
@@ -65,13 +64,9 @@ public class PaymentRequestedConsumer {
         Payment payment = new Payment();
         payment.setId(UUID.randomUUID());
         payment.setOrderId(event.orderId());
-
-        // 以下兩個欄位請依你的 event 實際欄位命名調整
-        // payment.setAmountCents(event.amountCents());
-        // payment.setCurrency(event.currency());
-
         payment.setStatus(PaymentStatus.INIT);
-        payment.setCreatedAt(OffsetDateTime.now());
+        payment.setAmountCents(event.totalAmount());
+        payment.setCurrency(event.currency());
 
         paymentRepository.save(payment);
 
@@ -85,7 +80,12 @@ public class PaymentRequestedConsumer {
                         event.eventId(),
                         paymentCreatedTopic,
                         payment.getOrderId(),
-                        payment.getId()
+                        payment.getId(),
+                        event.customerEmail(),
+                        event.customerName(),
+                        payment.getAmountCents(),
+                        event.provider(),
+                        event.expiresAt()
                 )
         );
 

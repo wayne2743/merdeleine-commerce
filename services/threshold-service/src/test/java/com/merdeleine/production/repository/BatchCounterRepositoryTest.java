@@ -2,7 +2,7 @@ package com.merdeleine.production.repository;
 
 import com.merdeleine.production.entity.BatchCounter;
 import com.merdeleine.production.entity.CounterEventLog;
-import com.merdeleine.production.enums.BatchCounterStatus;
+import com.merdeleine.production.enums.CounterStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ class BatchCounterRepositoryTest {
         testCounter.setProductId(productId);
         testCounter.setPaidQty(0);
         testCounter.setThresholdQty(100);
-        testCounter.setStatus(BatchCounterStatus.OPEN);
+        testCounter.setStatus(CounterStatus.OPEN);
     }
 
     @Test
@@ -78,7 +78,7 @@ class BatchCounterRepositoryTest {
         assertThat(saved.getProductId()).isEqualTo(productId);
         assertThat(saved.getPaidQty()).isEqualTo(0);
         assertThat(saved.getThresholdQty()).isEqualTo(100);
-        assertThat(saved.getStatus()).isEqualTo(BatchCounterStatus.OPEN);
+        assertThat(saved.getStatus()).isEqualTo(CounterStatus.OPEN);
         assertThat(saved.getUpdatedAt()).isNotNull();
     }
 
@@ -121,28 +121,28 @@ class BatchCounterRepositoryTest {
         entityManager.persistAndFlush(testCounter);
         
         BatchCounter reachedCounter = createCounter(UUID.randomUUID(), UUID.randomUUID());
-        reachedCounter.setStatus(BatchCounterStatus.REACHED);
+        reachedCounter.setStatus(CounterStatus.REACHED);
         reachedCounter.setReachedAt(OffsetDateTime.now());
         entityManager.persistAndFlush(reachedCounter);
         
-        List<BatchCounter> openCounters = batchCounterRepository.findByStatus(BatchCounterStatus.OPEN);
+        List<BatchCounter> openCounters = batchCounterRepository.findByStatus(CounterStatus.OPEN);
         
         assertThat(openCounters).hasSize(1);
-        assertThat(openCounters.get(0).getStatus()).isEqualTo(BatchCounterStatus.OPEN);
+        assertThat(openCounters.get(0).getStatus()).isEqualTo(CounterStatus.OPEN);
     }
 
     @Test
     void testCounterReachedThreshold() {
         BatchCounter saved = entityManager.persistAndFlush(testCounter);
         saved.setPaidQty(100);
-        saved.setStatus(BatchCounterStatus.REACHED);
+        saved.setStatus(CounterStatus.REACHED);
         saved.setReachedAt(OffsetDateTime.now());
         saved.setReachedEventId(UUID.randomUUID());
         
         BatchCounter updated = batchCounterRepository.save(saved);
         
         assertThat(updated.getPaidQty()).isEqualTo(100);
-        assertThat(updated.getStatus()).isEqualTo(BatchCounterStatus.REACHED);
+        assertThat(updated.getStatus()).isEqualTo(CounterStatus.REACHED);
         assertThat(updated.getReachedAt()).isNotNull();
         assertThat(updated.getReachedEventId()).isNotNull();
     }
@@ -181,7 +181,7 @@ class BatchCounterRepositoryTest {
         counter.setProductId(productId);
         counter.setPaidQty(0);
         counter.setThresholdQty(100);
-        counter.setStatus(BatchCounterStatus.OPEN);
+        counter.setStatus(CounterStatus.OPEN);
         return counter;
     }
 

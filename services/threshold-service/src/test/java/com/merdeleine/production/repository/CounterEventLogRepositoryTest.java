@@ -2,7 +2,7 @@ package com.merdeleine.production.repository;
 
 import com.merdeleine.production.entity.BatchCounter;
 import com.merdeleine.production.entity.CounterEventLog;
-import com.merdeleine.production.enums.BatchCounterStatus;
+import com.merdeleine.production.enums.CounterStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ class CounterEventLogRepositoryTest {
         testCounter.setProductId(UUID.randomUUID());
         testCounter.setPaidQty(0);
         testCounter.setThresholdQty(100);
-        testCounter.setStatus(BatchCounterStatus.OPEN);
+        testCounter.setStatus(CounterStatus.OPEN);
         entityManager.persistAndFlush(testCounter);
     }
 
@@ -165,7 +165,7 @@ class CounterEventLogRepositoryTest {
         counter.setProductId(UUID.randomUUID());
         counter.setPaidQty(0);
         counter.setThresholdQty(100);
-        counter.setStatus(BatchCounterStatus.OPEN);
+        counter.setStatus(CounterStatus.OPEN);
         return counter;
     }
 }

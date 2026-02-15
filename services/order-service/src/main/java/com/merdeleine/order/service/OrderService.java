@@ -31,7 +31,7 @@ public class OrderService {
                         OutboxEventRepository outboxEventRepository,
                         ObjectMapper objectMapper,
                         QuotaService quotaService,
-                        @Value("${app.outbox.event-types.sell-window-quota-configured:sell-window.quota.configured}") String sellWindowQuotaConfiguredTopic) {
+                        @Value("${app.kafka.topic.sell-window-quota-configured}") String sellWindowQuotaConfiguredTopic) {
         this.orderRepository = orderRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.objectMapper = objectMapper;
@@ -49,7 +49,7 @@ public class OrderService {
                 request.quantity()
         );
 
-        Order order = OrderMapper.toEntity(request);
+        Order order = OrderMapper.toEntity(request, OrderStatus.RESERVED);
         Order saved = orderRepository.save(order);
         writeOutbox(
                 "Order",

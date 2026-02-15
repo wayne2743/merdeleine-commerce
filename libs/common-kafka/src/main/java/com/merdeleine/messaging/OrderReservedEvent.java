@@ -3,7 +3,7 @@ package com.merdeleine.messaging;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record OrderAccumulatedEvent(
+public record OrderReservedEvent(
         UUID eventId,
         String eventType,            // "order.quantity_committed.v1"
         UUID orderId,

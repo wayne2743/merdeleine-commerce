@@ -4,8 +4,15 @@ CREATE TABLE orders (
                         customer_id UUID NOT NULL,
                         sell_window_id UUID,
 
+    -- Updated statuses:
+    -- RESERVED: 預約名額(未付款)
+    -- PAYMENT_REQUESTED: 已開放付款(可重試 payment.failed)
+    -- PAID: 已付款
+    -- EXPIRED: 付款逾期(釋放名額)
+    -- CANCELLED: 主動取消(釋放名額)
+    -- REFUNDED: 已退款
                         status VARCHAR(30) NOT NULL CHECK (
-                            status IN ('PENDING_PAYMENT', 'PAID', 'CANCELLED', 'REFUNDED')
+                            status IN ('RESERVED', 'PAYMENT_REQUESTED', 'PAID', 'EXPIRED', 'CANCELLED', 'REFUNDED')
                             ),
 
                         total_amount_cents INTEGER NOT NULL CHECK (total_amount_cents >= 0),
@@ -16,9 +23,21 @@ CREATE TABLE orders (
                         contact_email VARCHAR(255),
                         shipping_address TEXT,
 
+    -- New fields for this flow
+                        payment_due_at TIMESTAMPTZ,
+                        payment_failed_count INTEGER NOT NULL DEFAULT 0,
+                        last_payment_error TEXT,
+
                         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- (optional but useful) 查詢付款期限/狀態的索引
+CREATE INDEX idx_orders_status_due_at
+    ON orders (status, payment_due_at);
+
+CREATE INDEX idx_orders_sell_window_status
+    ON orders (sell_window_id, status);
 
 
 CREATE TABLE order_item (

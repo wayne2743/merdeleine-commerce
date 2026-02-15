@@ -7,12 +7,16 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payment")
+@Table(
+        name = "payment",
+        indexes = {
+                @Index(name = "idx_payment_order_id", columnList = "order_id"),
+                @Index(name = "idx_payment_status_created_at", columnList = "status, created_at")
+        }
+)
 public class Payment {
 
     @Id
@@ -47,111 +51,35 @@ public class Payment {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PaymentTxn> transactions = new ArrayList<>();
-
-    // Constructors
-    public Payment() {
+    @PrePersist
+    void prePersist() {
+        if (id == null) id = UUID.randomUUID();
+        if (status == null) status = PaymentStatus.INIT;
     }
 
-    public Payment(UUID id, UUID orderId, PaymentProvider provider, PaymentStatus status, 
-                   Integer amountCents, String currency) {
-        this.id = id;
-        this.orderId = orderId;
-        this.provider = provider;
-        this.status = status;
-        this.amountCents = amountCents;
-        this.currency = currency;
-    }
+    // getters/setters
 
-    // Getters and Setters
-    public UUID getId() {
-        return id;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    public UUID getOrderId() { return orderId; }
+    public void setOrderId(UUID orderId) { this.orderId = orderId; }
 
-    public UUID getOrderId() {
-        return orderId;
-    }
+    public PaymentProvider getProvider() { return provider; }
+    public void setProvider(PaymentProvider provider) { this.provider = provider; }
 
-    public void setOrderId(UUID orderId) {
-        this.orderId = orderId;
-    }
+    public PaymentStatus getStatus() { return status; }
+    public void setStatus(PaymentStatus status) { this.status = status; }
 
-    public PaymentProvider getProvider() {
-        return provider;
-    }
+    public Integer getAmountCents() { return amountCents; }
+    public void setAmountCents(Integer amountCents) { this.amountCents = amountCents; }
 
-    public void setProvider(PaymentProvider provider) {
-        this.provider = provider;
-    }
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
 
-    public PaymentStatus getStatus() {
-        return status;
-    }
+    public String getProviderPaymentId() { return providerPaymentId; }
+    public void setProviderPaymentId(String providerPaymentId) { this.providerPaymentId = providerPaymentId; }
 
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
-
-    public Integer getAmountCents() {
-        return amountCents;
-    }
-
-    public void setAmountCents(Integer amountCents) {
-        this.amountCents = amountCents;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public String getProviderPaymentId() {
-        return providerPaymentId;
-    }
-
-    public void setProviderPaymentId(String providerPaymentId) {
-        this.providerPaymentId = providerPaymentId;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<PaymentTxn> getTransactions() {
-        return transactions;
-    }
-
-    public void setTransactions(List<PaymentTxn> transactions) {
-        this.transactions = transactions;
-    }
-
-    public void addTransaction(PaymentTxn transaction) {
-        transactions.add(transaction);
-        transaction.setPayment(this);
-    }
-
-    public void removeTransaction(PaymentTxn transaction) {
-        transactions.remove(transaction);
-        transaction.setPayment(null);
-    }
+    public OffsetDateTime getCreatedAt() { return createdAt; }
+    public OffsetDateTime getUpdatedAt() { return updatedAt; }
 }

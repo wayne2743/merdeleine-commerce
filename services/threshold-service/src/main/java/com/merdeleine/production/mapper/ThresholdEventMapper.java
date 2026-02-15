@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class ThresholdEventMapper {
 
-    public ThresholdReachedEvent toThresholdReachedEvent(BatchCounter batchCounter) {
+    public ThresholdReachedEvent toThresholdReachedEvent(BatchCounter batchCounter, String eventType) {
         return new ThresholdReachedEvent(
                 UUID.randomUUID(),
                 "threshold.reached.v1",

@@ -1,17 +1,25 @@
 package com.merdeleine.notification.service;
 
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.Map;
+
 @Service
 public class ThymeleafMailService {
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
+
+    @Value("${app.mail.from}")
+    private String from;
 
     public ThymeleafMailService(
             JavaMailSender mailSender,
@@ -48,5 +56,29 @@ public class ThymeleafMailService {
         helper.setText(html, true);
 
         mailSender.send(message);
+    }
+
+    public void sendHtml(String to, String subject, String templateKey, Map<String, Object> payload) {
+        Context ctx = new Context(Locale.TAIWAN);
+        ctx.setVariables(payload);
+
+        String html = templateEngine.process(templateKey, ctx);
+
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    message,
+                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name()
+            );
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Send email failed: " + e.getMessage(), e);
+        }
     }
 }

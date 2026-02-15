@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class OrderMapper {
 
-    public static Order toEntity(CreateOrderRequest req) {
+    public static Order toEntity(CreateOrderRequest req, OrderStatus status) {
 
         int subtotal = req.quantity() * req.unitPriceCents();
 
@@ -18,7 +18,7 @@ public class OrderMapper {
                 UUID.randomUUID(),
                 generateOrderNo(),
                 req.customerId(),
-                OrderStatus.PENDING_PAYMENT,
+                status,
                 subtotal,
                 req.currency()
         );

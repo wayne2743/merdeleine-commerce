@@ -1,6 +1,6 @@
 package com.merdeleine.production.dto;
 
-import com.merdeleine.production.enums.BatchCounterStatus;
+import com.merdeleine.production.enums.CounterStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -23,7 +23,7 @@ public final class BatchCounterDto {
         private Integer thresholdQty;
 
         @NotNull
-        private BatchCounterStatus status;
+        private CounterStatus status;
 
         public CreateRequest() {}
 
@@ -36,8 +36,8 @@ public final class BatchCounterDto {
         public Integer getThresholdQty() { return thresholdQty; }
         public void setThresholdQty(Integer thresholdQty) { this.thresholdQty = thresholdQty; }
 
-        public BatchCounterStatus getStatus() { return status; }
-        public void setStatus(BatchCounterStatus status) { this.status = status; }
+        public CounterStatus getStatus() { return status; }
+        public void setStatus(CounterStatus status) { this.status = status; }
     }
 
     public static final class UpdateRequest {
@@ -46,15 +46,15 @@ public final class BatchCounterDto {
         private Integer thresholdQty;
 
         @NotNull
-        private BatchCounterStatus status;
+        private CounterStatus status;
 
         public UpdateRequest() {}
 
         public Integer getThresholdQty() { return thresholdQty; }
         public void setThresholdQty(Integer thresholdQty) { this.thresholdQty = thresholdQty; }
 
-        public BatchCounterStatus getStatus() { return status; }
-        public void setStatus(BatchCounterStatus status) { this.status = status; }
+        public CounterStatus getStatus() { return status; }
+        public void setStatus(CounterStatus status) { this.status = status; }
     }
 
     public static final class Response {
@@ -63,7 +63,7 @@ public final class BatchCounterDto {
         private UUID productId;
         private Integer paidQty;
         private Integer thresholdQty;
-        private BatchCounterStatus status;
+        private CounterStatus status;
         private OffsetDateTime reachedAt;
         private UUID reachedEventId;
         private OffsetDateTime updatedAt;
@@ -71,7 +71,7 @@ public final class BatchCounterDto {
         public Response() {}
 
         public Response(UUID id, UUID sellWindowId, UUID productId, Integer paidQty, Integer thresholdQty,
-                        BatchCounterStatus status, OffsetDateTime reachedAt, UUID reachedEventId, OffsetDateTime updatedAt) {
+                        CounterStatus status, OffsetDateTime reachedAt, UUID reachedEventId, OffsetDateTime updatedAt) {
             this.id = id;
             this.sellWindowId = sellWindowId;
             this.productId = productId;
@@ -98,8 +98,8 @@ public final class BatchCounterDto {
         public Integer getThresholdQty() { return thresholdQty; }
         public void setThresholdQty(Integer thresholdQty) { this.thresholdQty = thresholdQty; }
 
-        public BatchCounterStatus getStatus() { return status; }
-        public void setStatus(BatchCounterStatus status) { this.status = status; }
+        public CounterStatus getStatus() { return status; }
+        public void setStatus(CounterStatus status) { this.status = status; }
 
         public OffsetDateTime getReachedAt() { return reachedAt; }
         public void setReachedAt(OffsetDateTime reachedAt) { this.reachedAt = reachedAt; }

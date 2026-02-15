@@ -7,7 +7,7 @@ CREATE TABLE payment (
                              ),
 
                          status VARCHAR(20) NOT NULL CHECK (
-                             status IN ('INIT', 'SUCCEEDED', 'FAILED', 'REFUNDED')
+                             status IN ('INIT', 'SUCCEEDED', 'FAILED', 'EXPIRED', 'REFUNDED')
                              ),
 
                          amount_cents INTEGER NOT NULL CHECK (amount_cents >= 0),
@@ -18,6 +18,12 @@ CREATE TABLE payment (
                          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_payment_order_id
+    ON payment (order_id);
+
+CREATE INDEX idx_payment_status_created_at
+    ON payment (status, created_at);
 
 
 CREATE TABLE payment_txn (

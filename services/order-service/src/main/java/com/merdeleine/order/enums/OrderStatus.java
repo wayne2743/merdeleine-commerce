@@ -1,8 +1,10 @@
 package com.merdeleine.order.enums;
 
 public enum OrderStatus {
-    PENDING_PAYMENT,
+    RESERVED,
+    PAYMENT_REQUESTED,
     PAID,
+    EXPIRED,
     CANCELLED,
     REFUNDED
 }

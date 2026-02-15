@@ -1,0 +1,18 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: Arial, sans-serif; line-height: 1.6;">
+<p th:text="'您好 ' + (${customerName} ?: '顧客') + '，'">您好，</p>
+
+<p>我們已建立您的付款資訊，請於期限內完成付款，以確保訂單保留。</p>
+
+<ul>
+    <li>訂單 ID：<span th:text="${orderId}">ORDER_ID</span></li>
+    <li>付款 ID：<span th:text="${paymentId}">PAYMENT_ID</span></li>
+    <li>金額：<b><span th:text="${totalAmount}">0</span></b></li>
+    <li>付款方式：<span th:text="${paymentProvider}">PROVIDER</span></li>
+    <li>到期時間：<span th:text="${expireAtText}">YYYY-MM-DD HH:mm</span></li>
+</ul>
+
+<p>— merdeleine.tw</p>
+</body>
+</html>

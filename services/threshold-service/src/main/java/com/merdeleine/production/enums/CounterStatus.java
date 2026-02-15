@@ -1,7 +1,8 @@
 package com.merdeleine.production.enums;
 
-public enum BatchCounterStatus {
+public enum CounterStatus {
     OPEN,
     REACHED,
-    LOCKED
+    LOCKED,
+    FINALIZED
 }

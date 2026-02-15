@@ -9,14 +9,20 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "orders")
+@Table(
+        name = "orders",
+        indexes = {
+                @Index(name = "idx_orders_status_due_at", columnList = "status, payment_due_at"),
+                @Index(name = "idx_orders_sell_window_status", columnList = "sell_window_id, status")
+        }
+)
 public class Order {
 
     @Id
     @Column(name = "id", columnDefinition = "UUID")
     private UUID id;
 
-    @Column(name = "order_no", nullable = false, unique = true, length = 50)
+    @Column(name = "order_no", nullable = false, length = 50, unique = true)
     private String orderNo;
 
     @Column(name = "customer_id", nullable = false, columnDefinition = "UUID")
@@ -47,6 +53,15 @@ public class Order {
     @Column(name = "shipping_address", columnDefinition = "TEXT")
     private String shippingAddress;
 
+    @Column(name = "payment_due_at")
+    private OffsetDateTime paymentDueAt;
+
+    @Column(name = "payment_failed_count", nullable = false)
+    private Integer paymentFailedCount = 0;
+
+    @Column(name = "last_payment_error", columnDefinition = "TEXT")
+    private String lastPaymentError;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -67,7 +82,7 @@ public class Order {
     public Order() {
     }
 
-    public Order(UUID id, String orderNo, UUID customerId, OrderStatus status, 
+    public Order(UUID id, String orderNo, UUID customerId, OrderStatus status,
                  Integer totalAmountCents, String currency) {
         this.id = id;
         this.orderNo = orderNo;
@@ -75,6 +90,12 @@ public class Order {
         this.status = status;
         this.totalAmountCents = totalAmountCents;
         this.currency = currency;
+    }
+
+    @PrePersist
+    void prePersist() {
+        if (id == null) id = UUID.randomUUID();
+        if (paymentFailedCount == null) paymentFailedCount = 0;
     }
 
     /* ---------- domain methods ---------- */
@@ -96,106 +117,55 @@ public class Order {
         }
     }
 
-    /* ---------- getters / setters ---------- */
+    // getters/setters
 
-    public UUID getId() {
-        return id;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    public String getOrderNo() { return orderNo; }
+    public void setOrderNo(String orderNo) { this.orderNo = orderNo; }
 
-    public String getOrderNo() {
-        return orderNo;
-    }
+    public UUID getCustomerId() { return customerId; }
+    public void setCustomerId(UUID customerId) { this.customerId = customerId; }
 
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
-    }
+    public UUID getSellWindowId() { return sellWindowId; }
+    public void setSellWindowId(UUID sellWindowId) { this.sellWindowId = sellWindowId; }
 
-    public UUID getCustomerId() {
-        return customerId;
-    }
+    public OrderStatus getStatus() { return status; }
+    public void setStatus(OrderStatus status) { this.status = status; }
 
-    public void setCustomerId(UUID customerId) {
-        this.customerId = customerId;
-    }
+    public Integer getTotalAmountCents() { return totalAmountCents; }
+    public void setTotalAmountCents(Integer totalAmountCents) { this.totalAmountCents = totalAmountCents; }
 
-    public UUID getSellWindowId() {
-        return sellWindowId;
-    }
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
 
-    public void setSellWindowId(UUID sellWindowId) {
-        this.sellWindowId = sellWindowId;
-    }
+    public String getContactName() { return contactName; }
+    public void setContactName(String contactName) { this.contactName = contactName; }
 
-    public OrderStatus getStatus() {
-        return status;
-    }
+    public String getContactPhone() { return contactPhone; }
+    public void setContactPhone(String contactPhone) { this.contactPhone = contactPhone; }
 
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
+    public String getContactEmail() { return contactEmail; }
+    public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
 
-    public Integer getTotalAmountCents() {
-        return totalAmountCents;
-    }
+    public String getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
 
-    public void setTotalAmountCents(Integer totalAmountCents) {
-        this.totalAmountCents = totalAmountCents;
-    }
+    public OffsetDateTime getPaymentDueAt() { return paymentDueAt; }
+    public void setPaymentDueAt(OffsetDateTime paymentDueAt) { this.paymentDueAt = paymentDueAt; }
 
-    public String getCurrency() {
-        return currency;
-    }
+    public Integer getPaymentFailedCount() { return paymentFailedCount; }
+    public void setPaymentFailedCount(Integer paymentFailedCount) { this.paymentFailedCount = paymentFailedCount; }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
+    public String getLastPaymentError() { return lastPaymentError; }
+    public void setLastPaymentError(String lastPaymentError) { this.lastPaymentError = lastPaymentError; }
 
-    public String getContactName() {
-        return contactName;
-    }
-
-    public void setContactName(String contactName) {
-        this.contactName = contactName;
-    }
-
-    public String getContactPhone() {
-        return contactPhone;
-    }
-
-    public void setContactPhone(String contactPhone) {
-        this.contactPhone = contactPhone;
-    }
-
-    public String getContactEmail() {
-        return contactEmail;
-    }
-
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
-    }
-
-    public String getShippingAddress() {
-        return shippingAddress;
-    }
-
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public OffsetDateTime getCreatedAt() { return createdAt; }
+    public OffsetDateTime getUpdatedAt() { return updatedAt; }
 
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     public void setUpdatedAt(OffsetDateTime updatedAt) {
@@ -205,4 +175,5 @@ public class Order {
     public OrderItem getItem() {
         return item;
     }
+
 }
