@@ -24,31 +24,47 @@ CREATE TABLE product_variant (
 
 
 CREATE TABLE sell_window (
-                             id UUID PRIMARY KEY,
-                             name VARCHAR(100) NOT NULL,
-                             start_at TIMESTAMPTZ NOT NULL,
-                             end_at TIMESTAMPTZ NOT NULL,
-                             timezone VARCHAR(50) NOT NULL
+                                    id uuid NOT NULL,
+                                    "name" varchar(100) NOT NULL,
+                                    start_at timestamptz NOT NULL,
+                                    end_at timestamptz NOT NULL,
+                                    timezone varchar(50) NOT NULL,
+                                    status varchar(20) NOT NULL,
+                                    closed_at timestamptz NULL,
+                                    "version" int8 NOT NULL,
+                                    CONSTRAINT sell_window_pkey PRIMARY KEY (id)
 );
-
 
 CREATE TABLE product_sell_window (
                                      id UUID PRIMARY KEY,
                                      product_id UUID NOT NULL,
                                      sell_window_id UUID NOT NULL,
-
-                                     threshold_qty INTEGER NOT NULL CHECK (threshold_qty >= 0),
+                                     min_total_qty INTEGER NOT NULL CHECK (min_total_qty >= 0),
                                      max_total_qty INTEGER,
                                      lead_days INTEGER,
                                      ship_days INTEGER,
-                                     enabled BOOLEAN NOT NULL DEFAULT true,
-
+                                     is_closed BOOLEAN NOT NULL DEFAULT true,
                                      CONSTRAINT fk_psw_product
                                          FOREIGN KEY (product_id) REFERENCES product(id),
-
                                      CONSTRAINT fk_psw_sell_window
                                          FOREIGN KEY (sell_window_id) REFERENCES sell_window(id),
-
                                      CONSTRAINT uq_product_sell_window
                                          UNIQUE (product_id, sell_window_id)
 );
+
+
+CREATE TABLE public.outbox_event (
+                                     id uuid NOT NULL,
+                                     aggregate_type varchar(50) NOT NULL,
+                                     aggregate_id uuid NOT NULL,
+                                     event_type varchar(100) NOT NULL,
+                                     idempotency_key varchar(200) NOT NULL,
+                                     payload jsonb NOT NULL,
+                                     status varchar(20) NOT NULL,
+                                     created_at timestamptz DEFAULT now() NOT NULL,
+                                     sent_at timestamptz NULL,
+                                     CONSTRAINT ck_outbox_status CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'SENT'::character varying, 'FAILED'::character varying])::text[]))),
+	                                 CONSTRAINT outbox_event_pkey PRIMARY KEY (id)
+);
+CREATE INDEX idx_outbox_status_created_at ON public.outbox_event USING btree (status, created_at);
+CREATE UNIQUE INDEX uk_outbox_idempotency_key ON public.outbox_event USING btree (idempotency_key);
