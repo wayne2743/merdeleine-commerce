@@ -15,17 +15,6 @@ CREATE TABLE batch (
 );
 
 
-CREATE TABLE batch_order_link (
-                                  id UUID PRIMARY KEY,
-                                  batch_id UUID NOT NULL,
-                                  order_id UUID NOT NULL,
-                                  quantity INTEGER NOT NULL CHECK (quantity > 0),
-
-                                  CONSTRAINT fk_batch_order
-                                      FOREIGN KEY (batch_id) REFERENCES batch(id)
-);
-
-
 CREATE TABLE batch_schedule (
                                 id UUID PRIMARY KEY,
                                 batch_id UUID NOT NULL,
@@ -39,3 +28,22 @@ CREATE TABLE batch_schedule (
                                 CONSTRAINT fk_batch_schedule
                                     FOREIGN KEY (batch_id) REFERENCES batch(id)
 );
+
+
+CREATE TABLE outbox_event (
+                              id UUID PRIMARY KEY,
+
+                              aggregate_type VARCHAR(50) NOT NULL,
+                              aggregate_id UUID NOT NULL,
+
+                              event_type VARCHAR(100) NOT NULL,
+                              payload JSONB NOT NULL,
+
+                              status VARCHAR(20) NOT NULL CHECK (status IN ('NEW', 'SENT', 'FAILED')),
+
+                              created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                              sent_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_outbox_event_status
+    ON outbox_event (status, created_at);

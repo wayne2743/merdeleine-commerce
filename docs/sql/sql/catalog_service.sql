@@ -24,12 +24,15 @@ CREATE TABLE product_variant (
 
 
 CREATE TABLE sell_window (
-                                    id uuid NOT NULL,
-                                    "name" varchar(100) NOT NULL,
-                                    start_at timestamptz NOT NULL,
-                                    end_at timestamptz NOT NULL,
-                                    timezone varchar(50) NOT NULL,
-                                    CONSTRAINT sell_window_pkey PRIMARY KEY (id)
+                             id uuid NOT NULL,
+                             "name" varchar(100) NOT NULL,
+                             start_at timestamptz NOT NULL,
+                             end_at timestamptz NOT NULL,
+                             timezone varchar(50) NOT NULL,
+                             status varchar(20) NOT NULL,
+                             closed_at timestamptz NULL,
+                             "version" int8 NOT NULL,
+                             CONSTRAINT sell_window_pkey PRIMARY KEY (id)
 );
 
 
