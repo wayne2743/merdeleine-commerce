@@ -25,18 +25,19 @@ public class OrderService {
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
     private final QuotaService quotaService;
-    private final String sellWindowQuotaConfiguredTopic;
+    private final String orderReservedTopic;
 
     public OrderService(OrderRepository orderRepository,
                         OutboxEventRepository outboxEventRepository,
                         ObjectMapper objectMapper,
                         QuotaService quotaService,
-                        @Value("${app.kafka.topic.sell-window-quota-configured}") String sellWindowQuotaConfiguredTopic) {
+                        @Value("${app.kafka.topic.order-reserved-events}") String orderReservedTopic) {
         this.orderRepository = orderRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.objectMapper = objectMapper;
         this.quotaService = quotaService;
-        this.sellWindowQuotaConfiguredTopic = sellWindowQuotaConfiguredTopic;
+        this.orderReservedTopic = orderReservedTopic;
+
     }
 
     @Transactional
@@ -54,8 +55,8 @@ public class OrderService {
         writeOutbox(
                 "Order",
                 saved.getId(),
-                sellWindowQuotaConfiguredTopic,
-                new OrderEventMapper().toOrderEvent(saved)
+                orderReservedTopic,
+                new OrderEventMapper().toOrderEvent(saved, orderReservedTopic)
         );
 
         return OrderMapper.toResponse(saved);
@@ -76,7 +77,7 @@ public class OrderService {
         if (req.contactEmail() != null) order.setContactEmail(req.contactEmail());
         if (req.shippingAddress() != null) order.setShippingAddress(req.shippingAddress());
 
-        writeOutbox("ORDER", order.getId(), "order.updated.v1", new OrderEventMapper().toOrderEvent(order));
+        writeOutbox("ORDER", order.getId(), "order.updated.v1", new OrderEventMapper().toOrderEvent(order, "order.updated.v1"));
 
         return OrderMapper.toResponse(order);
     }

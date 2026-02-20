@@ -1,6 +1,7 @@
 package com.merdeleine.payment.entity;
 
-import com.merdeleine.payment.enums.PaymentProvider;
+
+import com.merdeleine.enums.PaymentProvider;
 import com.merdeleine.payment.enums.PaymentStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

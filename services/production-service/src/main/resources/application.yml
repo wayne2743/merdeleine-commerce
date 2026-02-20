@@ -8,12 +8,16 @@ spring:
     bootstrap-servers: localhost:9092
     listener:
       ack-mode: manual_immediate
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true # 這樣就會在 Kafka 消息頭中添加類型信息，方便消費者反序列化
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "com.merdeleine.messaging"
-        spring.json.value.default.type: "com.merdeleine.messaging.BatchCreatedNotificationEvent"
+        spring.json.use.type.headers: true # 這樣就會使用 Kafka 消息頭中的類型
   datasource:
     url: jdbc:postgresql://localhost:5432/production_db
     username: merdeleine

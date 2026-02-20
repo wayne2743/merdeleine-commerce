@@ -67,6 +67,7 @@ public class PaymentRequestedConsumer {
         payment.setStatus(PaymentStatus.INIT);
         payment.setAmountCents(event.totalAmount());
         payment.setCurrency(event.currency());
+        payment.setProvider(event.provider());
 
         paymentRepository.save(payment);
 

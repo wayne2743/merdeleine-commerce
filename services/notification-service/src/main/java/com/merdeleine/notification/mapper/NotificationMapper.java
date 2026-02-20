@@ -15,7 +15,7 @@ public class NotificationMapper {
     private static final DateTimeFormatter EXPIRE_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.of("Asia/Taipei"));
 
-    public static final String TEMPLATE_KEY = "mail/payment-created";
+    public static final String TEMPLATE_KEY = "payment-created";
 
 
     public static NotificationJob toNotificationJob(BatchCreatedNotificationEvent event, NotificationChannel channel, String recipient) {

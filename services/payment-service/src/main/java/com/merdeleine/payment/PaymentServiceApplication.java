@@ -4,7 +4,9 @@ import com.merdeleine.payment.ecpay.EcpayProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @EnableConfigurationProperties(EcpayProperties.class)
 @SpringBootApplication
 public class PaymentServiceApplication {

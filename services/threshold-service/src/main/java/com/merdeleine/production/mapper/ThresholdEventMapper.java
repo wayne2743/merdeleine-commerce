@@ -10,7 +10,7 @@ public class ThresholdEventMapper {
     public ThresholdReachedEvent toThresholdReachedEvent(BatchCounter batchCounter, String eventType) {
         return new ThresholdReachedEvent(
                 UUID.randomUUID(),
-                "threshold.reached.v1",
+                eventType,
                 batchCounter.getProductId(),
                 batchCounter.getSellWindowId(),
                 batchCounter.getId(),

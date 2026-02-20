@@ -9,7 +9,7 @@ spring:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: false
+        spring.json.add.type.headers: true
   datasource:
     url: jdbc:postgresql://localhost:5432/catalog_db
     username: merdeleine

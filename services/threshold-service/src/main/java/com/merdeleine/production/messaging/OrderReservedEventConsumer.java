@@ -47,10 +47,10 @@ public class OrderReservedEventConsumer {
         this.thresholdReachedTopic = thresholdReachedTopic;
     }
 
-    @KafkaListener(topics = "${kafka.topic.order-events:order.accumulated.events.v1}")
+    @KafkaListener(topics = "${app.kafka.topic.order-reserved-events}")
     @Transactional
     public void onMessage(OrderReservedEvent orderReservedEvent, Acknowledgment ack) {
-        log.info("OrderAccumulatedEvent:" + orderReservedEvent.toString());
+        log.info("OrderReservedEvent:" + orderReservedEvent.toString());
 
         if(counterEventLogRepository.existsBySourceEventId(orderReservedEvent.eventId())){
             log.info("Duplicate event detected, skipping processing for eventId: " + orderReservedEvent.eventId());

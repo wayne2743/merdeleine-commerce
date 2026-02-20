@@ -21,9 +21,9 @@ public class EcpayCheckoutService {
         this.props = props;
     }
 
-    public String buildAutoSubmitHtml(String orderId, int totalAmount, String itemName) {
+    public String buildAutoSubmitHtml(String merchantTradeNo, int totalAmount, String itemName) {
         // 你自己的交易號（務必唯一；且符合綠界格式限制）
-        String merchantTradeNo = "M" + orderId.replace("-", "").substring(0, 20);
+//        String merchantTradeNo = "M" + orderId.replace("-", "").substring(0, 20);
 
         String returnUrl = props.publicBaseUrl() + "/payments/ecpay/return";
         String orderResultUrl = props.publicBaseUrl() + "/payments/ecpay/result";
@@ -35,7 +35,7 @@ public class EcpayCheckoutService {
         form.put("MerchantTradeDate", OffsetDateTime.now().format(ECPAY_DT));
         form.put("PaymentType", "aio");
         form.put("TotalAmount", String.valueOf(totalAmount));
-        form.put("TradeDesc", "merdeleine order " + orderId);
+        form.put("TradeDesc", "merdeleine order " + merchantTradeNo);
         form.put("ItemName", itemName);
         form.put("ChoosePayment", "ALL"); // 讓消費者選付款方式:contentReference[oaicite:8]{index=8}
         form.put("ReturnURL", returnUrl);

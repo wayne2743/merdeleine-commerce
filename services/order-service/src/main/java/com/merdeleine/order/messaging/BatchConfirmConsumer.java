@@ -39,10 +39,12 @@ public class BatchConfirmConsumer {
     public BatchConfirmConsumer(OrderRepository orderRepository,
                                 ObjectMapper objectMapper,
                                 OutboxEventRepository outboxEventRepository,
-                                @Value("${app.kafka.topic.payment-requested-events}") String paymentRequestedTopic) {
+                                @Value("${app.kafka.topic.payment-requested-events}") String paymentRequestedTopic
+    ) {
         this.orderRepository = orderRepository;
         this.objectMapper = objectMapper;
         this.outboxEventRepository = outboxEventRepository;
+
         this.paymentRequestedTopic = paymentRequestedTopic;
     }
 
@@ -56,7 +58,7 @@ public class BatchConfirmConsumer {
             Acknowledgment ack
     ) {
         log.info(
-                "[QuotaConfigured] eventId={}, sellWindowId={}, productId={}, batchId={}",
+                "[BatchConfirmEvent] eventId={}, sellWindowId={}, productId={}, batchId={}",
                 event.eventId(),
                 event.sellWindowId(),
                 event.productId(),

@@ -1,6 +1,8 @@
 package com.merdeleine.production.planning.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merdeleine.messaging.BatchConfirmEvent;
+import com.merdeleine.messaging.BatchCreatedNotificationEvent;
 import com.merdeleine.production.planning.entity.OutboxEvent;
 import com.merdeleine.production.planning.enums.OutboxEventStatus;
 import com.merdeleine.production.planning.repository.OutboxEventRepository;
@@ -36,12 +38,18 @@ public class BatchPublisher {
 
         for (OutboxEvent e : events) {
             try {
-                // 你 outbox.payload 是 json string，這裡把它轉成你要送的 DTO 或 Map
-                // 做法 A：直接送 payload(Map)（最快）
-                String payload = objectMapper.writeValueAsString(e.getPayload());
+                Object event;
+                switch (e.getEventType()) {
+                    case "batch.confirmed.v1" ->
+                            event = objectMapper.treeToValue(e.getPayload(), BatchConfirmEvent.class);
+                    case "batch.created.notification.v1" ->
+                            event = objectMapper.treeToValue(e.getPayload(), BatchCreatedNotificationEvent.class);
+                    default ->
+                            throw new IllegalStateException("Unknown eventType: " + e.getEventType());
+                }
 
                 String key = e.getAggregateId().toString();
-                producer.publish(e.getEventType(), key, payload);
+                producer.publish(e.getEventType(), key, event);
 
                 e.setStatus(OutboxEventStatus.SENT);
                 e.setSentAt(OffsetDateTime.now());

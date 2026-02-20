@@ -1,8 +1,12 @@
 // EcpayController.java
 package com.merdeleine.payment.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.payment.ecpay.EcpayCheckMacValue;
 import com.merdeleine.payment.ecpay.EcpayProperties;
+import com.merdeleine.payment.entity.OutboxEvent;
+import com.merdeleine.payment.enums.OutboxEventStatus;
+import com.merdeleine.payment.repository.OutboxEventRepository;
 import com.merdeleine.payment.service.EcpayCheckoutService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/payments/ecpay")
@@ -18,14 +23,18 @@ public class EcpayController {
 
     private final EcpayCheckoutService checkoutService;
     private final EcpayProperties props;
+    private final ObjectMapper objectMapper;
+    private final OutboxEventRepository outboxEventRepository;
 
-    public EcpayController(EcpayCheckoutService checkoutService, EcpayProperties props) {
+    public EcpayController(EcpayCheckoutService checkoutService, EcpayProperties props, ObjectMapper objectMapper, OutboxEventRepository outboxEventRepository) {
         this.checkoutService = checkoutService;
         this.props = props;
+        this.objectMapper = objectMapper;
+        this.outboxEventRepository = outboxEventRepository;
     }
 
     // Demo：直接用 orderId 產生導轉頁（你實作時應該從 DB 讀金額/品項）
-    @PostMapping(value = "/checkout/{orderId}", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "/checkout/{orderId}", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> checkout(@PathVariable String orderId) {
         int amount = 1000;
         String itemName = "merdeleine dessert x1";
@@ -56,8 +65,20 @@ public class EcpayController {
 
         if ("1".equals(rtnCode)) {
             // TODO: update to PAID, publish payment.completed.v1
+            writeOutbox(
+                    "Payment",
+                    UUID.randomUUID(), // TODO: 改成 orderId 或 paymentId
+                    "payment.completed.v1",
+                    Map.of("orderId", merchantTradeNo, "amount", params.getOrDefault("TradeAmt", ""))
+            );
         } else {
             // TODO: update to FAILED or PENDING (ATM/超商可能是待繳費資訊)
+            writeOutbox(
+                    "Payment",
+                    UUID.randomUUID(), // TODO: 改成 orderId 或 paymentId
+                    "payment.failed.v1",
+                    Map.of("orderId", merchantTradeNo, "rtnCode", rtnCode)
+            );
         }
 
         // 3) 務必回這個字串，完全一致：1|OK:contentReference[oaicite:10]{index=10}
@@ -69,4 +90,21 @@ public class EcpayController {
     public String ecpayResult(@RequestBody MultiValueMap<String, String> body) {
         return "付款結果已接收，可回到商店頁面。";
     }
+
+    private void writeOutbox(String aggregateType, UUID aggregateId, String eventType, Object payloadObj) {
+        try {
+            OutboxEvent evt = new OutboxEvent();
+            evt.setId(UUID.randomUUID());
+            evt.setAggregateType(aggregateType);
+            evt.setAggregateId(aggregateId);
+            evt.setEventType(eventType);
+            evt.setPayload(objectMapper.valueToTree(payloadObj));
+            evt.setStatus(OutboxEventStatus.NEW);
+            outboxEventRepository.save(evt);
+        } catch (Exception e) {
+            // 讓 transaction rollback，確保「業務寫入 + outbox」同生共死
+            throw new RuntimeException("Failed to write outbox event", e);
+        }
+    }
+
 }

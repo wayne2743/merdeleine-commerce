@@ -103,7 +103,7 @@ sequenceDiagram
   NOTI-->>Customer: 發送付款連結/繳費資訊
 
   Note over Customer,PAY: 第三方完成付款後 callback PAY (驗簽/冪等)
-  PAY->>K: publish payment.succeeded|payment.failed|payment.expired(orderId,paymentId)
+  PAY->>K: publish payment.succeeded|payment.failed(orderId,paymentId)
 
   %% =========================================================
   %% 7) Order 依付款結果更新狀態並發布業務事件
@@ -118,20 +118,13 @@ sequenceDiagram
     %% AGG 聚合 paid 與 reserved 轉移
     K-->>AGG: order.paid
     AGG->>AGG: paid_qty += qty
-    AGG->>AGG: reserved_qty -= qty
 
   else payment.expired
+    SCH-->>+PAY: check exired payment
+    PAY->>-K:publish payment.expired
     K-->>ORD: payment.expired
     ORD->>ORD: update orders.status = EXPIRED
     ORD->>K: publish order.expired(orderId,sellWindowId,productId,qty)
-
-    %% expired 釋放名額（quota 扣回）
-    K-->>ORD: order.expired
-    ORD->>ORD: SELECT sell_window_quota FOR UPDATE
-    ORD->>ORD: sell_window_quota.sold_qty -= qty
-    alt sell_window_quota.status=CLOSED and sold_qty < max_qty
-      ORD->>ORD: sell_window_quota.status=OPEN
-    end
 
     %% AGG 扣回 reserved
     K-->>AGG: order.expired

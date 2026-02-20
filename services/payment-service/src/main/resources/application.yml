@@ -6,6 +6,19 @@ spring:
     name: payment-service
   kafka:
     bootstrap-servers: localhost:9092
+    listener:
+      ack-mode: manual_immediate
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true # 這樣就會在 Kafka 消息頭中添加類型信息，方便消費者反序列化
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.merdeleine.messaging"
+        spring.json.use.type.headers: true # 這樣就會使用 Kafka 消息頭中的類型信息來反序列化，而不是全局默認類型
+
   datasource:
     url: jdbc:postgresql://localhost:5432/payment_db
     username: merdeleine
@@ -40,13 +53,13 @@ ecpay:
 #  merchant-id: "3490805"     # 測試用 MerchantID（你也可換成自己後台的）
 #  hash-key: "VJvftkDaKOK9hjaF"
 #  hash-iv: "a514fnShdyMpnwYx"
-  merchant-id: "2000132"     # ECPay 提供的測試 MerchantID
-  hash-key: "5294y06JbISpM5x9"
-  hash-iv: "v77hoKGq4kWx8wYH"
+  merchant-id: "3362787"     # ECPay 提供的測試 MerchantID
+  hash-key: "5tzn8qyhl9EwzwuT"
+  hash-iv: "iz8YXaAUx60tijdL"
 
   stage-url: "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"
   prod-url:  "https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5"
-  public-base-url: "https://abcd-1234.ngrok-free.app"  # 換成你的 ngrok 網址
+  public-base-url: "https://e15d-36-231-146-208.ngrok-free.app"  # 換成你的 ngrok 網址
 
 logging:
   level:

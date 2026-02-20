@@ -1,4 +1,3 @@
-// EcpayCheckMacValue.java
 package com.merdeleine.payment.ecpay;
 
 import java.net.URLEncoder;
@@ -13,45 +12,47 @@ public final class EcpayCheckMacValue {
     private EcpayCheckMacValue() {}
 
     public static String gen(Map<String, String> params, String hashKey, String hashIv) {
-        // 1) 移除 CheckMacValue
+        // 1) remove CheckMacValue
         Map<String, String> filtered = params.entrySet().stream()
                 .filter(e -> e.getKey() != null && !"CheckMacValue".equalsIgnoreCase(e.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() == null ? "" : e.getValue()));
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue() == null ? "" : e.getValue()
+                ));
 
-        // 2) 依 key 排序（ASCII）
-        TreeMap<String, String> sorted = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        // 2) ASCII sort (case-sensitive)
+        TreeMap<String, String> sorted = new TreeMap<>();
         sorted.putAll(filtered);
 
-        // 3) 組字串：HashKey=...&k=v&...&HashIV=...
+        // 3) build raw string
         String raw = "HashKey=" + hashKey + "&" +
                 sorted.entrySet().stream()
                         .map(e -> e.getKey() + "=" + e.getValue())
                         .collect(Collectors.joining("&")) +
                 "&HashIV=" + hashIv;
 
-        // 4) URL encode（ECPay 要求接近 .NET 編碼；部分符號需替換）:contentReference[oaicite:6]{index=6}
-        String urlEncoded = urlEncodeEcpay(raw).toLowerCase(Locale.ROOT);
-
-        // 5) SHA256 + uppercase
-        return sha256(urlEncoded).toUpperCase(Locale.ROOT);
+        // 4) URL encode with ECPay rules, then SHA256
+        String encoded = urlEncodeEcpay(raw);
+        return sha256(encoded).toUpperCase(Locale.ROOT);
     }
 
     private static String urlEncodeEcpay(String input) {
-        // Java URLEncoder 會把空白變 '+'，ECPay 常用的是 '%20' 形式
-        String encoded = URLEncoder.encode(input, StandardCharsets.UTF_8)
-                .replace("+", "%20")
+        String encoded = URLEncoder.encode(input, StandardCharsets.UTF_8);
+
+        // 綠界步驟：先轉小寫 :contentReference[oaicite:2]{index=2}
+        encoded = encoded.toLowerCase(Locale.ROOT);
+
+        // 綠界指定替換 :contentReference[oaicite:3]{index=3}
+        encoded = encoded
+                .replace("%2d", "-")
+                .replace("%5f", "_")
+                .replace("%2e", ".")
                 .replace("%21", "!")
-                .replace("%2A", "*")
+                .replace("%2a", "*")
                 .replace("%28", "(")
                 .replace("%29", ")");
 
-        // 綠界文件也提到某些語言需對特定字元做替換以符合規則:contentReference[oaicite:7]{index=7}
-        encoded = encoded
-                .replace("%2D", "-")
-                .replace("%5F", "_")
-                .replace("%2E", ".")
-                .replace("%21", "!");
-
+        // 注意：不要把 '+' 換成 %20（官方範例就是 '+'） :contentReference[oaicite:4]{index=4}
         return encoded;
     }
 

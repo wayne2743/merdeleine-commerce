@@ -1,8 +1,8 @@
 package com.merdeleine.payment.repository;
 
+import com.merdeleine.enums.PaymentProvider;
 import com.merdeleine.payment.entity.Payment;
 import com.merdeleine.payment.entity.PaymentTxn;
-import com.merdeleine.payment.enums.PaymentProvider;
 import com.merdeleine.payment.enums.PaymentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -24,4 +24,6 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> 
     @Query("SELECT oe FROM OutboxEvent oe WHERE oe.status = :status AND oe.createdAt <= :before ORDER BY oe.createdAt ASC")
     List<OutboxEvent> findPendingEventsBefore(@Param("status") OutboxEventStatus status, 
                                                @Param("before") OffsetDateTime before);
+
+    List<OutboxEvent> findTop100ByStatusOrderByCreatedAtAsc(OutboxEventStatus outboxEventStatus);
 }

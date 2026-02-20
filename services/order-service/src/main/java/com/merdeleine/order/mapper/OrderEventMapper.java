@@ -5,10 +5,10 @@ import com.merdeleine.messaging.OrderReservedEvent;
 
 public class OrderEventMapper {
 
-    public OrderReservedEvent toOrderEvent(Order order) {
+    public OrderReservedEvent toOrderEvent(Order order, String eventType) {
         return new OrderReservedEvent(
                 java.util.UUID.randomUUID(),
-                "order.quantity_committed.v1",
+                eventType,
                 order.getId(),
                 order.getSellWindowId(),
                 order.getItem().getProductId(),
