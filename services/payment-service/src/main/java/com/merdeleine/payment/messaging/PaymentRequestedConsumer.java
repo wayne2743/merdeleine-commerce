@@ -9,6 +9,7 @@ import com.merdeleine.payment.enums.OutboxEventStatus;
 import com.merdeleine.payment.enums.PaymentStatus;
 import com.merdeleine.payment.repository.OutboxEventRepository;
 import com.merdeleine.payment.repository.PaymentRepository;
+import com.merdeleine.payment.utils.MerchantTradeNoGenerator;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,7 @@ public class PaymentRequestedConsumer {
         payment.setAmountCents(event.totalAmount());
         payment.setCurrency(event.currency());
         payment.setProvider(event.provider());
+        payment.setProviderPaymentId(MerchantTradeNoGenerator.generate());
 
         paymentRepository.save(payment);
 
