@@ -8,6 +8,7 @@ import com.merdeleine.payment.entity.OutboxEvent;
 import com.merdeleine.payment.enums.OutboxEventStatus;
 import com.merdeleine.payment.repository.OutboxEventRepository;
 import com.merdeleine.payment.service.EcpayCheckoutService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -28,7 +29,12 @@ public class EcpayController {
     private final String paymentCompleteTopic;
     private final String paymentFailedTopic;
 
-    public EcpayController(EcpayCheckoutService checkoutService, EcpayProperties props, ObjectMapper objectMapper, OutboxEventRepository outboxEventRepository, String paymentCompleteTopic, String paymentFailedTopic) {
+    public EcpayController(EcpayCheckoutService checkoutService,
+                           EcpayProperties props,
+                           ObjectMapper objectMapper,
+                           OutboxEventRepository outboxEventRepository,
+                           @Value("${app.kafka.topic.payment-completed-events}") String paymentCompleteTopic,
+                           @Value("${app.kafka.topic.payment-failed-events}") String paymentFailedTopic) {
         this.checkoutService = checkoutService;
         this.props = props;
         this.objectMapper = objectMapper;
