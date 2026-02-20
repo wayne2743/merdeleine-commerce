@@ -5,7 +5,7 @@ spring:
   application:
     name: threshold-service
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 100.113.120.124:9092
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
@@ -23,7 +23,7 @@ spring:
       ack-mode: manual_immediate
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/threshold_db
+    url: jdbc:postgresql://100.113.120.124:5432/threshold_db
     username: merdeleine
     password: merdeleine_pw
     driver-class-name: org.postgresql.Driver

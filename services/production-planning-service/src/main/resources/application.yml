@@ -5,7 +5,7 @@ spring:
   application:
     name: production-planning-service
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 100.113.120.124:9092
     listener:
       ack-mode: manual_immediate
     producer:
@@ -20,7 +20,7 @@ spring:
         spring.json.trusted.packages: "com.merdeleine.messaging"
         spring.json.use.type.headers: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/production_planning_db
+    url: jdbc:postgresql://100.113.120.124:5432/production_planning_db
     username: merdeleine
     password: merdeleine_pw
     driver-class-name: org.postgresql.Driver

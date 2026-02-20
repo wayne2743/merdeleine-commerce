@@ -5,7 +5,7 @@ spring:
   application:
     name: payment-service
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 100.113.120.124:9092
     listener:
       ack-mode: manual_immediate
     producer:
@@ -20,7 +20,7 @@ spring:
         spring.json.use.type.headers: true # 這樣就會使用 Kafka 消息頭中的類型信息來反序列化，而不是全局默認類型
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/payment_db
+    url: jdbc:postgresql://100.113.120.124:5432/payment_db
     username: merdeleine
     password: merdeleine_pw
     driver-class-name: org.postgresql.Driver

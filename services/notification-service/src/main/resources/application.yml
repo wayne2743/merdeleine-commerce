@@ -5,7 +5,7 @@ spring:
   application:
     name: notification-service
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 100.113.120.124:9092
     listener:
       ack-mode: manual_immediate
     producer:
@@ -20,7 +20,7 @@ spring:
         spring.json.use.type.headers: true # 這樣就會使用 Kafka 消息頭中的類型信息來反序列化，而不是全局默認類型
       auto-offset-reset: earliest # 消息消費者從最早的消息開始消費，確保不會錯過任何消息
   datasource:
-    url: jdbc:postgresql://localhost:5432/notification_db
+    url: jdbc:postgresql://100.113.120.124:5432/notification_db
     username: merdeleine
     password: merdeleine_pw
     driver-class-name: org.postgresql.Driver
@@ -65,7 +65,7 @@ app:
 
 services:
   order-service:
-    base-url: http://localhost:8081
+    base-url: http://100.113.120.124:8081
     timeout-ms: 3000
 
 logging:
