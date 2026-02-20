@@ -25,12 +25,16 @@ public class EcpayController {
     private final EcpayProperties props;
     private final ObjectMapper objectMapper;
     private final OutboxEventRepository outboxEventRepository;
+    private final String paymentCompleteTopic;
+    private final String paymentFailedTopic;
 
-    public EcpayController(EcpayCheckoutService checkoutService, EcpayProperties props, ObjectMapper objectMapper, OutboxEventRepository outboxEventRepository) {
+    public EcpayController(EcpayCheckoutService checkoutService, EcpayProperties props, ObjectMapper objectMapper, OutboxEventRepository outboxEventRepository, String paymentCompleteTopic, String paymentFailedTopic) {
         this.checkoutService = checkoutService;
         this.props = props;
         this.objectMapper = objectMapper;
         this.outboxEventRepository = outboxEventRepository;
+        this.paymentCompleteTopic = paymentCompleteTopic;
+        this.paymentFailedTopic = paymentFailedTopic;
     }
 
     // Demo：直接用 orderId 產生導轉頁（你實作時應該從 DB 讀金額/品項）
@@ -66,17 +70,17 @@ public class EcpayController {
         if ("1".equals(rtnCode)) {
             // TODO: update to PAID, publish payment.completed.v1
             writeOutbox(
-                    "Payment",
+                    "PAYMENT",
                     UUID.randomUUID(), // TODO: 改成 orderId 或 paymentId
-                    "payment.completed.v1",
+                    paymentCompleteTopic,
                     Map.of("orderId", merchantTradeNo, "amount", params.getOrDefault("TradeAmt", ""))
             );
         } else {
             // TODO: update to FAILED or PENDING (ATM/超商可能是待繳費資訊)
             writeOutbox(
-                    "Payment",
+                    "PAYMENT",
                     UUID.randomUUID(), // TODO: 改成 orderId 或 paymentId
-                    "payment.failed.v1",
+                    paymentFailedTopic,
                     Map.of("orderId", merchantTradeNo, "rtnCode", rtnCode)
             );
         }
