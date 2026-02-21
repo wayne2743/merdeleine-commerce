@@ -2,7 +2,7 @@ package com.merdeleine.order.repository;
 
 import com.merdeleine.order.entity.Order;
 import com.merdeleine.order.entity.OrderItem;
-import com.merdeleine.order.enums.OrderStatus;
+import com.merdeleine.enums.OrderStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

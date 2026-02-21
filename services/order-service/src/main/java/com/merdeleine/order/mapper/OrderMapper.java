@@ -4,7 +4,7 @@ import com.merdeleine.order.dto.CreateOrderRequest;
 import com.merdeleine.order.dto.OrderResponse;
 import com.merdeleine.order.entity.Order;
 import com.merdeleine.order.entity.OrderItem;
-import com.merdeleine.order.enums.OrderStatus;
+import com.merdeleine.enums.OrderStatus;
 
 import java.util.UUID;
 

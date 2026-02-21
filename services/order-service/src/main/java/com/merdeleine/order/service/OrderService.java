@@ -6,7 +6,7 @@ import com.merdeleine.order.dto.OrderResponse;
 import com.merdeleine.order.dto.UpdateOrderRequest;
 import com.merdeleine.order.entity.Order;
 import com.merdeleine.order.entity.OutboxEvent;
-import com.merdeleine.order.enums.OrderStatus;
+import com.merdeleine.enums.OrderStatus;
 import com.merdeleine.order.enums.OutboxEventStatus;
 import com.merdeleine.order.mapper.OrderEventMapper;
 import com.merdeleine.order.mapper.OrderMapper;

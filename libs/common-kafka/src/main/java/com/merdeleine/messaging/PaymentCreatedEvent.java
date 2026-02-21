@@ -10,6 +10,7 @@ public record PaymentCreatedEvent (
         String eventType,
         UUID orderId,
         UUID paymentId,
+        String providerPaymentId,
         String customerEmail,
         String customerName,
         int totalAmount,

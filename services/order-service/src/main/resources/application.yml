@@ -51,6 +51,8 @@ app:
       sell-window-quota-configured: sell-window.quota.configured.v1
       batch-confirm-events: batch.confirmed.v1
       payment-requested-events: payment.requested.v1
+      payment-completed-events: payment.completed.v1
+      payment-paid-events: payment.paid.v1
   outbox:
     publish-interval-ms: 5000
 

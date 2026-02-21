@@ -1,17 +1,14 @@
 package com.merdeleine.messaging;
 
-import java.time.OffsetDateTime;
+import com.merdeleine.enums.PaymentStatus;
+
 import java.util.UUID;
 
-public record PaymentCompletedEvent (
+public record PaymentCompletedEvent(
         UUID eventId,
         String eventType,            // "order.quantity_committed.v1"
+        UUID paymentId,
         UUID orderId,
-        String orderNo,
-        UUID sellWindowId,
-        UUID productId,
-        int quantity,
-        OffsetDateTime occurredAt
-
+        PaymentStatus paymentStatus
 ){
 }

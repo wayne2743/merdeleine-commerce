@@ -41,6 +41,7 @@ public class NotificationMapper {
         payload.put("eventType", event.eventType());
         payload.put("orderId", event.orderId().toString());
         payload.put("paymentId", event.paymentId().toString());
+        payload.put("providerPaymentId", event.providerPaymentId());
         payload.put("customerName", event.customerName());
         payload.put("customerEmail", event.customerEmail());
         payload.put("totalAmount", event.totalAmount());

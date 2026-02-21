@@ -2,6 +2,7 @@ package com.merdeleine.payment.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.messaging.PaymentCreatedEvent;
+import com.merdeleine.messaging.PaymentCompletedEvent;
 import com.merdeleine.payment.entity.OutboxEvent;
 import com.merdeleine.payment.enums.OutboxEventStatus;
 import com.merdeleine.payment.repository.OutboxEventRepository;
@@ -42,6 +43,8 @@ public class OutboxPublisher {
                 switch (e.getEventType()) {
                     case "payment.created.v1" ->
                             event = objectMapper.treeToValue(e.getPayload(), PaymentCreatedEvent.class);
+                    case "payment.completed.v1" ->
+                            event = objectMapper.treeToValue(e.getPayload(), PaymentCompletedEvent.class);
                     default ->
                             throw new IllegalStateException("Unknown eventType: " + e.getEventType());
                 }

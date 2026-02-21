@@ -8,6 +8,7 @@
 <ul>
     <li>訂單 ID：<span th:text="${orderId}">ORDER_ID</span></li>
     <li>付款 ID：<span th:text="${paymentId}">PAYMENT_ID</span></li>
+    <li>綠界付款 ID：<span th:text="${providerPaymentId}">PROVIDER_PAYMENT_ID</span></li>
     <li>金額：<b><span th:text="${totalAmount}">0</span></b></li>
     <li>付款方式：<span th:text="${paymentProvider}">PROVIDER</span></li>
     <li>到期時間：<span th:text="${expireAtText}">YYYY-MM-DD HH:mm</span></li>

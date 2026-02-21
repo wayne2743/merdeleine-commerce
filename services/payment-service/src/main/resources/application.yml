@@ -61,7 +61,7 @@ ecpay:
 
   stage-url: "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"
   prod-url:  "https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5"
-  public-base-url: "https://e15d-36-231-146-208.ngrok-free.app"  # 換成你的 ngrok 網址
+  public-base-url: "https://4a24-2401-e180-88e0-1a4a-1d5e-ea37-798e-80e5.ngrok-free.app"  # 換成你的 ngrok 網址
 
 logging:
   level:

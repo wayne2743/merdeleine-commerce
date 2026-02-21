@@ -1,4 +1,4 @@
-package com.merdeleine.order.enums;
+package com.merdeleine.enums;
 
 public enum OrderStatus {
     RESERVED,

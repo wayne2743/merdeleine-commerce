@@ -35,10 +35,11 @@ public class PaymentCreatedConsumer {
     )
     @Transactional
     public void onMessage(PaymentCreatedEvent event, Acknowledgment ack) {
-        log.info("[PaymentCreated] eventId={}, orderId={}, paymentId={}, email={}, amount={}, provider={}, expireAt={}",
+        log.info("[PaymentCreated] eventId={}, orderId={}, paymentId={}, providerPaymentId={}, email={}, amount={}, provider={}, expireAt={}",
                 event.eventId(),
                 event.orderId(),
                 event.paymentId(),
+                event.providerPaymentId(),
                 event.customerEmail(),
                 event.totalAmount(),
                 event.paymentProvider(),

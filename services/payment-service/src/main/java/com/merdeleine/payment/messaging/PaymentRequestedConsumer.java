@@ -6,7 +6,7 @@ import com.merdeleine.messaging.PaymentRequestedEvent;
 import com.merdeleine.payment.entity.OutboxEvent;
 import com.merdeleine.payment.entity.Payment;
 import com.merdeleine.payment.enums.OutboxEventStatus;
-import com.merdeleine.payment.enums.PaymentStatus;
+import com.merdeleine.enums.PaymentStatus;
 import com.merdeleine.payment.repository.OutboxEventRepository;
 import com.merdeleine.payment.repository.PaymentRepository;
 import com.merdeleine.payment.utils.MerchantTradeNoGenerator;
@@ -84,6 +84,7 @@ public class PaymentRequestedConsumer {
                         paymentCreatedTopic,
                         payment.getOrderId(),
                         payment.getId(),
+                        payment.getProviderPaymentId(),
                         event.customerEmail(),
                         event.customerName(),
                         payment.getAmountCents(),

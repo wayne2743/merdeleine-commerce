@@ -1,4 +1,4 @@
-package com.merdeleine.payment.enums;
+package com.merdeleine.enums;
 
 public enum PaymentStatus {
     INIT,

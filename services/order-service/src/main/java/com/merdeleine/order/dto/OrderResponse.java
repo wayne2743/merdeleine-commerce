@@ -1,6 +1,6 @@
 package com.merdeleine.order.dto;
 
-import com.merdeleine.order.enums.OrderStatus;
+import com.merdeleine.enums.OrderStatus;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

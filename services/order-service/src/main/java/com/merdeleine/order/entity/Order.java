@@ -1,6 +1,6 @@
 package com.merdeleine.order.entity;
 
-import com.merdeleine.order.enums.OrderStatus;
+import com.merdeleine.enums.OrderStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;

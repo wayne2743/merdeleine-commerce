@@ -1,9 +1,8 @@
 package com.merdeleine.order.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.merdeleine.enums.PaymentProvider;
-import com.merdeleine.messaging.BatchConfirmEvent;
-import com.merdeleine.messaging.PaymentRequestedEvent;
+import com.merdeleine.messaging.PaymentCompletedEvent;
+import com.merdeleine.messaging.PaymentPaidEvent;
 import com.merdeleine.order.entity.Order;
 import com.merdeleine.order.entity.OutboxEvent;
 import com.merdeleine.enums.OrderStatus;
@@ -20,82 +19,72 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 
 @Component
-public class BatchConfirmConsumer {
+public class PaymentCompletedConsumer {
 
     private final OrderRepository orderRepository;
     private final ObjectMapper objectMapper;
     private final OutboxEventRepository outboxEventRepository;
-    private final String paymentRequestedTopic;
+    private final String paymentPaidTopic;
 
-    private final Logger log = LoggerFactory.getLogger(BatchConfirmConsumer.class);
+    private final Logger log = LoggerFactory.getLogger(PaymentCompletedConsumer.class);
 
-    public BatchConfirmConsumer(OrderRepository orderRepository,
-                                ObjectMapper objectMapper,
-                                OutboxEventRepository outboxEventRepository,
-                                @Value("${app.kafka.topic.payment-requested-events}") String paymentRequestedTopic
-    ) {
+    public PaymentCompletedConsumer(OrderRepository orderRepository,
+                                    ObjectMapper objectMapper,
+                                    OutboxEventRepository outboxEventRepository,
+                                    @Value("${app.kafka.topic.payment-paid-events}") String paymentPaidTopic
+                                   ) {
         this.orderRepository = orderRepository;
         this.objectMapper = objectMapper;
         this.outboxEventRepository = outboxEventRepository;
-
-        this.paymentRequestedTopic = paymentRequestedTopic;
+        this.paymentPaidTopic = paymentPaidTopic;
     }
 
     @KafkaListener(
-            topics = "${app.kafka.topic.batch-confirm-events}",
+            topics = "${app.kafka.topic.payment-completed-events}",
             groupId = "${app.kafka.consumer.group-id}"
     )
     @Transactional
     public void onMessage(
-            BatchConfirmEvent event,
+            PaymentCompletedEvent event,
             Acknowledgment ack
     ) {
         log.info(
-                "[BatchConfirmEvent] eventId={}, sellWindowId={}, productId={}, batchId={}",
+                "[PaymentCompleted] eventId={}, orderId={}, paymentStatus={}",
                 event.eventId(),
-                event.sellWindowId(),
-                event.productId(),
-                event.batchId()
+                event.orderId(),
+                event.paymentStatus()
         );
 
-        List<Order> orders = orderRepository.findBySellWindowId(event.sellWindowId());
-
-        orders.stream().forEach(order -> {
-            order.setStatus(OrderStatus.PAYMENT_REQUESTED);
-            OffsetDateTime base = OffsetDateTime.now();
-
-            order.setPaymentDueAt(
-                    base.toLocalDate()             // 取當天日期
-                    .atTime(LocalTime.MIDNIGHT)    // 00:00:00
-                    .atOffset(base.getOffset())    // 套回原本 offset
-                    .plusDays(3)                   // +3天);
-            );
-
-            writeOutbox(
-                    "Order",
-                    order.getId(),
-                    paymentRequestedTopic,
-                    new PaymentRequestedEvent(
-                            UUID.randomUUID(),
-                            paymentRequestedTopic,
-                            order.getId(),
-                            order.getContactEmail(),
-                            order.getContactName(),
-                            order.getTotalAmountCents(),
-                            order.getCurrency(),
-                            order.getPaymentDueAt(),
-                            PaymentProvider.ECpay
-                    )
-            );
-
-        });
+        Order order = orderRepository.findById(event.orderId()).orElseThrow(
+                () -> new RuntimeException("Order not found for orderId: " + event.orderId())
+        );
+        switch (event.paymentStatus()) {
+            case SUCCEEDED -> order.setStatus(OrderStatus.PAID);
+            case FAILED -> order.setStatus(OrderStatus.CANCELLED);
+            default -> {
+                log.warn("[PaymentCompleted] unknown paymentStatus={}, orderId={}", event.paymentStatus(), event.orderId());
+            }
+        }
+        writeOutbox(
+                "Order",
+                order.getId(),
+                paymentPaidTopic,
+                new PaymentPaidEvent(
+                        UUID.randomUUID(),
+                        paymentPaidTopic,
+                        order.getId(),
+                        order.getSellWindowId(),
+                        order.getItem().getProductId(),
+                        order.getItem().getQuantity(),
+                        order.getStatus(),
+                        OffsetDateTime.now()
+                )
+        );
 
         // ✅ 重點：等交易「真的 commit」成功後才 ack
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
@@ -109,6 +98,7 @@ public class BatchConfirmConsumer {
             // 理論上在 @Transactional 內會 active；保底用
             ack.acknowledge();
         }
+
     }
 
     private void writeOutbox(String aggregateType, UUID aggregateId, String eventType, Object payloadObj) {
@@ -127,3 +117,4 @@ public class BatchConfirmConsumer {
         }
     }
 }
+
