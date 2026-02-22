@@ -26,16 +26,24 @@ public class SellWindow {
     @Column(nullable = false, length = 50)
     private String timezone;
 
-    // NEW
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private SellWindowStatus status = SellWindowStatus.DRAFT;
 
-    // NEW
     @Column(name = "closed_at")
     private OffsetDateTime closedAt;
 
-    // NEW
+    // NEW: 付款時窗規則（confirm 後才開放付款）
+    @Column(name = "payment_ttl_minutes", nullable = false)
+    private int paymentTtlMinutes = 60 * 24; // default 24h（你可改）
+
+    // NEW: 付款視窗起訖
+    @Column(name = "payment_opened_at")
+    private OffsetDateTime paymentOpenedAt;
+
+    @Column(name = "payment_close_at")
+    private OffsetDateTime paymentCloseAt;
+
     @Version
     @Column(nullable = false)
     private long version;
@@ -44,9 +52,10 @@ public class SellWindow {
     void prePersist() {
         if (id == null) id = UUID.randomUUID();
         if (status == null) status = SellWindowStatus.DRAFT;
+        // paymentTtlMinutes 已有預設值
     }
 
-    // getters / setters
+    // getters / setters (略，照你現有風格補齊)
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -67,6 +76,15 @@ public class SellWindow {
 
     public OffsetDateTime getClosedAt() { return closedAt; }
     public void setClosedAt(OffsetDateTime closedAt) { this.closedAt = closedAt; }
+
+    public int getPaymentTtlMinutes() { return paymentTtlMinutes; }
+    public void setPaymentTtlMinutes(int paymentTtlMinutes) { this.paymentTtlMinutes = paymentTtlMinutes; }
+
+    public OffsetDateTime getPaymentOpenedAt() { return paymentOpenedAt; }
+    public void setPaymentOpenedAt(OffsetDateTime paymentOpenedAt) { this.paymentOpenedAt = paymentOpenedAt; }
+
+    public OffsetDateTime getPaymentCloseAt() { return paymentCloseAt; }
+    public void setPaymentCloseAt(OffsetDateTime paymentCloseAt) { this.paymentCloseAt = paymentCloseAt; }
 
     public long getVersion() { return version; }
 }

@@ -3,8 +3,10 @@ package com.merdeleine.catalog.repository;
 
 import com.merdeleine.catalog.entity.SellWindow;
 import com.merdeleine.catalog.enums.SellWindowStatus;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -48,4 +50,12 @@ public interface SellWindowRepository extends JpaRepository<SellWindow, UUID> {
             @Param("id") UUID id,
             @Param("version") long version,
             @Param("now") OffsetDateTime now
-    );}
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select sw from SellWindow sw where sw.id = :id")
+    Optional<SellWindow> findByIdForUpdate(@Param("id") UUID id);
+
+}
+
+

@@ -4,10 +4,14 @@ package com.merdeleine.production.planning.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.messaging.BatchConfirmEvent;
 import com.merdeleine.production.planning.client.OrderServiceClient;
+import com.merdeleine.production.planning.client.catalog.CatalogClient;
 import com.merdeleine.production.planning.dto.BatchCreateRequest;
 import com.merdeleine.production.planning.dto.BatchUpdateRequest;
+import com.merdeleine.production.planning.dto.OpenPaymentRequest;
+import com.merdeleine.production.planning.dto.OpenPaymentResponse;
 import com.merdeleine.production.planning.entity.Batch;
 import com.merdeleine.production.planning.entity.OutboxEvent;
+import com.merdeleine.production.planning.enums.BatchStatus;
 import com.merdeleine.production.planning.enums.OutboxEventStatus;
 import com.merdeleine.production.planning.repository.BatchRepository;
 import com.merdeleine.production.planning.repository.OutboxEventRepository;
@@ -18,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
@@ -28,16 +33,19 @@ public class BatchService {
     private final OrderServiceClient orderServiceClient;
     private final String batchConfirmedTopic;
     private final ObjectMapper objectMapper;
+    private final CatalogClient catalogClient;
 
     public BatchService(BatchRepository batchRepository, OutboxEventRepository outboxEventRepository,
                         OrderServiceClient orderServiceClient,
                         @Value("${app.kafka.topic.batch-confirm-events}") String batchConfirmedTopic,
-                        ObjectMapper objectMapper) {
+                        ObjectMapper objectMapper,
+                        CatalogClient catalogClient) {
         this.batchRepository = batchRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.orderServiceClient = orderServiceClient;
         this.batchConfirmedTopic = batchConfirmedTopic;
         this.objectMapper = objectMapper;
+        this.catalogClient = catalogClient;
     }
 
     @Transactional
@@ -93,6 +101,14 @@ public class BatchService {
                 batchId,
                 "LOCK_QUOTA_FOR_PAYMENT"
         );
+
+        // 2) 開啟付款視窗（由 Catalog 計算 paymentCloseAt，且冪等）
+        OpenPaymentResponse payWin = catalogClient.openPayment(batch.getSellWindowId(), new OpenPaymentRequest());
+
+        // 3) 更新 batch 狀態（可選：把 paymentCloseAt/confirmedAt 寫進 DB）
+        batch.setStatus(BatchStatus.CONFIRMED);
+        batch.setConfirmedAt(OffsetDateTime.now());
+        batchRepository.save(batch);
 
         writeOutbox(
                 "Batch",

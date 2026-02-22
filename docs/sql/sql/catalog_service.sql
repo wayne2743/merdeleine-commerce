@@ -22,19 +22,30 @@ CREATE TABLE product_variant (
                                      FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
+-- public.sell_window definition
 
-CREATE TABLE sell_window (
-                             id uuid NOT NULL,
-                             "name" varchar(100) NOT NULL,
-                             start_at timestamptz NOT NULL,
-                             end_at timestamptz NOT NULL,
-                             timezone varchar(50) NOT NULL,
-                             status varchar(20) NOT NULL,
-                             closed_at timestamptz NULL,
-                             "version" int8 NOT NULL,
-                             CONSTRAINT sell_window_pkey PRIMARY KEY (id)
+-- Drop table
+
+-- DROP TABLE public.sell_window;
+
+CREATE TABLE public.sell_window (
+                                    id uuid NOT NULL,
+                                    "name" varchar(100) NOT NULL,
+                                    start_at timestamptz NOT NULL,
+                                    end_at timestamptz NOT NULL,
+                                    timezone varchar(50) NOT NULL,
+                                    status varchar(20) DEFAULT 'DRAFT'::character varying NOT NULL,
+                                    closed_at timestamptz NULL,
+                                    "version" int8 DEFAULT 0 NOT NULL,
+                                    payment_ttl_minutes int4 DEFAULT 1440 NOT NULL,
+                                    payment_opened_at timestamptz NULL,
+                                    payment_close_at timestamptz NULL,
+                                    CONSTRAINT chk_sell_window_payment_ttl_positive CHECK ((payment_ttl_minutes > 0)),
+                                    CONSTRAINT chk_sell_window_payment_window_valid CHECK (((payment_opened_at IS NULL) OR (payment_close_at IS NULL) OR (payment_close_at >= payment_opened_at))),
+                                    CONSTRAINT ck_sell_window_status CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'OPEN'::character varying, 'PAYMENT_OPEN'::character varying, 'PAYMENT_CLOSED'::character varying, 'CLOSED'::character varying])::text[]))),
+	CONSTRAINT sell_window_pkey PRIMARY KEY (id)
 );
-
+CREATE INDEX idx_sell_window_payment_close_at ON public.sell_window USING btree (payment_close_at) WHERE (payment_close_at IS NOT NULL);
 
 CREATE TABLE product_sell_window (
                                      id UUID PRIMARY KEY,

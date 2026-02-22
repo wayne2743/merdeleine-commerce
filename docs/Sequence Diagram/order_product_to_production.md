@@ -19,21 +19,22 @@ sequenceDiagram
   %% =========================================================
   %% 1) Admin 建立商品/檔期/規則
   %% - Catalog: 建 product/sell_window/product_sell_window
+  %% - sell_window 只有接單截止(orderCloseAt) + 付款時窗規則(paymentTtlMinutes)
   %% - 同步 REST 初始化 Aggregator counter
   %% - 發 sell_window.created 事件給 Order 建 sell_window_quota 投影
   %% =========================================================
   Admin->>GW: 建立商品/檔期/門檻與上限
   GW->>CAT: POST /products /sell-windows /product-sell-window
-  CAT->>CAT: insert product, sell_window, product_sell_window
+  CAT->>CAT: insert product, sell_window(orderCloseAt,paymentTtlMinutes), product_sell_window
   CAT->>AGG: REST POST /internal/counters(sellWindowId,productId,threshold=minQty)
   AGG-->>CAT: 201 Created(counterId)
-  CAT->>K: publish sell_window.created(sellWindowId,productId,minQty,maxQty,closeAt)
+  CAT->>K: publish sell_window.created(sellWindowId,productId,minQty,maxQty,orderCloseAt,paymentTtlMinutes)
   CAT-->>GW: OK
   GW-->>Admin: OK
 
   %% Order 建立 quota(投影/下單檢查用)
   K-->>ORD: sell_window.created
-  ORD->>ORD: upsert sell_window_quota(min_qty,max_qty,sold_qty=0,status=OPEN)
+  ORD->>ORD: upsert sell_window_quota(min_qty,max_qty,sold_qty=0,status=OPEN,orderCloseAt,paymentTtlMinutes)
 
   %% =========================================================
   %% 2) Customer 預約下單（不付款）
@@ -73,31 +74,44 @@ sequenceDiagram
 
   %% =========================================================
   %% 4) Admin Confirm 成團（開放付款）
-  %% - Planning 建/更 batch 狀態為 CONFIRMED
+  %% - 本設計選擇：保留 batch.confirmed 為唯一驅動事件
+  %% - Planning confirm 內部先 call Catalog open-payment 取得 paymentCloseAt
+  %% - Planning upsert batch(status=CONFIRMED) 後 publish batch.confirmed(含 paymentCloseAt)
   %% =========================================================
   Admin->>GW: Confirm 成團/開放付款
   GW->>PLN: POST /batches/{sellWindowId}/confirm
-  PLN->>PLN: upsert batch(status=CONFIRMED, sellWindowId, productId)
-  PLN->>K: publish batch.confirmed(batchId,sellWindowId,productId)
+
+  PLN->>CAT: POST /internal/sell-windows/{sellWindowId}/open-payment
+  CAT->>CAT: if not opened -> set payment_opened_at=now(), payment_close_at=now()+paymentTtlMinutes, status=PAYMENT_OPEN
+  CAT-->>PLN: 200 OK(paymentCloseAt)
+
+  PLN->>PLN: upsert batch(status=CONFIRMED, sellWindowId, productId, target_qty=NULL)
+  PLN->>K: publish batch.confirmed(batchId,sellWindowId,productId,paymentCloseAt,confirmedAt)
   PLN-->>GW: OK
   GW-->>Admin: OK
+
+  %% (optional) 通知 Admin：已開放付款
+  K-->>NOTI: batch.confirmed
+  NOTI-->>Admin: 通知「已開放付款（含付款截止時間）」
+
 
   %% =========================================================
   %% 5) Order 收到 batch.confirmed 才「要求建立付款單」
   %% - 將 RESERVED -> PAYMENT_REQUESTED
+  %% - payment_due_at = paymentCloseAt
   %% - 逐筆 publish payment.requested
   %% =========================================================
   K-->>ORD: batch.confirmed
-  ORD->>ORD: update orders(RESERVED -> PAYMENT_REQUESTED) + set payment_due_at
+  ORD->>ORD: update orders(RESERVED -> PAYMENT_REQUESTED) + set payment_due_at = paymentCloseAt
   loop each order in PAYMENT_REQUESTED
-    ORD->>K: publish payment.requested(orderId,amount,expireAt,providerHint)
+    ORD->>K: publish payment.requested(orderId,amount,expireAt=paymentCloseAt,providerHint)
   end
 
   %% =========================================================
   %% 6) Payment 建立付款單 + 通知付款
   %% =========================================================
   K-->>PAY: payment.requested
-  PAY->>PAY: insert payment(status=INIT, order_id, amount, provider)
+  PAY->>PAY: insert payment(status=INIT, order_id, amount, provider, expireAt=paymentCloseAt)
   PAY->>K: publish payment.created(orderId,paymentId,payInfo,expireAt)
   K-->>NOTI: payment.created
   NOTI-->>Customer: 發送付款連結/繳費資訊
@@ -115,13 +129,13 @@ sequenceDiagram
     ORD->>ORD: update orders.status = PAID
     ORD->>K: publish order.paid(orderId,sellWindowId,productId,qty)
 
-    %% AGG 聚合 paid 與 reserved 轉移
+    %% AGG 聚合 paid
     K-->>AGG: order.paid
     AGG->>AGG: paid_qty += qty
 
   else payment.expired
-    SCH-->>+PAY: check exired payment
-    PAY->>-K:publish payment.expired
+    SCH-->>+PAY: check expired payment (now > expireAt)
+    PAY->>-K: publish payment.expired(orderId,paymentId)
     K-->>ORD: payment.expired
     ORD->>ORD: update orders.status = EXPIRED
     ORD->>K: publish order.expired(orderId,sellWindowId,productId,qty)
@@ -132,34 +146,28 @@ sequenceDiagram
 
   else payment.failed
     K-->>ORD: payment.failed
-
-    %% 付款嘗試失敗：保持 PAYMENT_REQUESTED（可重試），不釋放名額
     ORD->>ORD: keep orders.status = PAYMENT_REQUESTED
-    %% (optional) 紀錄失敗原因/次數，便於客服或風控
-    %% ORD->>ORD: update orders.last_payment_error / payment_failed_count
-
-    %% (optional) 通知客戶：付款失敗可重試（或由前端自行提示）
     ORD->>K: publish notification.requested(payment_failed, orderId, customer)
     K-->>NOTI: notification.requested
     NOTI-->>Customer: 付款失敗，請重新嘗試/更換支付方式
   end
 
   %% =========================================================
-  %% 10) closeAt 結算最終生產量（以 paid_qty 為準）
-  %% - Planning 發 finalize_requested
-  %% - Aggregator 回 finalized(finalPaidQty)
-  %% - Planning 排產 production.scheduled
+  %% 10) paymentCloseAt 結算最終生產量（以 paid_qty 為準）
+  %% - Scheduler 掃 Catalog 的 payment_close_at（時間真相來源仍在 Catalog）
+  %% - 觸發 Planning finalize；Planning 向 AGG 取 paid snapshot
+  %% - Planning 更新 batch.target_qty 並發 production.scheduled
   %% =========================================================
-  SCH-->>PLN: 到 closeAt 觸發 finalize
-  PLN->>K: publish sell_window.finalize_requested(sellWindowId,productId)
+  SCH-->>CAT: scan sell_window where now >= payment_close_at and not finalized
+  CAT-->>SCH: due sellWindowId(s), productId(s)
+  SCH-->>PLN: trigger finalize(sellWindowId,productId)
 
-  K-->>AGG: sell_window.finalize_requested
-  AGG->>AGG: finalPaidQty = paid_qty (snapshot)
-  AGG->>K: publish sell_window.finalized(sellWindowId,productId,finalPaidQty)
+  PLN->>AGG: REST GET /internal/counters/{sellWindowId}/{productId}/snapshot
+  AGG-->>PLN: {paid_qty, reserved_qty, asOfTs}
 
-  K-->>PLN: sell_window.finalized
-  PLN->>PLN: update batch.target_qty = finalPaidQty
-  PLN->>K: publish production.scheduled(batchId,productId,productionQty=finalPaidQty)
+  PLN->>PLN: batch.target_qty = f(paid_qty, pack_size, buffer_policy, capacity)
+  PLN->>PLN: batch.status = FINALIZED
+  PLN->>K: publish production.scheduled(batchId,productId,productionQty=batch.target_qty)
 
   %% =========================================================
   %% 11) Production 建工單/工序

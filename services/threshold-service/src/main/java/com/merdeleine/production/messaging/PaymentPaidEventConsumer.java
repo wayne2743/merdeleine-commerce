@@ -1,21 +1,17 @@
 package com.merdeleine.production.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.merdeleine.messaging.OrderReservedEvent;
 import com.merdeleine.messaging.PaymentPaidEvent;
 import com.merdeleine.production.entity.BatchCounter;
 import com.merdeleine.production.entity.OutboxEvent;
-import com.merdeleine.production.enums.CounterStatus;
 import com.merdeleine.production.enums.OutboxEventStatus;
 import com.merdeleine.production.mapper.CounterEventLogMapper;
-import com.merdeleine.production.mapper.ThresholdEventMapper;
 import com.merdeleine.production.repository.BatchCounterRepository;
 import com.merdeleine.production.repository.CounterEventLogRepository;
 import com.merdeleine.production.repository.OutboxEventRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
@@ -72,17 +68,8 @@ public class PaymentPaidEventConsumer {
                 .save(new CounterEventLogMapper().toCounterEventLog(event, batchCounter));
 
         int newPaidQty = batchCounter.getPaidQty() + event.quantity();
-        batchCounter.setReservedQty(newPaidQty);
-        if(newReservedQty >= batchCounter.getThresholdQty()
-            && batchCounter.getStatus() == CounterStatus.OPEN) {
-            batchCounter.setStatus(CounterStatus.REACHED);
-            writeOutbox(
-                    "BATCHCOUNTER",
-                    batchCounter.getId(),
-                    thresholdReachedTopic,
-                    new ThresholdEventMapper().toThresholdReachedEvent(batchCounter, thresholdReachedTopic)
-            );
-        }
+        batchCounter.setPaidQty(newPaidQty);
+
         ack.acknowledge();
     }
 

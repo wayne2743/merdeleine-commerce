@@ -31,6 +31,11 @@ public class GlobalExceptionHandler {
                 .body(ApiErrorResponse.of("BAD_REQUEST", ex.getMessage()));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<?> handleConflict(IllegalStateException e) {
+        return ResponseEntity.status(409).body(ApiErrorResponse.of("CONFLICT", e.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
         log.error(ex.getMessage(), ex);

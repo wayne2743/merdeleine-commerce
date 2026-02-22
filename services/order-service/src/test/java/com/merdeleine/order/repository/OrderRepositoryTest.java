@@ -64,7 +64,7 @@ class OrderRepositoryTest {
         testOrder.setOrderNo("ORD-001");
         testOrder.setCustomerId(customerId);
         testOrder.setSellWindowId(sellWindowId);
-        testOrder.setStatus(OrderStatus.PENDING_PAYMENT);
+        testOrder.setStatus(OrderStatus.RESERVED);
         testOrder.setTotalAmountCents(10000);
         testOrder.setCurrency("TWD");
         testOrder.setContactName("Test User");
@@ -79,7 +79,7 @@ class OrderRepositoryTest {
         
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getOrderNo()).isEqualTo("ORD-001");
-        assertThat(saved.getStatus()).isEqualTo(OrderStatus.PENDING_PAYMENT);
+        assertThat(saved.getStatus()).isEqualTo(OrderStatus.RESERVED);
         assertThat(saved.getCreatedAt()).isNotNull();
         assertThat(saved.getUpdatedAt()).isNotNull();
     }
@@ -126,7 +126,7 @@ class OrderRepositoryTest {
         paidOrder.setCurrency("TWD");
         entityManager.persistAndFlush(paidOrder);
         
-        List<Order> pendingOrders = orderRepository.findByStatus(OrderStatus.PENDING_PAYMENT);
+        List<Order> pendingOrders = orderRepository.findByStatus(OrderStatus.RESERVED);
         
         assertThat(pendingOrders).hasSize(1);
         assertThat(pendingOrders.get(0).getOrderNo()).isEqualTo("ORD-001");
@@ -146,10 +146,10 @@ class OrderRepositoryTest {
     void testFindByCustomerIdAndStatus() {
         entityManager.persistAndFlush(testOrder);
         
-        List<Order> orders = orderRepository.findByCustomerIdAndStatus(customerId, OrderStatus.PENDING_PAYMENT);
+        List<Order> orders = orderRepository.findByCustomerIdAndStatus(customerId, OrderStatus.RESERVED);
         
         assertThat(orders).hasSize(1);
-        assertThat(orders.get(0).getStatus()).isEqualTo(OrderStatus.PENDING_PAYMENT);
+        assertThat(orders.get(0).getStatus()).isEqualTo(OrderStatus.RESERVED);
     }
 
     @Test
