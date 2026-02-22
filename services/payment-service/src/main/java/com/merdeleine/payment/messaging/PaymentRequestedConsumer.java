@@ -70,6 +70,7 @@ public class PaymentRequestedConsumer {
         payment.setCurrency(event.currency());
         payment.setProvider(event.provider());
         payment.setProviderPaymentId(MerchantTradeNoGenerator.generate());
+        payment.setExpireAt(event.expiresAt()); // 也就是 paymentCloseAt
 
         paymentRepository.save(payment);
 

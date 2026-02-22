@@ -65,7 +65,7 @@ public class PaymentCompletedConsumer {
         );
         switch (event.paymentStatus()) {
             case SUCCEEDED -> order.setStatus(OrderStatus.PAID);
-            case FAILED -> order.setStatus(OrderStatus.CANCELLED);
+            case FAILED -> order.setStatus(OrderStatus.PAYMENT_REQUESTED);
             default -> {
                 log.warn("[PaymentCompleted] unknown paymentStatus={}, orderId={}", event.paymentStatus(), event.orderId());
             }

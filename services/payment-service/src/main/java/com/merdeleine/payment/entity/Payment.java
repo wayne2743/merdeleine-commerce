@@ -44,6 +44,12 @@ public class Payment {
     @Column(name = "provider_payment_id", length = 100)
     private String providerPaymentId;
 
+    @Column(name = "expire_at")
+    private OffsetDateTime expireAt;
+
+    @Column(name = "expired_at")
+    private OffsetDateTime expiredAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -83,4 +89,10 @@ public class Payment {
 
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
+
+    public OffsetDateTime getExpireAt() { return expireAt; }
+    public void setExpireAt(OffsetDateTime expireAt) { this.expireAt = expireAt; }
+
+    public OffsetDateTime getExpiredAt() { return expiredAt; }
+    public void setExpiredAt(OffsetDateTime expiredAt) { this.expiredAt = expiredAt; }
 }

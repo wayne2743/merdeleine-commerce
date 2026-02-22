@@ -1,6 +1,7 @@
 package com.merdeleine.production.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merdeleine.enums.OrderStatus;
 import com.merdeleine.messaging.PaymentPaidEvent;
 import com.merdeleine.production.entity.BatchCounter;
 import com.merdeleine.production.entity.OutboxEvent;
@@ -52,6 +53,11 @@ public class PaymentPaidEventConsumer {
             return;
         }
 
+        if(event.orderStatus() != OrderStatus.PAID) {
+            log.info("Order status is not PAID, skipping processing for eventId: " + event.eventId());
+            ack.acknowledge();
+            return;
+        }
 
         BatchCounter batchCounter = batchCounterRepository
                 .findBySellWindowIdAndProductId(event.sellWindowId(), event.productId())
