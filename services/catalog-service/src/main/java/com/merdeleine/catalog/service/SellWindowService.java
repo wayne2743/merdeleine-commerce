@@ -100,7 +100,17 @@ public class SellWindowService {
     }
 
     private SellWindowDto.Response toResponse(SellWindow e) {
-        return new SellWindowDto.Response(e.getId(), e.getName(), e.getStartAt(), e.getEndAt(), e.getTimezone());
+        return new SellWindowDto.Response(
+                e.getId(),
+                e.getName(),
+                e.getStartAt(),
+                e.getEndAt(),
+                e.getTimezone(),
+                e.getStatus(),
+                e.getPaymentTtlMinutes(),
+                e.getPaymentOpenedAt(),
+                e.getPaymentCloseAt()
+        );
     }
 
     @Transactional

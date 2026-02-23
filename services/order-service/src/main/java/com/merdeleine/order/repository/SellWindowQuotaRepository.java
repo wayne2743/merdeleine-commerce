@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota, UUID> {
+public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota, UUID>, SellWindowQuotaRepositoryCustom  {
 
     @Modifying
     @Query(value = """

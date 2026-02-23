@@ -93,9 +93,11 @@ public final class ProductSellWindowDto {
     public static final class Response {
         private UUID id;
         private UUID productId;
+        private String productiName;
         private UUID sellWindowId;
+        private String sellWindowName;
 
-        private int thresholdQty;
+        private Integer thresholdQty;
         private Integer maxTotalQty;
         private Integer leadDays;
         private Integer shipDays;

@@ -47,23 +47,22 @@ CREATE TABLE public.sell_window (
 );
 CREATE INDEX idx_sell_window_payment_close_at ON public.sell_window USING btree (payment_close_at) WHERE (payment_close_at IS NOT NULL);
 
-CREATE TABLE product_sell_window (
-                                     id UUID PRIMARY KEY,
-                                     product_id UUID NOT NULL,
-                                     sell_window_id UUID NOT NULL,
-                                     min_total_qty INTEGER NOT NULL CHECK (min_total_qty >= 0),
-                                     max_total_qty INTEGER,
-                                     lead_days INTEGER,
-                                     ship_days INTEGER,
-                                     is_closed BOOLEAN NOT NULL DEFAULT true,
-                                     CONSTRAINT fk_psw_product
-                                         FOREIGN KEY (product_id) REFERENCES product(id),
-                                     CONSTRAINT fk_psw_sell_window
-                                         FOREIGN KEY (sell_window_id) REFERENCES sell_window(id),
-                                     CONSTRAINT uq_product_sell_window
-                                         UNIQUE (product_id, sell_window_id)
+CREATE TABLE sell_window_quota (
+                                          id uuid NOT NULL,
+                                          sell_window_id uuid NOT NULL,
+                                          product_id uuid NOT NULL,
+                                          min_qty int4 DEFAULT 0 NOT NULL,
+                                          max_qty int4 NOT NULL,
+                                          sold_qty int4 DEFAULT 0 NOT NULL,
+                                          status varchar(20) DEFAULT 'OPEN'::character varying NOT NULL,
+                                          updated_at timestamptz DEFAULT now() NOT NULL,
+                                          CONSTRAINT ck_max_positive CHECK ((max_qty > 0)),
+                                          CONSTRAINT ck_qty_nonneg CHECK ((sold_qty >= 0)),
+                                          CONSTRAINT sell_window_quota_pkey PRIMARY KEY (id),
+                                          CONSTRAINT sell_window_quota_status_check CHECK (((status)::text = ANY ((ARRAY['OPEN'::character varying, 'CLOSED'::character varying])::text[]))),
+	CONSTRAINT uq_quota null
 );
-
+CREATE INDEX idx_quota_lookup ON public.sell_window_quota USING btree (sell_window_id, product_id);
 
 CREATE TABLE public.outbox_event (
                                      id uuid NOT NULL,

@@ -10,7 +10,11 @@ import java.util.UUID;
 @Table(
         name = "sell_window_quota",
         uniqueConstraints = @UniqueConstraint(name = "uq_quota",
-                columnNames = {"sell_window_id", "product_id", "variant_id"})
+                columnNames = {"sell_window_id", "product_id"}
+        ),
+        indexes = {
+                @Index(name = "idx_quota_sell_window_product", columnList = "sell_window_id, product_id")
+        }
 )
 public class SellWindowQuota {
 

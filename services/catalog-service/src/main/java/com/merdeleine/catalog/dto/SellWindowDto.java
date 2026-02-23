@@ -1,5 +1,6 @@
 package com.merdeleine.catalog.dto;
 
+import com.merdeleine.catalog.enums.SellWindowStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -72,15 +73,24 @@ public final class SellWindowDto {
         private OffsetDateTime startAt;
         private OffsetDateTime endAt;
         private String timezone;
+        private SellWindowStatus status;
+        private int paymentTtlMinutes;
+        private OffsetDateTime paymentOpenAt;
+        private OffsetDateTime paymentCloseAt;
+
 
         public Response() {}
 
-        public Response(UUID id, String name, OffsetDateTime startAt, OffsetDateTime endAt, String timezone) {
+        public Response(UUID id, String name, OffsetDateTime startAt, OffsetDateTime endAt, String timezone, SellWindowStatus status, int paymentTtlMinutes, OffsetDateTime paymentOpenAt, OffsetDateTime paymentCloseAt) {
             this.id = id;
             this.name = name;
             this.startAt = startAt;
             this.endAt = endAt;
             this.timezone = timezone;
+            this.status = status;
+            this.paymentTtlMinutes = paymentTtlMinutes;
+            this.paymentOpenAt = paymentOpenAt;
+            this.paymentCloseAt = paymentCloseAt;
         }
 
         public UUID getId() { return id; }
@@ -97,5 +107,37 @@ public final class SellWindowDto {
 
         public String getTimezone() { return timezone; }
         public void setTimezone(String timezone) { this.timezone = timezone; }
+
+        public SellWindowStatus getStatus() {
+            return status;
+        }
+
+        public void setStatus(SellWindowStatus status) {
+            this.status = status;
+        }
+
+        public int getPaymentTtlMinutes() {
+            return paymentTtlMinutes;
+        }
+
+        public void setPaymentTtlMinutes(int paymentTtlMinutes) {
+            this.paymentTtlMinutes = paymentTtlMinutes;
+        }
+
+        public OffsetDateTime getPaymentOpenAt() {
+            return paymentOpenAt;
+        }
+
+        public void setPaymentOpenAt(OffsetDateTime paymentOpenAt) {
+            this.paymentOpenAt = paymentOpenAt;
+        }
+
+        public OffsetDateTime getPaymentCloseAt() {
+            return paymentCloseAt;
+        }
+
+        public void setPaymentCloseAt(OffsetDateTime paymentCloseAt) {
+            this.paymentCloseAt = paymentCloseAt;
+        }
     }
 }

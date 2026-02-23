@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/sell-windows")
+@RequestMapping("/api/catalog/sell-windows")
 public class SellWindowController {
 
     private final SellWindowService sellWindowService;

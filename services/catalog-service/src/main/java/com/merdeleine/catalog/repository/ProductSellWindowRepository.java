@@ -1,14 +1,19 @@
 package com.merdeleine.catalog.repository;
 
 
+import com.merdeleine.catalog.dto.ProductSellWindowRow;
 import com.merdeleine.catalog.entity.Product;
 import com.merdeleine.catalog.entity.ProductSellWindow;
 import com.merdeleine.catalog.entity.SellWindow;
+import com.merdeleine.catalog.enums.SellWindowStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,4 +38,30 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
           and psw.isClosed = false
     """)
     int closeAllOpenBySellWindowId(@Param("sellWindowId") UUID sellWindowId);
+
+    @Query("""
+        select new com.merdeleine.catalog.dto.ProductSellWindowRow(
+            sw.id, sw.name, sw.startAt, sw.endAt, sw.timezone, sw.paymentCloseAt,
+            p.id, p.name,
+            psw.minTotalQty, psw.maxTotalQty
+        )
+        from ProductSellWindow psw
+        join psw.product p
+        join psw.sellWindow sw
+        order by sw.startAt desc, p.name asc
+    """)
+    Page<ProductSellWindowRow> pageRows(Pageable pageable);
+
+    @Query("""
+        select psw
+        from ProductSellWindow psw
+        join fetch psw.sellWindow sw
+        join fetch psw.product p
+        where p.id = :productId
+          and psw.isClosed = false
+          and sw.status = :status
+          and sw.endAt > :now
+        order by sw.endAt asc
+    """)
+    Optional<ProductSellWindow> findFirstActiveByProductId(UUID productId, SellWindowStatus status, OffsetDateTime now);
 }

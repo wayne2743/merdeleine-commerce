@@ -37,7 +37,9 @@ merdeleine:
     topics:
       sell-window-quota-configured: sell-window.quota.configured.v1
       sell-window-closed: sell-window.closed.v1
-
+app:
+  order:
+    base-url: http://localhost:8083
 
 logging:
   level:

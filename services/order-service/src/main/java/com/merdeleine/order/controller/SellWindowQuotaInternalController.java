@@ -2,13 +2,16 @@ package com.merdeleine.order.controller;
 
 
 import com.merdeleine.order.dto.CloseQuotaDtos;
+import com.merdeleine.order.dto.SellWindowQuotaBatchDto;
 import com.merdeleine.order.service.SellWindowQuotaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/internal/sell-window-quotas")
+@RequestMapping("/order/internal/sell-window-quotas")
 public class SellWindowQuotaInternalController {
 
     private final SellWindowQuotaService service;
@@ -22,4 +25,16 @@ public class SellWindowQuotaInternalController {
     public CloseQuotaDtos.CloseQuotaResponse close(@Valid @RequestBody CloseQuotaDtos.CloseQuotaRequest req) {
         return service.close(req);
     }
+
+    @PostMapping("/_batch")
+    public List<SellWindowQuotaBatchDto.QuotaResponse> batchGet(
+            @RequestBody SellWindowQuotaBatchDto.BatchRequest req
+    ) {
+        List<SellWindowQuotaBatchDto.Key> keys =
+                (req == null) ? List.of() : req.keys();
+
+        return service.batchGet(keys);
+    }
+
+
 }
