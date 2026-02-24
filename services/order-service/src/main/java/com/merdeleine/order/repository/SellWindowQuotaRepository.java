@@ -2,11 +2,15 @@ package com.merdeleine.order.repository;
 
 
 import com.merdeleine.order.entity.SellWindowQuota;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota, UUID>, SellWindowQuotaRepositoryCustom  {
@@ -86,4 +90,18 @@ public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota
     """)
     int close(UUID sellWindowId, UUID productId, String closedStatus, OffsetDateTime now);
 
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        select q
+        from SellWindowQuota q
+        where q.sellWindowId = :sellWindowId
+          and q.productId = :productId
+    """)
+    Optional<SellWindowQuota> findForUpdate(
+            @Param("sellWindowId") UUID sellWindowId,
+            @Param("productId") UUID productId
+    );
+
+    Optional<SellWindowQuota> findBySellWindowIdAndProductId(UUID sellWindowId, UUID productId);
 }

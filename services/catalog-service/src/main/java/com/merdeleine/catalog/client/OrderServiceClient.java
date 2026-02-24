@@ -42,4 +42,32 @@ public class OrderServiceClient {
                 .retrieve()
                 .body(AutoReserveResponse.class);
     }
+
+
+    // NEW: upsert quota
+    public record UpsertQuotaRequest(
+            UUID sellWindowId,
+            UUID productId,
+            Integer minQty,
+            Integer maxQty
+    ) {}
+
+    public record UpsertQuotaResponse(
+            UUID id,
+            UUID sellWindowId,
+            UUID productId,
+            Integer minQty,
+            Integer maxQty,
+            Integer soldQty,
+            String status
+    ) {}
+
+    public UpsertQuotaResponse upsertQuota(UpsertQuotaRequest req) {
+        return restClient.put()
+                .uri("/order/internal/sell-window-quotas/upsert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(req)
+                .retrieve()
+                .body(UpsertQuotaResponse.class);
+    }
 }

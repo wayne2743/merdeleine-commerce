@@ -1,7 +1,9 @@
 package com.merdeleine.catalog.service;
 
 import com.merdeleine.catalog.client.OrderServiceClient;
-
+import com.merdeleine.catalog.client.ThresholdServiceClient;
+import com.merdeleine.catalog.dto.AutoGroupOrderDtos;
+import com.merdeleine.catalog.dto.threshold.BatchCounterRequest;
 import com.merdeleine.catalog.entity.Product;
 import com.merdeleine.catalog.entity.ProductSellWindow;
 import com.merdeleine.catalog.entity.SellWindow;
@@ -13,29 +15,37 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AutoGroupOrderService {
+
+    // maxQty 若 catalog 允許 null(不限制)，但 order quota 目前是必填 int，
+    // 先用一個大數頂住；後續你要再把 order 端 maxQty 改成 nullable
+    private static final int DEFAULT_MAX_QTY = 9999;
 
     private final ProductRepository productRepository;
     private final SellWindowRepository sellWindowRepository;
     private final ProductSellWindowRepository productSellWindowRepository;
     private final SellWindowPlanner planner;
     private final OrderServiceClient orderClient;
+    private final ThresholdServiceClient thresholdClient;
 
     public AutoGroupOrderService(
             ProductRepository productRepository,
             SellWindowRepository sellWindowRepository,
             ProductSellWindowRepository productSellWindowRepository,
             SellWindowPlanner planner,
-            OrderServiceClient orderClient
+            OrderServiceClient orderClient,
+            ThresholdServiceClient thresholdClient
     ) {
         this.productRepository = productRepository;
         this.sellWindowRepository = sellWindowRepository;
         this.productSellWindowRepository = productSellWindowRepository;
         this.planner = planner;
         this.orderClient = orderClient;
+        this.thresholdClient = thresholdClient;
     }
 
     @Transactional
@@ -46,14 +56,49 @@ public class AutoGroupOrderService {
 
         OffsetDateTime now = OffsetDateTime.now();
 
+        boolean createdNew = false;
+
         // 1) 找是否已有可用檔期
-        ProductSellWindow psw = productSellWindowRepository
-                .findFirstActiveByProductId(product.getId(), SellWindowStatus.OPEN, now)
-                .orElseGet(() -> createNewSellWindow(product));
+        Optional<ProductSellWindow> existing = productSellWindowRepository
+                .findFirstActiveByProductId(product.getId(), SellWindowStatus.OPEN, now);
+
+        ProductSellWindow psw;
+        if (existing.isPresent()) {
+            psw = existing.get();
+        } else {
+            psw = createNewSellWindow(product);
+            createdNew = true;
+            onProductSellWindowCreated(
+                    psw.getSellWindow().getId(),
+                    product.getId(),
+                    psw.getMinTotalQty()
+            );
+        }
 
         SellWindow sw = psw.getSellWindow();
 
-        // 2) 呼叫 order-service 建 reserved 訂單
+        // 2) 先 upsert quota（確保 order-service 立刻有投影）
+        // min/max 以 product_sell_window 設定為準
+        int minQty = psw.getMinTotalQty();
+        int maxQty = (psw.getMaxTotalQty() == null) ? DEFAULT_MAX_QTY : psw.getMaxTotalQty();
+
+        try {
+            orderClient.upsertQuota(new OrderServiceClient.UpsertQuotaRequest(
+                    sw.getId(),
+                    product.getId(),
+                    minQty,
+                    maxQty
+            ));
+        } catch (Exception e) {
+            // upsert quota 失敗，如果是新建檔期才補償關閉
+            if (createdNew) {
+                sw.setStatus(SellWindowStatus.CLOSED);
+                psw.setClosed(true);
+            }
+            throw new RuntimeException("order-service upsert quota failed: " + e.getMessage(), e);
+        }
+
+        // 3) 再呼叫 order-service 建 reserved 訂單
         OrderServiceClient.AutoReserveResponse orderResp;
         try {
             orderResp = orderClient.autoReserve(new OrderServiceClient.AutoReserveRequest(
@@ -66,11 +111,11 @@ public class AutoGroupOrderService {
                     req.shippingAddress()
             ));
         } catch (Exception e) {
-            // MVP：如果這次是新建檔期但下單失敗，做補償：取消檔期 + 關閉 psw
-            // （你之後有 BFF/Outbox/補償流程可以再更精緻）
-            sw.setStatus(SellWindowStatus.CANCELED);
-            psw.setClosed(true);
-            // JPA dirty checking 會在 commit 時更新
+            // auto-reserve 失敗，如果是新建檔期才補償關閉
+            if (createdNew) {
+                sw.setStatus(SellWindowStatus.CLOSED);
+                psw.setClosed(true);
+            }
             throw new RuntimeException("order-service auto-reserve failed: " + e.getMessage(), e);
         }
 
@@ -91,7 +136,7 @@ public class AutoGroupOrderService {
         SellWindowPlanner.Plan plan = planner.plan();
 
         SellWindow sw = new SellWindow();
-        sw.setName("AUTO-" + UUID.randomUUID()); // 你現在 name unique，先用 UUID 避免衝突
+        sw.setName("AUTO-" + UUID.randomUUID()); // name unique
         sw.setStartAt(plan.startAt());
         sw.setEndAt(plan.endAt());
         sw.setTimezone(plan.timezone());
@@ -104,13 +149,24 @@ public class AutoGroupOrderService {
         psw.setProduct(product);
         psw.setSellWindow(sw);
 
-        // MVP：先用固定規則
+        // 你後續可改成從 Product 設定 / 預設規則算出來
         psw.setMinTotalQty(1);
-        psw.setMaxTotalQty(9999);   // 或 null 表示不限制
+        psw.setMaxTotalQty(DEFAULT_MAX_QTY);
         psw.setClosed(false);
 
         productSellWindowRepository.save(psw);
 
         return psw;
+    }
+
+    private void onProductSellWindowCreated(UUID sellWindowId, UUID productId, int thresholdQty) {
+
+        BatchCounterRequest req = new BatchCounterRequest();
+        req.setSellWindowId(sellWindowId);
+        req.setProductId(productId);
+        req.setThresholdQty(thresholdQty);
+        req.setStatus("OPEN");
+
+        thresholdClient.createBatchCounter(req);
     }
 }

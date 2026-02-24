@@ -30,7 +30,7 @@ spring:
     time-zone: UTC
 
 threshold-service:
-  base-url: http://100.113.120.124:8087
+  base-url: http://localhost:8087
 
 merdeleine:
   kafka:
@@ -38,8 +38,9 @@ merdeleine:
       sell-window-quota-configured: sell-window.quota.configured.v1
       sell-window-closed: sell-window.closed.v1
 app:
-  order:
-    base-url: http://localhost:8083
+  services:
+    order:
+      base-url: http://localhost:8083
 
 logging:
   level:

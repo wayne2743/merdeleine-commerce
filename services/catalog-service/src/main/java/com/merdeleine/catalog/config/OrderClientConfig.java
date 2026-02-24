@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 public class OrderClientConfig {
 
     @Bean
-    RestClient orderRestClient(@Value("${app.order.base-url}") String baseUrl) {
+    RestClient orderRestClient(@Value("${app.services.order.base-url}") String baseUrl) {
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();

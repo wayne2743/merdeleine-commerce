@@ -3,6 +3,7 @@ package com.merdeleine.order.controller;
 
 import com.merdeleine.order.dto.CloseQuotaDtos;
 import com.merdeleine.order.dto.SellWindowQuotaBatchDto;
+import com.merdeleine.order.dto.SellWindowQuotaUpsertDtos;
 import com.merdeleine.order.service.SellWindowQuotaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -36,5 +37,9 @@ public class SellWindowQuotaInternalController {
         return service.batchGet(keys);
     }
 
+    @PutMapping("/upsert")
+    public SellWindowQuotaUpsertDtos.Response upsert(@Valid @RequestBody SellWindowQuotaUpsertDtos.Request req) {
+        return service.upsert(req);
+    }
 
 }
