@@ -32,6 +32,14 @@ public class ProductSellWindow {
     @Column
     private Integer shipDays;
 
+    // ✅ NEW: 價格
+    @Column(name = "unit_price_cents", nullable = false)
+    private Integer unitPriceCents;
+
+    // ✅ NEW: 幣別
+    @Column(nullable = false, length = 10)
+    private String currency;
+
     @Column(nullable = false)
     private boolean isClosed = true;
 
@@ -105,5 +113,21 @@ public class ProductSellWindow {
 
     public void setClosed(boolean closed) {
         isClosed = closed;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public Integer getUnitPriceCents() {
+        return unitPriceCents;
+    }
+
+    public void setUnitPriceCents(Integer unitPriceCents) {
+        this.unitPriceCents = unitPriceCents;
     }
 }

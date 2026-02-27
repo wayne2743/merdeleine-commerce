@@ -23,6 +23,8 @@ public class OrderServiceClient {
             UUID sellWindowId,
             UUID productId,
             Integer qty,
+            Integer unitPriceCents,
+            String currency,
             String contactName,
             String contactPhone,
             String contactEmail,

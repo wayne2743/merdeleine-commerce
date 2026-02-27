@@ -1,7 +1,6 @@
 package com.merdeleine.catalog.repository;
 
 
-import com.merdeleine.catalog.dto.ProductSellWindowRow;
 import com.merdeleine.catalog.entity.Product;
 import com.merdeleine.catalog.entity.ProductSellWindow;
 import com.merdeleine.catalog.entity.SellWindow;
@@ -40,11 +39,24 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
     int closeAllOpenBySellWindowId(@Param("sellWindowId") UUID sellWindowId);
 
     @Query("""
-        select new com.merdeleine.catalog.dto.ProductSellWindowRow(
-            sw.id, sw.name, sw.startAt, sw.endAt, sw.timezone, sw.paymentCloseAt,
-            p.id, p.name,
-            psw.minTotalQty, psw.maxTotalQty
-        )
+        select
+            psw.id as productSellWindowId,
+    
+            sw.id as sellWindowId,
+            sw.name as sellWindowName,
+            sw.startAt as startAt,
+            sw.endAt as endAt,
+            sw.timezone as timezone,
+            sw.paymentCloseAt as paymentCloseAt,
+    
+            p.id as productId,
+            p.name as productName,
+    
+            psw.unitPriceCents as unitPriceCents,
+            psw.currency as currency,
+    
+            psw.minTotalQty as minQty,
+            psw.maxTotalQty as maxQty
         from ProductSellWindow psw
         join psw.product p
         join psw.sellWindow sw
@@ -64,4 +76,49 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
         order by sw.endAt asc
     """)
     Optional<ProductSellWindow> findFirstActiveByProductId(UUID productId, SellWindowStatus status, OffsetDateTime now);
+
+
+    @Query("""
+        select
+            psw.id as productSellWindowId,
+            sw.id as sellWindowId,
+            sw.name as sellWindowName,
+            sw.startAt as startAt,
+            sw.endAt as endAt,
+            sw.timezone as timezone,
+            sw.paymentCloseAt as paymentCloseAt,
+            p.id as productId,
+            p.name as productName,
+            psw.unitPriceCents as unitPriceCents,
+            psw.currency as currency,
+            psw.minTotalQty as minQty,
+            psw.maxTotalQty as maxQty
+        from ProductSellWindow psw
+        join psw.sellWindow sw
+        join psw.product p
+        where psw.id = :productSellWindowId
+    """)
+    Optional<ProductSellWindowRow> findRowByProductSellWindowId(@Param("productSellWindowId") UUID productSellWindowId);
+
+
+    interface ProductSellWindowRow {
+        UUID getProductSellWindowId();
+
+        UUID getSellWindowId();
+        String getSellWindowName();
+        OffsetDateTime getStartAt();
+        OffsetDateTime getEndAt();
+        String getTimezone();
+        OffsetDateTime getPaymentCloseAt();
+
+        UUID getProductId();
+        String getProductName();
+        Integer getUnitPriceCents();
+        String getCurrency();
+
+        Integer getMinQty();
+        Integer getMaxQty();
+    }
+
+
 }

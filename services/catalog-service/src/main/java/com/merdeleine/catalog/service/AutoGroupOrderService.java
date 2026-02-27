@@ -105,6 +105,8 @@ public class AutoGroupOrderService {
                     sw.getId(),
                     product.getId(),
                     req.qty(),
+                    psw.getUnitPriceCents(),
+                    psw.getCurrency(),
                     req.contactName(),
                     req.contactPhone(),
                     req.contactEmail(),
@@ -152,6 +154,8 @@ public class AutoGroupOrderService {
         // 你後續可改成從 Product 設定 / 預設規則算出來
         psw.setMinTotalQty(1);
         psw.setMaxTotalQty(DEFAULT_MAX_QTY);
+        psw.setUnitPriceCents(product.getUnitPriceCents());
+        psw.setCurrency(product.getCurrency());
         psw.setClosed(false);
 
         productSellWindowRepository.save(psw);

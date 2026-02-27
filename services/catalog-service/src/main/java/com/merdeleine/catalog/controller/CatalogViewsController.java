@@ -5,9 +5,13 @@ import com.merdeleine.catalog.dto.PageResponse;
 import com.merdeleine.catalog.dto.ProductSellWindowView;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -27,25 +31,21 @@ public class CatalogViewsController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        // 防炸：限制 size
         int safeSize = Math.min(Math.max(size, 1), 100);
         int safePage = Math.max(page, 0);
 
         var rowsPage = pswRepo.pageRows(PageRequest.of(safePage, safeSize));
         var rows = rowsPage.getContent();
 
-        // keys
         List<OrderQuotaClient.Key> keys = rows.stream()
-                .map(r -> new OrderQuotaClient.Key(r.sellWindowId(), r.productId()))
+                .map(r -> new OrderQuotaClient.Key(r.getSellWindowId(), r.getProductId()))
                 .distinct()
                 .toList();
 
-        // batch quotas（order service 掛了怎麼辦？先用降級策略）
         List<OrderQuotaClient.QuotaDto> quotas;
         try {
             quotas = orderQuotaClient.batchGet(keys);
         } catch (Exception ex) {
-            // 降級：quota 全部當 0 / OPEN（你也可以改成直接回 502）
             quotas = List.of();
         }
 
@@ -58,28 +58,8 @@ public class CatalogViewsController {
 
         List<ProductSellWindowView> items = rows.stream()
                 .map(r -> {
-                    var q = quotaMap.get(keyOf(r.sellWindowId(), r.productId()));
-                    int soldQty = (q != null && q.soldQty() != null) ? q.soldQty() : 0;
-                    String status = (q != null && q.status() != null) ? q.status() : "OPEN";
-
-                    return new ProductSellWindowView(
-                            r.sellWindowId(),
-                            r.sellWindowName(),
-                            r.startAt(),
-                            r.endAt(),
-                            r.timezone(),
-                            r.paymentCloseAt(),
-
-                            r.productId(),
-                            r.productName(),
-
-                            r.minQty(),
-                            r.maxQty(),
-
-                            soldQty,
-                            status,
-                            (q != null) ? q.updatedAt() : null
-                    );
+                    var q = quotaMap.get(keyOf(r.getSellWindowId(), r.getProductId()));
+                    return toView(r, q);
                 })
                 .toList();
 
@@ -90,6 +70,59 @@ public class CatalogViewsController {
                 rowsPage.getTotalElements()
         );
     }
+
+    @GetMapping("/product-sell-windows/{productSellWindowId}")
+    public ProductSellWindowView getProductSellWindow(@PathVariable UUID productSellWindowId) {
+        var r = pswRepo.findRowByProductSellWindowId(productSellWindowId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "ProductSellWindow not found: " + productSellWindowId
+                ));
+
+        List<OrderQuotaClient.Key> keys = List.of(new OrderQuotaClient.Key(r.getSellWindowId(), r.getProductId()));
+
+        List<OrderQuotaClient.QuotaDto> quotas;
+        try {
+            quotas = orderQuotaClient.batchGet(keys);
+        } catch (Exception ex) {
+            quotas = List.of();
+        }
+
+        var q = quotas.stream().findFirst().orElse(null);
+        return toView(r, q);
+    }
+
+    private ProductSellWindowView toView(
+            ProductSellWindowRepository.ProductSellWindowRow r,
+            OrderQuotaClient.QuotaDto q
+    ) {
+        int soldQty = (q != null && q.soldQty() != null) ? q.soldQty() : 0;
+        String status = (q != null && q.status() != null) ? q.status() : "OPEN";
+
+        return new ProductSellWindowView(
+                r.getProductSellWindowId(),
+
+                r.getSellWindowId(),
+                r.getSellWindowName(),
+                r.getStartAt(),
+                r.getEndAt(),
+                r.getTimezone(),
+                r.getPaymentCloseAt(),
+
+                r.getProductId(),
+                r.getProductName(),
+                r.getUnitPriceCents(),
+                r.getCurrency(),
+
+                r.getMinQty(),
+                r.getMaxQty(),
+
+                soldQty,
+                status,
+                (q != null) ? q.updatedAt() : null
+        );
+    }
+
 
     private static String keyOf(UUID sellWindowId, UUID productId) {
         return sellWindowId + ":" + productId;

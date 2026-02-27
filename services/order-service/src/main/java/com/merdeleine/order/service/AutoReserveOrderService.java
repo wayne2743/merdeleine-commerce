@@ -77,13 +77,14 @@ public class AutoReserveOrderService {
 
         int unitPriceCents = 0;              // MVP：先 0；之後可由 catalog 傳入或查價
         String currency = "TWD";
+        int subtotal = qty * req.unitPriceCents();
 
         Order order = new Order(
                 orderId,
                 generateOrderNo(),
                 customerId,
                 OrderStatus.RESERVED,
-                qty * unitPriceCents,
+                subtotal,
                 currency
         );
         order.setSellWindowId(req.sellWindowId());
@@ -96,8 +97,8 @@ public class AutoReserveOrderService {
                 UUID.randomUUID(),
                 req.productId(),
                 qty,
-                unitPriceCents,
-                qty * unitPriceCents
+                req.unitPriceCents(),
+                subtotal
         );
         order.setItem(item);
 

@@ -11,9 +11,11 @@ public class AutoReserveOrderDtos {
             @NotNull UUID sellWindowId,
             @NotNull UUID productId,
             @NotNull @Min(1) Integer qty,
+            @NotNull @Min(1) Integer unitPriceCents,
+            @NotNull String currency,
 
-            String contactName,
-            String contactPhone,
+            @NotNull String contactName,
+            @NotNull String contactPhone,
             String contactEmail,
             String shippingAddress
     ) {}

@@ -4,6 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record ProductSellWindowView(
+        UUID productSellWindowId,
+
         UUID sellWindowId,
         String sellWindowName,
         OffsetDateTime startAt,
@@ -13,11 +15,13 @@ public record ProductSellWindowView(
 
         UUID productId,
         String productName,
+        Integer unitPriceCents,
+        String currency,
 
-        int minQty,
+        Integer minQty,
         Integer maxQty,
 
-        int soldQty,
+        Integer soldQty,
         String quotaStatus,
         OffsetDateTime quotaUpdatedAt
 ) {}

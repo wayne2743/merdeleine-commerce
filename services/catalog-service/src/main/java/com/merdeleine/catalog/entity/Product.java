@@ -24,6 +24,14 @@ public class Product {
     @Column(nullable = false, length = 20)
     private ProductStatus status;
 
+    // ✅ NEW: 價格
+    @Column(name = "unit_price_cents", nullable = false)
+    private Integer unitPriceCents;
+
+    // ✅ NEW: 幣別
+    @Column(nullable = false, length = 10)
+    private String currency;
+
     @Column(nullable = false)
     private OffsetDateTime createdAt;
 
@@ -92,4 +100,19 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public Integer getUnitPriceCents() {
+        return unitPriceCents;
+    }
+
+    public void setUnitPriceCents(Integer unitPriceCents) {
+        this.unitPriceCents = unitPriceCents;
+    }
 }
