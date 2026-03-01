@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/catalog/customer")
+@RequestMapping("/customer")
 public class CustomerAutoGroupOrderController {
 
     private final AutoGroupOrderService service;

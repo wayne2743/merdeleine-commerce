@@ -10,8 +10,18 @@ java {
     }
 }
 
+ext {
+    set("springCloudVersion", "2024.0.1")
+}
+
 dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.withType(Test).configureEach {

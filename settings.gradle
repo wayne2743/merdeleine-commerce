@@ -9,5 +9,6 @@ include(
         "services:payment-service",
         "services:production-planning-service",
         "services:production-service",
-        "services:threshold-service"
+        "services:threshold-service",
+        "services:api-gateway-bff"
 )

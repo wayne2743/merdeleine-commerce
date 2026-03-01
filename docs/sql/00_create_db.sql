@@ -1,6 +1,7 @@
 -- 00_create_databases.sql
 -- 這支會在預設 DB（POSTGRES_DB=postgres）裡執行
 
+CREATE DATABASE gateway_db OWNER merdeleine;
 CREATE DATABASE catalog_db OWNER merdeleine;
 CREATE DATABASE threshold_db OWNER merdeleine;
 CREATE DATABASE order_db OWNER merdeleine;

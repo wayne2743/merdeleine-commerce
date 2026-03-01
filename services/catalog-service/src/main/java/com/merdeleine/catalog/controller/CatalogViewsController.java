@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/catalog/views")
+@RequestMapping("/views")
 public class CatalogViewsController {
 
     private final ProductSellWindowRepository pswRepo;

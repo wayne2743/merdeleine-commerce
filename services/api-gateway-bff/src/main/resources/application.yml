@@ -1,0 +1,83 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: api-gateway-bff
+
+  datasource:
+    url: jdbc:postgresql://100.113.120.124:5432/gateway_db
+    username: merdeleine
+    password: merdeleine_pw
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid, profile, email
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID}
+            client-secret: ${FACEBOOK_CLIENT_SECRET}
+            scope: public_profile, email
+        provider:
+          # Facebook 不是完整 OIDC，Spring 需要你補 provider 資訊比較穩
+          facebook:
+            authorization-uri: https://www.facebook.com/v19.0/dialog/oauth
+            token-uri: https://graph.facebook.com/v19.0/oauth/access_token
+            user-info-uri: https://graph.facebook.com/me?fields=id,name,email,picture
+            user-name-attribute: id
+  cloud:
+    gateway:
+      routes:
+        - id: order-service
+          uri: ${app.services.order.base-url}
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=2
+
+        - id: catalog-service
+          uri: ${app.services.catalog.base-url}
+          predicates:
+            - Path=/api/catalog/**
+          filters:
+            - StripPrefix=2
+
+        - id: payment-service
+          uri: ${app.services.payment.base-url}
+          predicates:
+            - Path=/api/payment/**
+          filters:
+            - StripPrefix=2
+
+app:
+  user:
+    header: X-USER-ID
+    default: dev-user-001
+
+  services:
+    order:
+      base-url: http://localhost:8083
+    catalog:
+      base-url: http://localhost:8081
+    payment:
+      base-url: http://localhost:8084
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,beans,conditions
+  endpoint:
+    gateway:
+      enabled: true

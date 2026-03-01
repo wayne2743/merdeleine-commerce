@@ -50,7 +50,7 @@ public class PaymentExpiryService {
 
             PaymentExpiredEvent event = new PaymentExpiredEvent(
                     UUID.randomUUID(),
-                    "payment.expired",
+                    paymentExpiredTopic,
                     p.getId(),
                     p.getOrderId(),
                     now

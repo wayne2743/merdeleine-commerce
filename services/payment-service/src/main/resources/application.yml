@@ -38,17 +38,24 @@ spring:
   jackson:
     time-zone: UTC
 
+
+
 app:
   kafka:
     consumer:
       group-id: payment-service-group
     topic:
+      payment-expired: payment.expired.v1
       payment-requested-events: payment.requested.v1
       payment-created-events: payment.created.v1
       payment-completed-events: payment.completed.v1
       payment-failed-events: payment.failed.v1
   outbox:
     publish-interval-ms: 5000
+
+
+
+
 
 ecpay:
   env: stage   # stage | prod

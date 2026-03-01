@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/catalog/product-sell-windows")
+@RequestMapping("/product-sell-windows")
 public class ProductSellWindowController {
 
     private final ProductSellWindowService pswService;
