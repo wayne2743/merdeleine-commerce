@@ -6,6 +6,13 @@ dependencies {
     implementation project(":libs:common-domain")
     implementation project(":libs:common-kafka")
 
+    // AWS S3 SDK v2
+    implementation platform("software.amazon.awssdk:bom:2.29.52")
+    implementation "software.amazon.awssdk:s3"
+
+    // Image resizing
+    implementation "net.coobird:thumbnailator:0.4.20"
+
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-validation"

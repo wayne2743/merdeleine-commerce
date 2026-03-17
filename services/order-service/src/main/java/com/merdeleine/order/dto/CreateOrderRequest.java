@@ -24,18 +24,5 @@ public record CreateOrderRequest(
 
         @NotBlank
         @Size(max = 10)
-        String currency,
-
-        @Size(max = 100)
-        String contactName,
-
-        @Size(max = 30)
-        String contactPhone,
-
-        @Email
-        @Size(max = 255)
-        String contactEmail,
-
-        @Size(max = 1000)
-        String shippingAddress
+        String currency
 ) {}

@@ -11,10 +11,6 @@ CREATE TABLE orders (
                         total_amount_cents INTEGER NOT NULL CHECK (total_amount_cents >= 0),
                         currency VARCHAR(10) NOT NULL,
 
-                        contact_name VARCHAR(100),
-                        contact_phone VARCHAR(30),
-                        contact_email VARCHAR(255),
-                        shipping_address TEXT,
 
                         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

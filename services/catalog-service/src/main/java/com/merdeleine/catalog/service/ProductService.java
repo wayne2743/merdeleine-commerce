@@ -30,7 +30,9 @@ public class ProductService {
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setStatus(request.getStatus() != null ? request.getStatus() : ProductStatus.DRAFT);
-        
+        product.setUnitPriceCents(request.getUnitPriceCents());
+        product.setCurrency(request.getCurrency() != null ? request.getCurrency() : "TWD");
+
         Product saved = productRepository.save(product);
         return ProductResponse.fromEntity(saved);
     }
@@ -68,6 +70,12 @@ public class ProductService {
         }
         if (request.getStatus() != null) {
             product.setStatus(request.getStatus());
+        }
+        if (request.getUnitPriceCents() != null) {
+            product.setUnitPriceCents(request.getUnitPriceCents());
+        }
+        if (request.getCurrency() != null) {
+            product.setCurrency(request.getCurrency());
         }
         
         Product updated = productRepository.save(product);

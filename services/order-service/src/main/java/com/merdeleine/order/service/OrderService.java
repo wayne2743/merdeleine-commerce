@@ -71,12 +71,6 @@ public class OrderService {
     @Transactional
     public OrderResponse update(UUID orderId, UpdateOrderRequest req) {
         Order order = findOrder(orderId);
-
-        if (req.contactName() != null) order.setContactName(req.contactName());
-        if (req.contactPhone() != null) order.setContactPhone(req.contactPhone());
-        if (req.contactEmail() != null) order.setContactEmail(req.contactEmail());
-        if (req.shippingAddress() != null) order.setShippingAddress(req.shippingAddress());
-
         writeOutbox("ORDER", order.getId(), "order.updated.v1", new OrderEventMapper().toOrderEvent(order, "order.updated.v1"));
 
         return OrderMapper.toResponse(order);

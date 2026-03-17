@@ -18,10 +18,6 @@ CREATE TABLE orders (
                         total_amount_cents INTEGER NOT NULL CHECK (total_amount_cents >= 0),
                         currency VARCHAR(10) NOT NULL,
 
-                        contact_name VARCHAR(100),
-                        contact_phone VARCHAR(30),
-                        contact_email VARCHAR(255),
-                        shipping_address TEXT,
 
     -- New fields for this flow
                         payment_due_at TIMESTAMPTZ,

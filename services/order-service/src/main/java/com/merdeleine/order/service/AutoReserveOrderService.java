@@ -88,10 +88,6 @@ public class AutoReserveOrderService {
                 currency
         );
         order.setSellWindowId(req.sellWindowId());
-        order.setContactName(req.contactName());
-        order.setContactPhone(req.contactPhone());
-        order.setContactEmail(req.contactEmail());
-        order.setShippingAddress(req.shippingAddress());
 
         OrderItem item = new OrderItem(
                 UUID.randomUUID(),

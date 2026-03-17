@@ -1,8 +1,10 @@
 CREATE TABLE product (
                          id UUID PRIMARY KEY,
-                         name VARCHAR(255) NOT NULL,
-                         description TEXT,
+                         name VARCHAR(100) NOT NULL,
+                         description VARCHAR(500),
                          status VARCHAR(20) NOT NULL CHECK (status IN ('DRAFT', 'ACTIVE', 'INACTIVE')),
+                         unit_price_cents INTEGER NOT NULL DEFAULT 0,
+                         currency VARCHAR(10) NOT NULL DEFAULT 'TWD',
                          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -106,11 +106,7 @@ public class AutoGroupOrderService {
                     product.getId(),
                     req.qty(),
                     psw.getUnitPriceCents(),
-                    psw.getCurrency(),
-                    req.contactName(),
-                    req.contactPhone(),
-                    req.contactEmail(),
-                    req.shippingAddress()
+                    psw.getCurrency()
             ));
         } catch (Exception e) {
             // auto-reserve 失敗，如果是新建檔期才補償關閉

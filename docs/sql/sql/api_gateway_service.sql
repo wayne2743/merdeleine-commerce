@@ -3,6 +3,11 @@ create table if not exists app_user (
                                         email varchar(255) not null unique,
     display_name varchar(255),
     provider varchar(50),
+    contact_name varchar(100),
+    contact_phone varchar(30),
+    contact_email varchar(255),
+    shipping_address text,
+    profile_completed boolean not null default false,
     created_at timestamptz not null,
     last_login_at timestamptz
 );

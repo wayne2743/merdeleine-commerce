@@ -12,6 +12,8 @@ public class ProductResponse {
     private String name;
     private String description;
     private ProductStatus status;
+    private Integer unitPriceCents;
+    private String currency;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -19,11 +21,13 @@ public class ProductResponse {
     }
 
     public ProductResponse(UUID id, String name, String description, ProductStatus status, 
-                          OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+                          Integer unitPriceCents, String currency, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
+        this.unitPriceCents = unitPriceCents;
+        this.currency = currency;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -34,6 +38,8 @@ public class ProductResponse {
             product.getName(),
             product.getDescription(),
             product.getStatus(),
+            product.getUnitPriceCents(),
+            product.getCurrency(),
             product.getCreatedAt(),
             product.getUpdatedAt()
         );
@@ -69,6 +75,22 @@ public class ProductResponse {
 
     public void setStatus(ProductStatus status) {
         this.status = status;
+    }
+
+    public Integer getUnitPriceCents() {
+        return unitPriceCents;
+    }
+
+    public void setUnitPriceCents(Integer unitPriceCents) {
+        this.unitPriceCents = unitPriceCents;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public OffsetDateTime getCreatedAt() {

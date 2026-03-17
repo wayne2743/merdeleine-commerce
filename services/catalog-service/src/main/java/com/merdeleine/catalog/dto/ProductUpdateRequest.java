@@ -2,25 +2,34 @@ package com.merdeleine.catalog.dto;
 
 
 import com.merdeleine.catalog.enums.ProductStatus;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
 public class ProductUpdateRequest {
     
     @Size(max = 100, message = "Product name must not exceed 100 characters")
     private String name;
-    
+
     @Size(max = 500, message = "Description must not exceed 500 characters")
     private String description;
     
     private ProductStatus status;
 
+    @Min(value = 0, message = "Unit price must be >= 0")
+    private Integer unitPriceCents;
+
+    @Size(max = 10, message = "Currency must not exceed 10 characters")
+    private String currency;
+
     public ProductUpdateRequest() {
     }
 
-    public ProductUpdateRequest(String name, String description, ProductStatus status) {
+    public ProductUpdateRequest(String name, String description, ProductStatus status, Integer unitPriceCents, String currency) {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.unitPriceCents = unitPriceCents;
+        this.currency = currency;
     }
 
     public String getName() {
@@ -45,5 +54,21 @@ public class ProductUpdateRequest {
 
     public void setStatus(ProductStatus status) {
         this.status = status;
+    }
+
+    public Integer getUnitPriceCents() {
+        return unitPriceCents;
+    }
+
+    public void setUnitPriceCents(Integer unitPriceCents) {
+        this.unitPriceCents = unitPriceCents;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 }

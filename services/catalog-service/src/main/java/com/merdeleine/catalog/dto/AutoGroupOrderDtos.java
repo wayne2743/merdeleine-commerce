@@ -10,11 +10,7 @@ public class AutoGroupOrderDtos {
 
     public record Request(
             @NotNull UUID productId,
-            @NotNull @Min(1) Integer qty,
-            String contactName,
-            String contactPhone,
-            String contactEmail,
-            String shippingAddress
+            @NotNull @Min(1) Integer qty
     ) {}
 
     public record Response(

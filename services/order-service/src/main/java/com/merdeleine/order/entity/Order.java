@@ -41,17 +41,6 @@ public class Order {
     @Column(name = "currency", nullable = false, length = 10)
     private String currency;
 
-    @Column(name = "contact_name", length = 100)
-    private String contactName;
-
-    @Column(name = "contact_phone", length = 30)
-    private String contactPhone;
-
-    @Column(name = "contact_email", length = 255)
-    private String contactEmail;
-
-    @Column(name = "shipping_address", columnDefinition = "TEXT")
-    private String shippingAddress;
 
     @Column(name = "payment_due_at")
     private OffsetDateTime paymentDueAt;
@@ -140,17 +129,6 @@ public class Order {
     public String getCurrency() { return currency; }
     public void setCurrency(String currency) { this.currency = currency; }
 
-    public String getContactName() { return contactName; }
-    public void setContactName(String contactName) { this.contactName = contactName; }
-
-    public String getContactPhone() { return contactPhone; }
-    public void setContactPhone(String contactPhone) { this.contactPhone = contactPhone; }
-
-    public String getContactEmail() { return contactEmail; }
-    public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
-
-    public String getShippingAddress() { return shippingAddress; }
-    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
 
     public OffsetDateTime getPaymentDueAt() { return paymentDueAt; }
     public void setPaymentDueAt(OffsetDateTime paymentDueAt) { this.paymentDueAt = paymentDueAt; }

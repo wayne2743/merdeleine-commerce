@@ -14,9 +14,42 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     runtimeOnly "org.postgresql:postgresql"
 
+    // JWT
+    implementation "io.jsonwebtoken:jjwt-api:0.12.6"
+    runtimeOnly   "io.jsonwebtoken:jjwt-impl:0.12.6"
+    runtimeOnly   "io.jsonwebtoken:jjwt-jackson:0.12.6"
+
     // optional
     implementation "org.springframework.boot:spring-boot-starter-actuator"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 
+}
+
+def loadDotEnv(File envFile) {
+    def map = [:]
+    if (!envFile.exists()) return map
+    envFile.eachLine { line ->
+        def s = line.trim()
+        if (!s || s.startsWith("#")) return
+        def idx = s.indexOf("=")
+        if (idx <= 0) return
+        def key = s.substring(0, idx).trim()
+        def value = s.substring(idx + 1).trim()
+        // 去掉可選的引號
+        if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.substring(1, value.length() - 1)
+        }
+        map[key] = value
+    }
+    return map
+}
+
+tasks.named("bootRun") {
+    // repo root 的 .env（你也可以改成 module 內）
+    def env = loadDotEnv(rootProject.file(".env"))
+    environment env
+
+    // 可選：固定用 local profile
+    environment "SPRING_PROFILES_ACTIVE", (System.getenv("SPRING_PROFILES_ACTIVE") ?: "local")
 }

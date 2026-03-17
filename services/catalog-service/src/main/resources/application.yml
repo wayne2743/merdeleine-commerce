@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: catalog-service
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB      # 單一檔案上限
+      max-request-size: 100MB  # 整個 request 上限
   kafka:
     bootstrap-servers: 100.113.120.124:9092
     producer:
@@ -28,6 +33,14 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   jackson:
     time-zone: UTC
+
+aws:
+  s3:
+    region: ap-east-2
+    bucket: merdeleine-commerce-storage-906401006785-ap-east-2-an
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+    cdn-base-url: ${AWS_CDN_BASE_URL:}   # e.g. https://cdn.merdeleine.com
 
 threshold-service:
   base-url: http://localhost:8087

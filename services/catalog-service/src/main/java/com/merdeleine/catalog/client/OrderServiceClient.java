@@ -24,11 +24,7 @@ public class OrderServiceClient {
             UUID productId,
             Integer qty,
             Integer unitPriceCents,
-            String currency,
-            String contactName,
-            String contactPhone,
-            String contactEmail,
-            String shippingAddress
+            String currency
     ) {}
 
     public record AutoReserveResponse(

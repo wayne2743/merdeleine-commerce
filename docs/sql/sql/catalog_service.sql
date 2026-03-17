@@ -26,9 +26,11 @@ ALTER TABLE public.outbox_event OWNER TO merdeleine;
 
 CREATE TABLE public.product (
                                 id uuid NOT NULL,
-                                name character varying(255) NOT NULL,
-                                description text,
+                                name character varying(100) NOT NULL,
+                                description character varying(500),
                                 status character varying(20) NOT NULL,
+                                unit_price_cents integer NOT NULL DEFAULT 0,
+                                currency character varying(10) NOT NULL DEFAULT 'TWD',
                                 created_at timestamp with time zone DEFAULT now() NOT NULL,
                                 updated_at timestamp with time zone DEFAULT now() NOT NULL,
                                 CONSTRAINT product_status_check CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'ACTIVE'::character varying, 'INACTIVE'::character varying])::text[])))
@@ -169,3 +171,27 @@ ALTER TABLE ONLY public.product_sell_window
 
 ALTER TABLE ONLY public.product_sell_window
     ADD CONSTRAINT fk_psw_sell_window FOREIGN KEY (sell_window_id) REFERENCES public.sell_window(id);
+
+
+
+CREATE TABLE product_image (
+                               id UUID PRIMARY KEY,
+                               product_id UUID NOT NULL REFERENCES product(id),
+                               image_type VARCHAR(30) NOT NULL,
+                               sort_order INT NOT NULL DEFAULT 0,
+                               s3_bucket VARCHAR(100) NOT NULL,
+                               s3_key VARCHAR(500) NOT NULL,
+                               cdn_url VARCHAR(1000),
+                               original_filename VARCHAR(255),
+                               content_type VARCHAR(100),
+                               file_size BIGINT,
+                               width INT,
+                               height INT,
+                               is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+                               is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                               created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                               updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_product_image_product_id ON product_image(product_id);
+CREATE INDEX idx_product_image_primary ON product_image(product_id, is_primary);

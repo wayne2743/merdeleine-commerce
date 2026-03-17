@@ -1,4 +1,36 @@
 
+## API Gateway BFF（使用者帳號）
+```mermaid
+erDiagram
+  APP_USER ||--o{ APP_USER_ROLE : has
+  APP_ROLE ||--o{ APP_USER_ROLE : assigned_to
+
+  APP_USER {
+    uuid id PK
+    string email
+    string display_name
+    string provider "google|facebook..."
+    string contact_name
+    string contact_phone
+    string contact_email
+    string shipping_address
+    boolean profile_completed "false=新用戶未完成註冊"
+    datetime created_at
+    datetime last_login_at
+  }
+
+  APP_ROLE {
+    uuid id PK
+    string code "USER|ADMIN"
+    datetime created_at
+  }
+
+  APP_USER_ROLE {
+    uuid user_id FK
+    uuid role_id FK
+  }
+```
+
 ## Catalog Service（商品/檔期/門檻規則）
 ```mermaid
 erDiagram
@@ -59,10 +91,6 @@ erDiagram
     string status "PENDING_PAYMENT|PAID|CANCELLED|REFUNDED"
     int total_amount_cents
     string currency
-    string contact_name
-    string contact_phone
-    string contact_email
-    string shipping_address
     datetime created_at
     datetime updated_at
   }

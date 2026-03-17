@@ -27,6 +27,21 @@ public class AppUser {
     @Column(name = "last_login_at")
     private OffsetDateTime lastLoginAt;
 
+    @Column(name = "contact_name", length = 100)
+    private String contactName;
+
+    @Column(name = "contact_phone", length = 30)
+    private String contactPhone;
+
+    @Column(name = "contact_email", length = 255)
+    private String contactEmail;
+
+    @Column(name = "shipping_address", columnDefinition = "TEXT")
+    private String shippingAddress;
+
+    @Column(name = "profile_completed", nullable = false)
+    private boolean profileCompleted = false;
+
     // Getters and Setters
 
     public UUID getId() {
@@ -76,4 +91,19 @@ public class AppUser {
     public void setLastLoginAt(OffsetDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
     }
+
+    public String getContactName() { return contactName; }
+    public void setContactName(String contactName) { this.contactName = contactName; }
+
+    public String getContactPhone() { return contactPhone; }
+    public void setContactPhone(String contactPhone) { this.contactPhone = contactPhone; }
+
+    public String getContactEmail() { return contactEmail; }
+    public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
+
+    public String getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
+
+    public boolean isProfileCompleted() { return profileCompleted; }
+    public void setProfileCompleted(boolean profileCompleted) { this.profileCompleted = profileCompleted; }
 }
