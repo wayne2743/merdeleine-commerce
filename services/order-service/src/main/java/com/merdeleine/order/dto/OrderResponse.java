@@ -8,6 +8,7 @@ public record OrderResponse(
 
         UUID orderId,
         String orderNo,
+        UUID customerId,
         OrderStatus status,
         UUID sellWindowId,
         UUID productId,

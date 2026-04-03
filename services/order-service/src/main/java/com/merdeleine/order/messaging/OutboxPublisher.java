@@ -1,8 +1,8 @@
 package com.merdeleine.order.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merdeleine.messaging.OrderCancelledEvent;
 import com.merdeleine.messaging.OrderReservedEvent;
-import com.merdeleine.messaging.PaymentCompletedEvent;
 import com.merdeleine.messaging.PaymentPaidEvent;
 import com.merdeleine.messaging.PaymentRequestedEvent;
 import com.merdeleine.order.entity.OutboxEvent;
@@ -44,6 +44,8 @@ public class OutboxPublisher {
                 switch (e.getEventType()) {
                     case "order.reserved.v1" ->
                             event = objectMapper.treeToValue(e.getPayload(), OrderReservedEvent.class);
+                    case "order.cancelled.v1" ->
+                            event = objectMapper.treeToValue(e.getPayload(), OrderCancelledEvent.class);
                     case "payment.requested.v1" ->
                             event = objectMapper.treeToValue(e.getPayload(), PaymentRequestedEvent.class);
                     case "payment.paid.v1" ->

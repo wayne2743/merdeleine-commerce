@@ -13,9 +13,14 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class UserAuthService {
@@ -99,6 +104,31 @@ public class UserAuthService {
 
     public Mono<List<AppRole>> loadRoles(UUID userId) {
         return Mono.fromCallable(() -> appUserRoleRepository.findRolesByUserId(userId))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<Optional<AppUser>> findByCustomerId(UUID customerId) {
+        return Mono.fromCallable(() -> appUserRepository.findById(customerId))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<List<AppUser>> findByCustomerIds(List<UUID> customerIds) {
+        return Mono.fromCallable(() -> {
+                    LinkedHashSet<UUID> uniqueIds = new LinkedHashSet<>(customerIds);
+                    List<AppUser> users = appUserRepository.findAllById(uniqueIds);
+
+                    Map<UUID, AppUser> byId = users.stream()
+                            .collect(Collectors.toMap(AppUser::getId, Function.identity()));
+
+                    List<AppUser> ordered = new ArrayList<>();
+                    for (UUID id : uniqueIds) {
+                        AppUser user = byId.get(id);
+                        if (user != null) {
+                            ordered.add(user);
+                        }
+                    }
+                    return ordered;
+                })
                 .subscribeOn(Schedulers.boundedElastic());
     }
 }

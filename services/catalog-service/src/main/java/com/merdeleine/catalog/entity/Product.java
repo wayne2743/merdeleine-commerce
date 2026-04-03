@@ -32,6 +32,18 @@ public class Product {
     @Column(nullable = false, length = 10)
     private String currency;
 
+    @Column(name = "default_min_qty", nullable = false)
+    private Integer defaultMinQty = 1;
+
+    @Column(name = "default_max_qty")
+    private Integer defaultMaxQty;
+
+    @Column(name = "default_lead_days")
+    private Integer defaultLeadDays;
+
+    @Column(name = "default_ship_days")
+    private Integer defaultShipDays;
+
     @Column(nullable = false)
     private OffsetDateTime createdAt;
 
@@ -42,6 +54,7 @@ public class Product {
     void prePersist() {
         if (id == null) id = UUID.randomUUID();
         if (status == null) status = ProductStatus.DRAFT;
+        if (defaultMinQty == null || defaultMinQty < 1) defaultMinQty = 1;
         createdAt = OffsetDateTime.now();
         updatedAt = createdAt;
     }
@@ -114,5 +127,37 @@ public class Product {
 
     public void setUnitPriceCents(Integer unitPriceCents) {
         this.unitPriceCents = unitPriceCents;
+    }
+
+    public Integer getDefaultMinQty() {
+        return defaultMinQty;
+    }
+
+    public void setDefaultMinQty(Integer defaultMinQty) {
+        this.defaultMinQty = defaultMinQty;
+    }
+
+    public Integer getDefaultMaxQty() {
+        return defaultMaxQty;
+    }
+
+    public void setDefaultMaxQty(Integer defaultMaxQty) {
+        this.defaultMaxQty = defaultMaxQty;
+    }
+
+    public Integer getDefaultLeadDays() {
+        return defaultLeadDays;
+    }
+
+    public void setDefaultLeadDays(Integer defaultLeadDays) {
+        this.defaultLeadDays = defaultLeadDays;
+    }
+
+    public Integer getDefaultShipDays() {
+        return defaultShipDays;
+    }
+
+    public void setDefaultShipDays(Integer defaultShipDays) {
+        this.defaultShipDays = defaultShipDays;
     }
 }

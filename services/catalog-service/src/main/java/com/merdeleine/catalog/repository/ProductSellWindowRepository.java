@@ -28,6 +28,33 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
     List<ProductSellWindow> findByProduct_Id(UUID productId);
     List<ProductSellWindow> findBySellWindow_Id(UUID sellWindowId);
 
+    @Query("""
+        select max(sw.endAt)
+        from ProductSellWindow psw
+        join psw.sellWindow sw
+        where psw.product.id = :productId
+    """)
+    OffsetDateTime findMaxSellWindowEndAtByProductId(@Param("productId") UUID productId);
+
+    @Query("""
+        select psw.id
+        from ProductSellWindow psw
+        join psw.sellWindow sw
+        where psw.product.id = :productId
+          and psw.isClosed = false
+          and sw.status = com.merdeleine.catalog.enums.SellWindowStatus.OPEN
+        order by sw.endAt asc
+    """)
+    List<UUID> findOpenProductSellWindowIdsByProductId(@Param("productId") UUID productId, Pageable pageable);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM ProductSellWindow psw WHERE psw.product.id = :productId")
+    int deleteByProductId(@Param("productId") UUID productId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM ProductSellWindow psw WHERE psw.sellWindow.id = :sellWindowId")
+    int deleteBySellWindowId(@Param("sellWindowId") UUID sellWindowId);
+
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
@@ -56,10 +83,17 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
             psw.currency as currency,
     
             psw.minTotalQty as minQty,
-            psw.maxTotalQty as maxQty
+            psw.maxTotalQty as maxQty,
+    
+            psw.shipDays as shipDays,
+            sw.predictedPaymentDate as predictedPaymentDate,
+            sw.predictedProdDate as predictedProdDate,
+            sw.predictedShipDate as predictedShipDate
         from ProductSellWindow psw
         join psw.product p
         join psw.sellWindow sw
+        where psw.isClosed = false
+          and sw.status <> com.merdeleine.catalog.enums.SellWindowStatus.CLOSED
         order by sw.startAt desc, p.name asc
     """)
     Page<ProductSellWindowRow> pageRows(Pageable pageable);
@@ -92,7 +126,11 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
             psw.unitPriceCents as unitPriceCents,
             psw.currency as currency,
             psw.minTotalQty as minQty,
-            psw.maxTotalQty as maxQty
+            psw.maxTotalQty as maxQty,
+            psw.shipDays as shipDays,
+            sw.predictedPaymentDate as predictedPaymentDate,
+            sw.predictedProdDate as predictedProdDate,
+            sw.predictedShipDate as predictedShipDate
         from ProductSellWindow psw
         join psw.sellWindow sw
         join psw.product p
@@ -118,6 +156,11 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
 
         Integer getMinQty();
         Integer getMaxQty();
+
+        Integer getShipDays();
+        OffsetDateTime getPredictedPaymentDate();
+        OffsetDateTime getPredictedProdDate();
+        OffsetDateTime getPredictedShipDate();
     }
 
 

@@ -39,4 +39,11 @@ public class InternalRefsController {
     ) {
         return sellWindowExpireService.closeExpired(limit);
     }
+
+    @PostMapping("/eventbridge/sell-windows/close-overdue")
+    public SellWindowExpireService.CloseExpiredResult closeOverdueForEventBridge(
+            @RequestParam(name = "limit", defaultValue = "200") int limit
+    ) {
+        return sellWindowExpireService.closeExpired(limit);
+    }
 }

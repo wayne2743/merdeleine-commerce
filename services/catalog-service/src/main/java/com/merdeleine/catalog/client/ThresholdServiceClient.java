@@ -58,4 +58,13 @@ public class ThresholdServiceClient {
                 counterId
         );
     }
+
+    /**
+     * 依 sellWindowId 刪除所有 BatchCounter（threshold-service 端 cascade 刪除 counter_event_log）。
+     * 供 SellWindowService.delete() 呼叫，確保跨服務資料一致性。
+     */
+    public void deleteBatchCountersBySellWindowId(String sellWindowId) {
+        String url = baseUrl + "/api/batch-counters/by-sell-window/" + sellWindowId;
+        restTemplate.delete(url);
+    }
 }

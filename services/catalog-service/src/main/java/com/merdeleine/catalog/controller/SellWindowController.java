@@ -1,5 +1,6 @@
 package com.merdeleine.catalog.controller;
 
+import com.merdeleine.catalog.dto.NextGroupOpenAtResponse;
 import com.merdeleine.catalog.dto.SellWindowDto;
 import com.merdeleine.catalog.service.SellWindowService;
 import jakarta.validation.Valid;
@@ -33,6 +34,11 @@ public class SellWindowController {
     @GetMapping
     public List<SellWindowDto.Response> list() {
         return sellWindowService.list();
+    }
+
+    @GetMapping("/next-group-open-at")
+    public NextGroupOpenAtResponse nextGroupOpenAt() {
+        return sellWindowService.getNextGroupOpenAt();
     }
 
     @PutMapping("/{id}")

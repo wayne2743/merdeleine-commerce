@@ -4,15 +4,17 @@ import com.merdeleine.order.dto.AutoReserveOrderDtos;
 import com.merdeleine.order.dto.CreateOrderRequest;
 import com.merdeleine.order.dto.OrderResponse;
 import com.merdeleine.order.dto.UpdateOrderRequest;
+import com.merdeleine.order.exception.BadRequestException;
 import com.merdeleine.order.service.AutoReserveOrderService;
 import com.merdeleine.order.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/order/orders")
+@RequestMapping("/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -33,6 +35,23 @@ public class OrderController {
         return orderService.get(orderId);
     }
 
+    @GetMapping
+    public List<OrderResponse> list(
+            @RequestParam(required = false) UUID customerId,
+            @RequestParam(required = false) UUID sellWindowId
+    ) {
+        if (customerId != null && sellWindowId != null) {
+            throw new BadRequestException("Provide either customerId or sellWindowId, not both");
+        }
+        if (customerId == null && sellWindowId == null) {
+            throw new BadRequestException("Either customerId or sellWindowId is required");
+        }
+        if (customerId != null) {
+            return orderService.listByCustomerId(customerId);
+        }
+        return orderService.listBySellWindowId(sellWindowId);
+    }
+
     @PutMapping("/{orderId}")
     public OrderResponse update(
             @PathVariable UUID orderId,
@@ -47,7 +66,23 @@ public class OrderController {
     }
 
     @PostMapping("/auto-reserve")
-    public AutoReserveOrderDtos.Response autoReserve(@Valid @RequestBody AutoReserveOrderDtos.Request req) {
+    public AutoReserveOrderDtos.Response autoReserve(
+            @Valid @RequestBody AutoReserveOrderDtos.Request req,
+            @RequestHeader(value = "X-USER-ID", required = false) String userId
+    ) {
+        // 如果 header 中没有 userId，从 request 中获取
+        // 否则使用 header 中的 userId 覆盖 request 中的 customerId
+        if (userId != null && !userId.isEmpty()) {
+            AutoReserveOrderDtos.Request newReq = new AutoReserveOrderDtos.Request(
+                    req.sellWindowId(),
+                    req.productId(),
+                    req.qty(),
+                    req.unitPriceCents(),
+                    req.currency(),
+                    UUID.fromString(userId)
+            );
+            return service.autoReserve(newReq);
+        }
         return service.autoReserve(req);
     }
 }

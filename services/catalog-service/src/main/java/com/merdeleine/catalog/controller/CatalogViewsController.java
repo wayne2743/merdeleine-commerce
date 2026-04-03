@@ -119,7 +119,12 @@ public class CatalogViewsController {
 
                 soldQty,
                 status,
-                (q != null) ? q.updatedAt() : null
+                (q != null) ? q.updatedAt() : null,
+
+                r.getShipDays(),
+                r.getPredictedPaymentDate(),
+                r.getPredictedProdDate(),
+                r.getPredictedShipDate()
         );
     }
 

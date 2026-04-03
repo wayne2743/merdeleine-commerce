@@ -23,5 +23,9 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, UUID
     @Modifying
     @Query("UPDATE ProductImage pi SET pi.isPrimary = false WHERE pi.product.id = :productId AND pi.id <> :excludeId")
     void clearPrimaryByProductId(@Param("productId") UUID productId, @Param("excludeId") UUID excludeId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM ProductImage pi WHERE pi.product.id = :productId")
+    int deleteByProductId(@Param("productId") UUID productId);
 }
 

@@ -23,5 +23,10 @@ public record ProductSellWindowView(
 
         Integer soldQty,
         String quotaStatus,
-        OffsetDateTime quotaUpdatedAt
+        OffsetDateTime quotaUpdatedAt,
+
+        Integer shipDays,
+        OffsetDateTime predictedPaymentDate,
+        OffsetDateTime predictedProdDate,
+        OffsetDateTime predictedShipDate
 ) {}

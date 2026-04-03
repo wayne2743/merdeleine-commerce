@@ -1,6 +1,8 @@
 package com.merdeleine.catalog.service;
 
 
+import com.merdeleine.catalog.client.ThresholdServiceClient;
+import com.merdeleine.catalog.dto.NextGroupOpenAtResponse;
 import com.merdeleine.catalog.dto.OpenPaymentRequest;
 import com.merdeleine.catalog.dto.OpenPaymentResponse;
 import com.merdeleine.catalog.dto.SellWindowDto;
@@ -8,6 +10,7 @@ import com.merdeleine.catalog.entity.SellWindow;
 import com.merdeleine.catalog.enums.SellWindowStatus;
 import com.merdeleine.catalog.exception.BadRequestException;
 import com.merdeleine.catalog.exception.NotFoundException;
+import com.merdeleine.catalog.repository.ProductSellWindowRepository;
 import com.merdeleine.catalog.repository.SellWindowRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,9 +26,15 @@ import java.util.UUID;
 public class SellWindowService {
 
     private final SellWindowRepository sellWindowRepository;
+    private final ProductSellWindowRepository productSellWindowRepository;
+    private final ThresholdServiceClient thresholdServiceClient;
 
-    public SellWindowService(SellWindowRepository sellWindowRepository) {
+    public SellWindowService(SellWindowRepository sellWindowRepository,
+                             ProductSellWindowRepository productSellWindowRepository,
+                             ThresholdServiceClient thresholdServiceClient) {
         this.sellWindowRepository = sellWindowRepository;
+        this.productSellWindowRepository = productSellWindowRepository;
+        this.thresholdServiceClient = thresholdServiceClient;
     }
 
     @Transactional
@@ -41,6 +50,9 @@ public class SellWindowService {
         e.setStartAt(req.getStartAt());
         e.setEndAt(req.getEndAt());
         e.setTimezone(req.getTimezone());
+        e.setPredictedPaymentDate(req.getPredictedPaymentDate());
+        e.setPredictedProdDate(req.getPredictedProdDate());
+        e.setPredictedShipDate(req.getPredictedShipDate());
 
         return toResponse(sellWindowRepository.save(e));
     }
@@ -54,6 +66,11 @@ public class SellWindowService {
     @Transactional(readOnly = true)
     public List<SellWindowDto.Response> list() {
         return sellWindowRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public NextGroupOpenAtResponse getNextGroupOpenAt() {
+        return new NextGroupOpenAtResponse(sellWindowRepository.findMaxEndAt());
     }
 
     @Transactional
@@ -71,6 +88,9 @@ public class SellWindowService {
         e.setStartAt(req.getStartAt());
         e.setEndAt(req.getEndAt());
         e.setTimezone(req.getTimezone());
+        e.setPredictedPaymentDate(req.getPredictedPaymentDate());
+        e.setPredictedProdDate(req.getPredictedProdDate());
+        e.setPredictedShipDate(req.getPredictedShipDate());
 
         return toResponse(sellWindowRepository.save(e));
     }
@@ -80,6 +100,11 @@ public class SellWindowService {
         if (!sellWindowRepository.existsById(id)) {
             throw new NotFoundException("SellWindow not found: " + id);
         }
+        // 1) 刪除 threshold-service 的 batch_counter（及 cascade counter_event_log）
+        thresholdServiceClient.deleteBatchCountersBySellWindowId(id.toString());
+        // 2) 刪除 catalog DB 的 product_sell_window（FK 保護）
+        productSellWindowRepository.deleteBySellWindowId(id);
+        // 3) 刪除 sell_window
         sellWindowRepository.deleteById(id);
     }
 
@@ -109,7 +134,10 @@ public class SellWindowService {
                 e.getStatus(),
                 e.getPaymentTtlMinutes(),
                 e.getPaymentOpenedAt(),
-                e.getPaymentCloseAt()
+                e.getPaymentCloseAt(),
+                e.getPredictedPaymentDate(),
+                e.getPredictedProdDate(),
+                e.getPredictedShipDate()
         );
     }
 

@@ -56,8 +56,8 @@ public class AutoReserveOrderService {
         }
 
         int sold = quota.getSoldQty() == null ? 0 : quota.getSoldQty();
-        int max = quota.getMaxQty() == null ? 0 : quota.getMaxQty();
-        int qty = req.qty();
+        int max  = quota.getMaxQty()  == null ? 0 : quota.getMaxQty();
+        int qty  = req.qty();
 
         if (sold + qty > max) {
             throw new IllegalStateException("quota not enough");
@@ -66,45 +66,54 @@ public class AutoReserveOrderService {
         // 2) 扣 quota
         int newSold = sold + qty;
         quota.setSoldQty(newSold);
-        if (newSold == max) {
+        if (newSold >= max) {
             quota.setStatus(QUOTA_CLOSED);
         }
-        // quotaRepository.save(quota); // 可省略，交易內 managed entity dirty checking 會更新
 
-        // 3) 建立 Order / OrderItem
-        UUID orderId = UUID.randomUUID();
-        UUID customerId = UUID.randomUUID(); // MVP：先用系統生成；之後接登入再改
+        // 3) 判斷是否已有同一 sell window 的既有 RESERVED 訂單
+        UUID customerId = req.customerId();
+        int  unitPriceCents = req.unitPriceCents();
+        int  subtotalDelta  = qty * unitPriceCents;
 
-        int unitPriceCents = 0;              // MVP：先 0；之後可由 catalog 傳入或查價
-        String currency = "TWD";
-        int subtotal = qty * req.unitPriceCents();
+        Order order = orderRepository
+                .findActiveOrderByCustomerAndSellWindow(customerId, req.sellWindowId(), OrderStatus.RESERVED)
+                .map(existing -> {
+                    // --- 合併：把新增數量疊加到既有 order item ---
+                    OrderItem item = existing.getItem();
+                    item.setQuantity(item.getQuantity() + qty);
+                    item.setSubtotalCents(item.getSubtotalCents() + subtotalDelta);
+                    existing.setTotalAmountCents(existing.getTotalAmountCents() + subtotalDelta);
+                    return existing;
+                })
+                .orElseGet(() -> {
+                    // --- 建新單 ---
+                    Order newOrder = new Order(
+                            UUID.randomUUID(),
+                            generateOrderNo(),
+                            customerId,
+                            OrderStatus.RESERVED,
+                            subtotalDelta,
+                            req.currency()
+                    );
+                    newOrder.setSellWindowId(req.sellWindowId());
 
-        Order order = new Order(
-                orderId,
-                generateOrderNo(),
-                customerId,
-                OrderStatus.RESERVED,
-                subtotal,
-                currency
-        );
-        order.setSellWindowId(req.sellWindowId());
+                    OrderItem item = new OrderItem(
+                            UUID.randomUUID(),
+                            req.productId(),
+                            qty,
+                            unitPriceCents,
+                            subtotalDelta
+                    );
+                    newOrder.setItem(item);
+                    return orderRepository.save(newOrder);
+                });
 
-        OrderItem item = new OrderItem(
-                UUID.randomUUID(),
-                req.productId(),
-                qty,
-                req.unitPriceCents(),
-                subtotal
-        );
-        order.setItem(item);
-
-        orderRepository.save(order);
-
+        // 4) 不論新建或合併，都只發「本次 delta qty」給 threshold
         writeOutbox(
                 "Order",
                 order.getId(),
                 orderReservedTopic,
-                new OrderEventMapper().toOrderEvent(order, orderReservedTopic)
+                new OrderEventMapper().toOrderEvent(order, orderReservedTopic, qty)
         );
 
         return new AutoReserveOrderDtos.Response(order.getId(), order.getStatus().name());

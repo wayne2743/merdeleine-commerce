@@ -40,6 +40,12 @@ public class SellWindowQuotaService {
         return new CloseQuotaDtos.CloseQuotaResponse(req.sellWindowId(), req.productId(), updated == 1, STATUS_CLOSED);
     }
 
+    @Transactional
+    public CloseQuotaDtos.CloseBySellWindowResponse closeBySellWindow(CloseQuotaDtos.CloseBySellWindowRequest req) {
+        int updated = repo.closeAllBySellWindowId(req.sellWindowId(), STATUS_CLOSED, OffsetDateTime.now());
+        return new CloseQuotaDtos.CloseBySellWindowResponse(req.sellWindowId(), updated, STATUS_CLOSED);
+    }
+
 
     @Transactional(readOnly = true)
     public List<SellWindowQuotaBatchDto.QuotaResponse> batchGet(

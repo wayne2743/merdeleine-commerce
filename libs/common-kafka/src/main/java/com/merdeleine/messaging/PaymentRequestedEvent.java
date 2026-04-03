@@ -9,8 +9,6 @@ public record PaymentRequestedEvent (
         UUID eventId,
         String eventType,
         UUID orderId,
-        String customerEmail,
-        String customerName,
         int totalAmount,
         String currency,
         OffsetDateTime expiresAt,

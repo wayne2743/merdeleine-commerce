@@ -1,9 +1,12 @@
 package com.merdeleine.catalog.controller;
 
 import com.merdeleine.catalog.dto.ProductCreateRequest;
+import com.merdeleine.catalog.dto.ProductNextGroupOpenAtResponse;
+import com.merdeleine.catalog.dto.ProductOpenSellWindowResponse;
 import com.merdeleine.catalog.dto.ProductResponse;
 import com.merdeleine.catalog.dto.ProductUpdateRequest;
 import com.merdeleine.catalog.enums.ProductStatus;
+import com.merdeleine.catalog.service.ProductSellWindowService;
 import com.merdeleine.catalog.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,9 +21,12 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductSellWindowService productSellWindowService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService,
+                             ProductSellWindowService productSellWindowService) {
         this.productService = productService;
+        this.productSellWindowService = productSellWindowService;
     }
 
     @PostMapping
@@ -32,6 +38,18 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable UUID id) {
         ProductResponse response = productService.getProductById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{productId}/next-group-open-at")
+    public ResponseEntity<ProductNextGroupOpenAtResponse> getProductNextGroupOpenAt(@PathVariable UUID productId) {
+        ProductNextGroupOpenAtResponse response = productService.getProductNextGroupOpenAt(productId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{productId}/open-product-sell-window")
+    public ResponseEntity<ProductOpenSellWindowResponse> getOpenProductSellWindow(@PathVariable UUID productId) {
+        ProductOpenSellWindowResponse response = productSellWindowService.findOpenByProductId(productId);
         return ResponseEntity.ok(response);
     }
 

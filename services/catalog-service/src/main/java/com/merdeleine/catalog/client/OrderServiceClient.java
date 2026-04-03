@@ -24,7 +24,8 @@ public class OrderServiceClient {
             UUID productId,
             Integer qty,
             Integer unitPriceCents,
-            String currency
+            String currency,
+            UUID customerId
     ) {}
 
     public record AutoReserveResponse(
@@ -34,7 +35,7 @@ public class OrderServiceClient {
 
     public AutoReserveResponse autoReserve(AutoReserveRequest req) {
         return restClient.post()
-                .uri("/api/order/orders/auto-reserve")
+                .uri("/orders/auto-reserve")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(req)
                 .retrieve()

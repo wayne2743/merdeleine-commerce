@@ -1,7 +1,10 @@
 package com.merdeleine.gatewaybff.bff;
 
 import com.merdeleine.gatewaybff.auth.dto.CompleteRegistrationRequest;
+import com.merdeleine.gatewaybff.auth.dto.BatchUserLookupRequest;
+import com.merdeleine.gatewaybff.auth.dto.BatchUserLookupResponse;
 import com.merdeleine.gatewaybff.auth.dto.MeResponse;
+import com.merdeleine.gatewaybff.auth.dto.UserLookupResponse;
 import com.merdeleine.gatewaybff.auth.dto.UpdateUserProfileRequest;
 import com.merdeleine.gatewaybff.auth.entity.AppUser;
 import com.merdeleine.gatewaybff.auth.repo.AppUserRepository;
@@ -17,6 +20,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -138,6 +142,50 @@ public class AuthController {
                         }));
     }
 
+    /**
+     * GET /auth/users/{customerId}
+     * 依 customerId (app_user.id) 查詢用戶資料
+     */
+    @GetMapping("/users/{customerId}")
+    public Mono<ResponseEntity<UserLookupResponse>> getUserByCustomerId(
+            @PathVariable UUID customerId
+    ) {
+        return userAuthService.findByCustomerId(customerId)
+                .map(optUser -> optUser
+                        .map(user -> ResponseEntity.ok(toUserLookupResponse(user)))
+                        .orElseGet(() -> ResponseEntity.notFound().build()));
+    }
+
+    /**
+     * POST /auth/users/batch
+     * 一次查詢多個 customerId 對應的用戶資料
+     */
+    @PostMapping("/users/batch")
+    public Mono<ResponseEntity<BatchUserLookupResponse>> getUsersByCustomerIds(
+            @Valid @RequestBody BatchUserLookupRequest req
+    ) {
+        List<UUID> requestedIds = req.customerIds();
+
+        return userAuthService.findByCustomerIds(requestedIds)
+                .map(users -> {
+                    Set<UUID> foundIds = users.stream()
+                            .map(AppUser::getId)
+                            .collect(Collectors.toSet());
+
+                    List<String> missingCustomerIds = requestedIds.stream()
+                            .distinct()
+                            .filter(id -> !foundIds.contains(id))
+                            .map(UUID::toString)
+                            .toList();
+
+                    List<UserLookupResponse> responses = users.stream()
+                            .map(this::toUserLookupResponse)
+                            .toList();
+
+                    return ResponseEntity.ok(new BatchUserLookupResponse(responses, missingCustomerIds));
+                });
+    }
+
     private MeResponse toMeResponse(AppUser user, List<String> roleCodes, String token) {
         return new MeResponse(
                 user.getId().toString(),
@@ -150,6 +198,20 @@ public class AuthController {
                 user.getContactPhone(),
                 user.getContactEmail(),
                 user.getShippingAddress()
+        );
+    }
+
+    private UserLookupResponse toUserLookupResponse(AppUser user) {
+        return new UserLookupResponse(
+                user.getId().toString(),
+                user.getEmail(),
+                user.getDisplayName(),
+                user.getProvider(),
+                user.getContactName(),
+                user.getContactPhone(),
+                user.getContactEmail(),
+                user.getShippingAddress(),
+                user.isProfileCompleted()
         );
     }
 }

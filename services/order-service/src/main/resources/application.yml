@@ -48,6 +48,7 @@ app:
       group-id: order-service
     topic:
       order-reserved-events: order.reserved.v1
+      order-cancelled-events: order.cancelled.v1
       sell-window-quota-configured: sell-window.quota.configured.v1
       batch-confirm-events: batch.confirmed.v1
       payment-requested-events: payment.requested.v1

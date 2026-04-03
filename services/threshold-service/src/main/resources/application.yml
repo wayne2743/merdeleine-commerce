@@ -45,6 +45,8 @@ app:
   kafka:
     topic:
       order-reserved-events: order.reserved.v1
+      order-cancelled-events: order.cancelled.v1
+      payment-paid-events: payment.paid.v1
       threshold-reached-events: threshold.reached.v1
 
 

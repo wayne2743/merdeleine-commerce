@@ -42,10 +42,10 @@ public class PaymentPaidEventConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "${app.kafka.topic.order-reserved-events}")
+    @KafkaListener(topics = "${app.kafka.topic.payment-paid-events}")
     @Transactional
     public void onMessage(PaymentPaidEvent event, Acknowledgment ack) {
-        log.info("OrderReservedEvent:" + event.toString());
+        log.info("PaymentPaidEvent:{}", event);
 
         if(counterEventLogRepository.existsBySourceEventId(event.eventId())){
             log.info("Duplicate event detected, skipping processing for eventId: " + event.eventId());

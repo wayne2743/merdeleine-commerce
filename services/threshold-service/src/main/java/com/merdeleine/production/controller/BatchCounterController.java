@@ -49,11 +49,18 @@ public class BatchCounterController {
         return batchCounterService.update(id, req);
     }
 
-    // Delete
+    // Delete single
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
         batchCounterService.delete(id);
+    }
+
+    // Delete all by sell-window (called by catalog-service when deleting a sell window)
+    @DeleteMapping("/by-sell-window/{sellWindowId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBySellWindowId(@PathVariable UUID sellWindowId) {
+        batchCounterService.deleteBySellWindowId(sellWindowId);
     }
 
     // Apply paid event (increase paidQty + write CounterEventLog)

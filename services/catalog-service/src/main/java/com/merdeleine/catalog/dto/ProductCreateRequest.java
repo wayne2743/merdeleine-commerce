@@ -26,15 +26,33 @@ public class ProductCreateRequest {
     @Size(max = 10, message = "Currency must not exceed 10 characters")
     private String currency = "TWD";
 
+    @Min(value = 1, message = "defaultMinQty must be >= 1")
+    private Integer defaultMinQty;
+
+    @Min(value = 1, message = "defaultMaxQty must be >= 1")
+    private Integer defaultMaxQty;
+
+    @Min(value = 0, message = "defaultLeadDays must be >= 0")
+    private Integer defaultLeadDays;
+
+    @Min(value = 0, message = "defaultShipDays must be >= 0")
+    private Integer defaultShipDays;
+
     public ProductCreateRequest() {
     }
 
-    public ProductCreateRequest(String name, String description, ProductStatus status, Integer unitPriceCents, String currency) {
+    public ProductCreateRequest(String name, String description, ProductStatus status, Integer unitPriceCents, String currency,
+                                Integer defaultMinQty, Integer defaultMaxQty,
+                                Integer defaultLeadDays, Integer defaultShipDays) {
         this.name = name;
         this.description = description;
         this.status = status;
         this.unitPriceCents = unitPriceCents;
         this.currency = currency;
+        this.defaultMinQty = defaultMinQty;
+        this.defaultMaxQty = defaultMaxQty;
+        this.defaultLeadDays = defaultLeadDays;
+        this.defaultShipDays = defaultShipDays;
     }
 
     public String getName() {
@@ -75,5 +93,37 @@ public class ProductCreateRequest {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public Integer getDefaultMinQty() {
+        return defaultMinQty;
+    }
+
+    public void setDefaultMinQty(Integer defaultMinQty) {
+        this.defaultMinQty = defaultMinQty;
+    }
+
+    public Integer getDefaultMaxQty() {
+        return defaultMaxQty;
+    }
+
+    public void setDefaultMaxQty(Integer defaultMaxQty) {
+        this.defaultMaxQty = defaultMaxQty;
+    }
+
+    public Integer getDefaultLeadDays() {
+        return defaultLeadDays;
+    }
+
+    public void setDefaultLeadDays(Integer defaultLeadDays) {
+        this.defaultLeadDays = defaultLeadDays;
+    }
+
+    public Integer getDefaultShipDays() {
+        return defaultShipDays;
+    }
+
+    public void setDefaultShipDays(Integer defaultShipDays) {
+        this.defaultShipDays = defaultShipDays;
     }
 }

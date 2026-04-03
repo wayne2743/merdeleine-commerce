@@ -1,5 +1,6 @@
 package com.merdeleine.production.mapper;
 
+import com.merdeleine.messaging.OrderCancelledEvent;
 import com.merdeleine.messaging.OrderReservedEvent;
 import com.merdeleine.messaging.PaymentPaidEvent;
 import com.merdeleine.production.entity.BatchCounter;
@@ -16,6 +17,16 @@ public class CounterEventLogMapper {
                 orderReservedEvent.eventType(),
                 orderReservedEvent.eventId(),
                 orderReservedEvent.quantity()
+        );
+    }
+
+    public CounterEventLog toReverseCounterEventLog(OrderCancelledEvent orderCancelledEvent, BatchCounter batchCounter) {
+        return new CounterEventLog(
+                UUID.randomUUID(),
+                batchCounter,
+                orderCancelledEvent.eventType(),
+                orderCancelledEvent.eventId(),
+                -orderCancelledEvent.quantity()
         );
     }
 

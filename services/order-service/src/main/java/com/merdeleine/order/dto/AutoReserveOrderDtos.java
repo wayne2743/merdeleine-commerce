@@ -12,7 +12,8 @@ public class AutoReserveOrderDtos {
             @NotNull UUID productId,
             @NotNull @Min(1) Integer qty,
             @NotNull @Min(1) Integer unitPriceCents,
-            @NotNull String currency
+            @NotNull String currency,
+            @NotNull UUID customerId
     ) {}
 
     public record Response(

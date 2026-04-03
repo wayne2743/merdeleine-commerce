@@ -86,8 +86,6 @@ public class BatchConfirmConsumer {
                             UUID.randomUUID(),
                             paymentRequestedTopic,
                             order.getId(),
-                            order.getContactEmail(),
-                            order.getContactName(),
                             order.getTotalAmountCents(),
                             order.getCurrency(),
                             order.getPaymentDueAt(),

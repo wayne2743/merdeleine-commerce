@@ -5,8 +5,18 @@ CREATE TABLE product (
                          status VARCHAR(20) NOT NULL CHECK (status IN ('DRAFT', 'ACTIVE', 'INACTIVE')),
                          unit_price_cents INTEGER NOT NULL DEFAULT 0,
                          currency VARCHAR(10) NOT NULL DEFAULT 'TWD',
+                         default_min_qty INTEGER NOT NULL DEFAULT 1 CHECK (default_min_qty >= 1),
+                         default_max_qty INTEGER,
+                         default_lead_days INTEGER,
+                         default_ship_days INTEGER,
                          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                         CONSTRAINT product_default_qty_range_check
+                             CHECK (default_max_qty IS NULL OR default_max_qty >= default_min_qty),
+                         CONSTRAINT product_default_lead_days_check
+                             CHECK (default_lead_days IS NULL OR default_lead_days >= 0),
+                         CONSTRAINT product_default_ship_days_check
+                             CHECK (default_ship_days IS NULL OR default_ship_days >= 0)
 );
 
 
@@ -33,6 +43,9 @@ CREATE TABLE sell_window (
                                     timezone varchar(50) NOT NULL,
                                     status varchar(20) NOT NULL,
                                     closed_at timestamptz NULL,
+                                    predicted_payment_date timestamptz NULL,
+                                    predicted_prod_date timestamptz NULL,
+                                    predicted_ship_date timestamptz NULL,
                                     "version" int8 NOT NULL,
                                     CONSTRAINT sell_window_pkey PRIMARY KEY (id)
 );

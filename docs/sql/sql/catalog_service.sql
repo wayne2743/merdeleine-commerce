@@ -31,9 +31,17 @@ CREATE TABLE public.product (
                                 status character varying(20) NOT NULL,
                                 unit_price_cents integer NOT NULL DEFAULT 0,
                                 currency character varying(10) NOT NULL DEFAULT 'TWD',
+                                default_min_qty integer NOT NULL DEFAULT 1,
+                                default_max_qty integer,
+                                default_lead_days integer,
+                                default_ship_days integer,
                                 created_at timestamp with time zone DEFAULT now() NOT NULL,
                                 updated_at timestamp with time zone DEFAULT now() NOT NULL,
-                                CONSTRAINT product_status_check CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'ACTIVE'::character varying, 'INACTIVE'::character varying])::text[])))
+                                CONSTRAINT product_status_check CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'ACTIVE'::character varying, 'INACTIVE'::character varying])::text[]))),
+                                CONSTRAINT product_default_min_qty_check CHECK ((default_min_qty >= 1)),
+                                CONSTRAINT product_default_qty_range_check CHECK (((default_max_qty IS NULL) OR (default_max_qty >= default_min_qty))),
+                                CONSTRAINT product_default_lead_days_check CHECK (((default_lead_days IS NULL) OR (default_lead_days >= 0))),
+                                CONSTRAINT product_default_ship_days_check CHECK (((default_ship_days IS NULL) OR (default_ship_days >= 0)))
 );
 
 
@@ -78,6 +86,9 @@ CREATE TABLE public.sell_window (
                                     payment_ttl_minutes integer DEFAULT 1440 NOT NULL,
                                     payment_opened_at timestamp with time zone,
                                     payment_close_at timestamp with time zone,
+                                    predicted_payment_date timestamp with time zone,
+                                    predicted_prod_date timestamp with time zone,
+                                    predicted_ship_date timestamp with time zone,
                                     CONSTRAINT chk_sell_window_payment_ttl_positive CHECK ((payment_ttl_minutes > 0)),
                                     CONSTRAINT chk_sell_window_payment_window_valid CHECK (((payment_opened_at IS NULL) OR (payment_close_at IS NULL) OR (payment_close_at >= payment_opened_at))),
                                     CONSTRAINT ck_sell_window_status CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'OPEN'::character varying, 'PAYMENT_OPEN'::character varying, 'PAYMENT_CLOSED'::character varying, 'CLOSED'::character varying])::text[])))

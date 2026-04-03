@@ -19,4 +19,16 @@ public class CloseQuotaDtos {
             boolean closed,     // 這次呼叫是否真的把狀態改掉（OPEN->CLOSED）
             String status       // 回傳目標狀態（CLOSED）
     ) {}
+
+    public record CloseBySellWindowRequest(
+            @NotNull UUID sellWindowId,
+            UUID reasonEventId,
+            String reason
+    ) {}
+
+    public record CloseBySellWindowResponse(
+            UUID sellWindowId,
+            int closedCount,
+            String status
+    ) {}
 }

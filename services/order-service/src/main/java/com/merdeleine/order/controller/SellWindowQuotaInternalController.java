@@ -27,6 +27,14 @@ public class SellWindowQuotaInternalController {
         return service.close(req);
     }
 
+    @PostMapping("/close-by-sell-window")
+    @ResponseStatus(HttpStatus.OK)
+    public CloseQuotaDtos.CloseBySellWindowResponse closeBySellWindow(
+            @Valid @RequestBody CloseQuotaDtos.CloseBySellWindowRequest req
+    ) {
+        return service.closeBySellWindow(req);
+    }
+
     @PostMapping("/_batch")
     public List<SellWindowQuotaBatchDto.QuotaResponse> batchGet(
             @RequestBody SellWindowQuotaBatchDto.BatchRequest req

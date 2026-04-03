@@ -21,9 +21,8 @@ import java.util.UUID;
 @Service
 public class AutoGroupOrderService {
 
-    // maxQty 若 catalog 允許 null(不限制)，但 order quota 目前是必填 int，
-    // 先用一個大數頂住；後續你要再把 order 端 maxQty 改成 nullable
-    private static final int DEFAULT_MAX_QTY = 9999;
+    // order quota 目前 maxQty 必填 int；若 product defaultMaxQty 為 null（不限制），先用大數兜底。
+    private static final int ORDER_QUOTA_FALLBACK_MAX_QTY = 9999;
 
     private final ProductRepository productRepository;
     private final SellWindowRepository sellWindowRepository;
@@ -66,7 +65,7 @@ public class AutoGroupOrderService {
         if (existing.isPresent()) {
             psw = existing.get();
         } else {
-            psw = createNewSellWindow(product);
+            psw = createNewSellWindow(product, req);
             createdNew = true;
             onProductSellWindowCreated(
                     psw.getSellWindow().getId(),
@@ -80,7 +79,7 @@ public class AutoGroupOrderService {
         // 2) 先 upsert quota（確保 order-service 立刻有投影）
         // min/max 以 product_sell_window 設定為準
         int minQty = psw.getMinTotalQty();
-        int maxQty = (psw.getMaxTotalQty() == null) ? DEFAULT_MAX_QTY : psw.getMaxTotalQty();
+        int maxQty = (psw.getMaxTotalQty() == null) ? ORDER_QUOTA_FALLBACK_MAX_QTY : psw.getMaxTotalQty();
 
         try {
             orderClient.upsertQuota(new OrderServiceClient.UpsertQuotaRequest(
@@ -106,7 +105,8 @@ public class AutoGroupOrderService {
                     product.getId(),
                     req.qty(),
                     psw.getUnitPriceCents(),
-                    psw.getCurrency()
+                    psw.getCurrency(),
+                    req.customerId()
             ));
         } catch (Exception e) {
             // auto-reserve 失敗，如果是新建檔期才補償關閉
@@ -130,13 +130,31 @@ public class AutoGroupOrderService {
         );
     }
 
-    private ProductSellWindow createNewSellWindow(Product product) {
-        SellWindowPlanner.Plan plan = planner.plan();
+    private ProductSellWindow createNewSellWindow(Product product, AutoGroupOrderDtos.Request req) {
+        SellWindowPlanner.Plan plan = planner.planFrom(req.predictedGroupOpenAt());
+
+        if (req.predictedGroupEndAt().isBefore(req.predictedGroupOpenAt())) {
+            throw new IllegalArgumentException("predictedGroupEndAt must be after or equal to predictedGroupOpenAt");
+        }
+
+        // 依需求：start_at 由前端傳入；end_at = start_at + 7 天。
+        // predicted_payment_date = end_at + 1 天。
+        // predicted_prod_date    = predicted_payment_date + 2 天。
+        // predicted_ship_date    = predicted_prod_date + leads_day。
+        OffsetDateTime startAt = req.predictedGroupOpenAt();
+        OffsetDateTime endAt = startAt.plusDays(7);
+        OffsetDateTime predictedPaymentDate = endAt.plusDays(1);
+        OffsetDateTime predictedProdDate = predictedPaymentDate.plusDays(2);
+        OffsetDateTime predictedShipDate = predictedProdDate.plusDays(req.leadsDay());
 
         SellWindow sw = new SellWindow();
         sw.setName("AUTO-" + UUID.randomUUID()); // name unique
-        sw.setStartAt(plan.startAt());
-        sw.setEndAt(plan.endAt());
+        sw.setStartAt(startAt);
+        sw.setEndAt(endAt);
+        sw.setClosedAt(null);
+        sw.setPredictedPaymentDate(predictedPaymentDate);
+        sw.setPredictedProdDate(predictedProdDate);
+        sw.setPredictedShipDate(predictedShipDate);
         sw.setTimezone(plan.timezone());
         sw.setPaymentTtlMinutes(plan.paymentTtlMinutes());
         sw.setStatus(SellWindowStatus.OPEN);
@@ -147,9 +165,10 @@ public class AutoGroupOrderService {
         psw.setProduct(product);
         psw.setSellWindow(sw);
 
-        // 你後續可改成從 Product 設定 / 預設規則算出來
-        psw.setMinTotalQty(1);
-        psw.setMaxTotalQty(DEFAULT_MAX_QTY);
+        psw.setMinTotalQty(product.getDefaultMinQty() != null ? product.getDefaultMinQty() : 1);
+        psw.setMaxTotalQty(product.getDefaultMaxQty());
+        psw.setLeadDays(req.leadsDay());
+        psw.setShipDays(req.shipDay());
         psw.setUnitPriceCents(product.getUnitPriceCents());
         psw.setCurrency(product.getCurrency());
         psw.setClosed(false);

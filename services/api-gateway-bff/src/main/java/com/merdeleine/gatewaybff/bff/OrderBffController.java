@@ -50,13 +50,14 @@ public class OrderBffController {
         Map<String, Object> payload = Map.of(
                 "sellWindowId", req.get("sellWindowId"),
                 "productId", req.get("productId"),
-                "quantity", req.get("quantity"),
-                "customerId", userId,
-                "status", "RESERVED"
+                "qty", req.get("qty") != null ? req.get("qty") : req.get("quantity"),
+                "unitPriceCents", req.get("unitPriceCents") != null ? req.get("unitPriceCents") : 0,
+                "currency", req.get("currency") != null ? req.get("currency") : "TWD",
+                "customerId", userId
         );
 
         return webClient.post()
-                .uri(orderBaseUrl + "/orders")
+                .uri(orderBaseUrl + "/orders/auto-reserve")
                 .bodyValue(payload)
                 .retrieve()
                 .bodyToMono(Map.class)

@@ -44,6 +44,15 @@ public class SellWindow {
     @Column(name = "payment_close_at")
     private OffsetDateTime paymentCloseAt;
 
+    @Column(name = "predicted_payment_date")
+    private OffsetDateTime predictedPaymentDate;
+
+    @Column(name = "predicted_prod_date")
+    private OffsetDateTime predictedProdDate;
+
+    @Column(name = "predicted_ship_date")
+    private OffsetDateTime predictedShipDate;
+
     @Version
     @Column(nullable = false)
     private long version;
@@ -85,6 +94,15 @@ public class SellWindow {
 
     public OffsetDateTime getPaymentCloseAt() { return paymentCloseAt; }
     public void setPaymentCloseAt(OffsetDateTime paymentCloseAt) { this.paymentCloseAt = paymentCloseAt; }
+
+    public OffsetDateTime getPredictedPaymentDate() { return predictedPaymentDate; }
+    public void setPredictedPaymentDate(OffsetDateTime predictedPaymentDate) { this.predictedPaymentDate = predictedPaymentDate; }
+
+    public OffsetDateTime getPredictedProdDate() { return predictedProdDate; }
+    public void setPredictedProdDate(OffsetDateTime predictedProdDate) { this.predictedProdDate = predictedProdDate; }
+
+    public OffsetDateTime getPredictedShipDate() { return predictedShipDate; }
+    public void setPredictedShipDate(OffsetDateTime predictedShipDate) { this.predictedShipDate = predictedShipDate; }
 
     public long getVersion() { return version; }
 }

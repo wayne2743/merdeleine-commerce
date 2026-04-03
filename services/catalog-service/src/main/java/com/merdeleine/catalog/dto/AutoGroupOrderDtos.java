@@ -10,7 +10,12 @@ public class AutoGroupOrderDtos {
 
     public record Request(
             @NotNull UUID productId,
-            @NotNull @Min(1) Integer qty
+            @NotNull @Min(1) Integer qty,
+            @NotNull UUID customerId,
+            @NotNull OffsetDateTime predictedGroupOpenAt,
+            @NotNull OffsetDateTime predictedGroupEndAt,
+            @NotNull @Min(0) Integer leadsDay,
+            @NotNull @Min(0) Integer shipDay
     ) {}
 
     public record Response(

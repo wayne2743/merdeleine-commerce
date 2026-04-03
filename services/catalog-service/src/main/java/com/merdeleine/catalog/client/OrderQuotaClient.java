@@ -27,6 +27,18 @@ public class OrderQuotaClient {
             OffsetDateTime updatedAt
     ) {}
 
+    public record CloseBySellWindowRequest(
+            UUID sellWindowId,
+            UUID reasonEventId,
+            String reason
+    ) {}
+
+    public record CloseBySellWindowResponse(
+            UUID sellWindowId,
+            int closedCount,
+            String status
+    ) {}
+
     public List<QuotaDto> batchGet(List<Key> keys) {
         var req = new BatchRequest(keys);
         return restClient.post()
@@ -34,5 +46,13 @@ public class OrderQuotaClient {
                 .body(req)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<QuotaDto>>() {});
+    }
+
+    public CloseBySellWindowResponse closeBySellWindow(UUID sellWindowId, String reason) {
+        return restClient.post()
+                .uri("/order/internal/sell-window-quotas/close-by-sell-window")
+                .body(new CloseBySellWindowRequest(sellWindowId, null, reason))
+                .retrieve()
+                .body(CloseBySellWindowResponse.class);
     }
 }

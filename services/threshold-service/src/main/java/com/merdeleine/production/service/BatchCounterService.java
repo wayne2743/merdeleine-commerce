@@ -92,6 +92,19 @@ public class BatchCounterService {
     }
 
     /**
+     * 依 sellWindowId 刪除所有 BatchCounter（及其 cascade CounterEventLog）。
+     * 供 catalog-service 刪除 sell_window 時呼叫，避免 threshold DB 留下孤兒資料。
+     */
+    @Transactional
+    public void deleteBySellWindowId(UUID sellWindowId) {
+        List<BatchCounter> counters = batchCounterRepository.findBySellWindowId(sellWindowId);
+        if (!counters.isEmpty()) {
+            // deleteAll 會逐筆呼叫 delete，觸發 cascade 刪除 counter_event_log
+            batchCounterRepository.deleteAll(counters);
+        }
+    }
+
+    /**
      * 核心動作：收到 payment/order paid 事件後，把 paidQty += deltaQty，並寫入 CounterEventLog。
      * - 以 sourceEventId 做去重（同事件只處理一次）
      * - 到量時標記 reachedAt / reachedEventId / status

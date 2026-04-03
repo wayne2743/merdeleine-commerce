@@ -3,6 +3,7 @@ package com.merdeleine.catalog.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.merdeleine.catalog.client.OrderQuotaClient;
 import com.merdeleine.catalog.entity.OutboxEvent;
 import com.merdeleine.catalog.entity.SellWindow;
 import com.merdeleine.catalog.enums.OutboxEventStatus;
@@ -28,6 +29,7 @@ public class SellWindowExpireService {
     private final SellWindowRepository sellWindowRepository;
     private final ProductSellWindowRepository productSellWindowRepository;
     private final OutboxEventRepository outboxEventRepository;
+    private final OrderQuotaClient orderQuotaClient;
     private final ObjectMapper objectMapper;
     private final String sellWindowClosedTopic;
 
@@ -35,12 +37,14 @@ public class SellWindowExpireService {
             SellWindowRepository sellWindowRepository,
             ProductSellWindowRepository productSellWindowRepository,
             OutboxEventRepository outboxEventRepository,
+            OrderQuotaClient orderQuotaClient,
             ObjectMapper objectMapper,
             @Value("${app.outbox.event-types.sell-window-closed:sellwindow.closed.v1}") String sellWindowClosedTopic
     ) {
         this.sellWindowRepository = sellWindowRepository;
         this.productSellWindowRepository = productSellWindowRepository;
         this.outboxEventRepository = outboxEventRepository;
+        this.orderQuotaClient = orderQuotaClient;
         this.objectMapper = objectMapper;
         this.sellWindowClosedTopic = sellWindowClosedTopic;
     }
@@ -57,6 +61,7 @@ public class SellWindowExpireService {
 
         int casWonCount = 0;
         int totalClosedPsw = 0;
+        int totalClosedQuotas = 0;
         int outboxInsertedCount = 0;
         List<Item> items = new ArrayList<>();
 
@@ -67,7 +72,7 @@ public class SellWindowExpireService {
             int updated = sellWindowRepository.closeIfExpiredOpenAndVersionMatch(id, c.getVersion(), now);
             if (updated != 1) {
                 // 沒搶到：可能已被關、或被延長、或狀態已變
-                items.add(new Item(id, false, 0, false));
+                items.add(new Item(id, false, 0, 0, false));
                 continue;
             }
 
@@ -77,6 +82,17 @@ public class SellWindowExpireService {
             int closedPsw = productSellWindowRepository.closeAllOpenBySellWindowId(id);
             totalClosedPsw += closedPsw;
 
+            int closedQuotas = 0;
+            try {
+                var quotaResp = orderQuotaClient.closeBySellWindow(id, "sell_window_expired");
+                if (quotaResp != null) {
+                    closedQuotas = quotaResp.closedCount();
+                    totalClosedQuotas += closedQuotas;
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException("Failed to close order quotas for sellWindowId=" + id, ex);
+            }
+
             // 重新讀 SellWindow 拿 name/endAt/timezone（也可改用 native returning，但先簡單穩）
             SellWindow sw = sellWindowRepository.findById(id)
                     .orElseThrow(() -> new IllegalStateException("SellWindow disappeared: " + id));
@@ -84,7 +100,7 @@ public class SellWindowExpireService {
             boolean outboxInserted = insertSellWindowClosedOutboxOnce(sw, now);
             if (outboxInserted) outboxInsertedCount++;
 
-            items.add(new Item(id, true, closedPsw, outboxInserted));
+            items.add(new Item(id, true, closedPsw, closedQuotas, outboxInserted));
         }
 
         return new CloseExpiredResult(
@@ -92,6 +108,7 @@ public class SellWindowExpireService {
                 candidates.size(),
                 casWonCount,
                 totalClosedPsw,
+                totalClosedQuotas,
                 outboxInsertedCount,
                 items
         );
@@ -141,6 +158,7 @@ public class SellWindowExpireService {
             int candidateCount,
             int casWonCount,
             int totalClosedProductSellWindows,
+            int totalClosedSellWindowQuotas,
             int outboxInsertedCount,
             List<Item> items
     ) {}
@@ -149,6 +167,7 @@ public class SellWindowExpireService {
             UUID sellWindowId,
             boolean casWon,
             int closedProductSellWindows,
+            int closedSellWindowQuotas,
             boolean outboxInserted
     ) {}
 

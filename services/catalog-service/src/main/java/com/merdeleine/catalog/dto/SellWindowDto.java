@@ -24,6 +24,10 @@ public final class SellWindowDto {
         @NotBlank
         private String timezone;
 
+        private OffsetDateTime predictedPaymentDate;
+        private OffsetDateTime predictedProdDate;
+        private OffsetDateTime predictedShipDate;
+
         public CreateRequest() {}
 
         public String getName() { return name; }
@@ -37,6 +41,15 @@ public final class SellWindowDto {
 
         public String getTimezone() { return timezone; }
         public void setTimezone(String timezone) { this.timezone = timezone; }
+
+        public OffsetDateTime getPredictedPaymentDate() { return predictedPaymentDate; }
+        public void setPredictedPaymentDate(OffsetDateTime predictedPaymentDate) { this.predictedPaymentDate = predictedPaymentDate; }
+
+        public OffsetDateTime getPredictedProdDate() { return predictedProdDate; }
+        public void setPredictedProdDate(OffsetDateTime predictedProdDate) { this.predictedProdDate = predictedProdDate; }
+
+        public OffsetDateTime getPredictedShipDate() { return predictedShipDate; }
+        public void setPredictedShipDate(OffsetDateTime predictedShipDate) { this.predictedShipDate = predictedShipDate; }
     }
 
     public static final class UpdateRequest {
@@ -52,6 +65,10 @@ public final class SellWindowDto {
         @NotBlank
         private String timezone;
 
+        private OffsetDateTime predictedPaymentDate;
+        private OffsetDateTime predictedProdDate;
+        private OffsetDateTime predictedShipDate;
+
         public UpdateRequest() {}
 
         public String getName() { return name; }
@@ -65,6 +82,15 @@ public final class SellWindowDto {
 
         public String getTimezone() { return timezone; }
         public void setTimezone(String timezone) { this.timezone = timezone; }
+
+        public OffsetDateTime getPredictedPaymentDate() { return predictedPaymentDate; }
+        public void setPredictedPaymentDate(OffsetDateTime predictedPaymentDate) { this.predictedPaymentDate = predictedPaymentDate; }
+
+        public OffsetDateTime getPredictedProdDate() { return predictedProdDate; }
+        public void setPredictedProdDate(OffsetDateTime predictedProdDate) { this.predictedProdDate = predictedProdDate; }
+
+        public OffsetDateTime getPredictedShipDate() { return predictedShipDate; }
+        public void setPredictedShipDate(OffsetDateTime predictedShipDate) { this.predictedShipDate = predictedShipDate; }
     }
 
     public static final class Response {
@@ -77,11 +103,17 @@ public final class SellWindowDto {
         private int paymentTtlMinutes;
         private OffsetDateTime paymentOpenAt;
         private OffsetDateTime paymentCloseAt;
+        private OffsetDateTime predictedPaymentDate;
+        private OffsetDateTime predictedProdDate;
+        private OffsetDateTime predictedShipDate;
 
 
         public Response() {}
 
-        public Response(UUID id, String name, OffsetDateTime startAt, OffsetDateTime endAt, String timezone, SellWindowStatus status, int paymentTtlMinutes, OffsetDateTime paymentOpenAt, OffsetDateTime paymentCloseAt) {
+        public Response(UUID id, String name, OffsetDateTime startAt, OffsetDateTime endAt, String timezone,
+                        SellWindowStatus status, int paymentTtlMinutes,
+                        OffsetDateTime paymentOpenAt, OffsetDateTime paymentCloseAt,
+                        OffsetDateTime predictedPaymentDate, OffsetDateTime predictedProdDate, OffsetDateTime predictedShipDate) {
             this.id = id;
             this.name = name;
             this.startAt = startAt;
@@ -91,6 +123,9 @@ public final class SellWindowDto {
             this.paymentTtlMinutes = paymentTtlMinutes;
             this.paymentOpenAt = paymentOpenAt;
             this.paymentCloseAt = paymentCloseAt;
+            this.predictedPaymentDate = predictedPaymentDate;
+            this.predictedProdDate = predictedProdDate;
+            this.predictedShipDate = predictedShipDate;
         }
 
         public UUID getId() { return id; }
@@ -139,5 +174,14 @@ public final class SellWindowDto {
         public void setPaymentCloseAt(OffsetDateTime paymentCloseAt) {
             this.paymentCloseAt = paymentCloseAt;
         }
+
+        public OffsetDateTime getPredictedPaymentDate() { return predictedPaymentDate; }
+        public void setPredictedPaymentDate(OffsetDateTime predictedPaymentDate) { this.predictedPaymentDate = predictedPaymentDate; }
+
+        public OffsetDateTime getPredictedProdDate() { return predictedProdDate; }
+        public void setPredictedProdDate(OffsetDateTime predictedProdDate) { this.predictedProdDate = predictedProdDate; }
+
+        public OffsetDateTime getPredictedShipDate() { return predictedShipDate; }
+        public void setPredictedShipDate(OffsetDateTime predictedShipDate) { this.predictedShipDate = predictedShipDate; }
     }
 }

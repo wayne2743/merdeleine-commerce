@@ -56,6 +56,9 @@ public interface SellWindowRepository extends JpaRepository<SellWindow, UUID> {
     @Query("select sw from SellWindow sw where sw.id = :id")
     Optional<SellWindow> findByIdForUpdate(@Param("id") UUID id);
 
+    @Query("select max(sw.endAt) from SellWindow sw")
+    OffsetDateTime findMaxEndAt();
+
 }
 
 

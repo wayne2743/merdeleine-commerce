@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.catalog.client.ThresholdServiceClient;
 import com.merdeleine.catalog.dto.ProductSellWindowDto;
+import com.merdeleine.catalog.dto.ProductOpenSellWindowResponse;
 import com.merdeleine.catalog.dto.threshold.BatchCounterRequest;
 import com.merdeleine.catalog.entity.OutboxEvent;
 import com.merdeleine.catalog.entity.Product;
@@ -17,6 +18,7 @@ import com.merdeleine.catalog.repository.OutboxEventRepository;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
 import com.merdeleine.catalog.repository.SellWindowRepository;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,6 +126,13 @@ public class ProductSellWindowService {
             return pswRepository.findBySellWindow_Id(sellWindowId).stream().map(this::toResponse).toList();
         }
         return pswRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ProductOpenSellWindowResponse findOpenByProductId(UUID productId) {
+        List<UUID> ids = pswRepository.findOpenProductSellWindowIdsByProductId(productId, PageRequest.of(0, 1));
+        UUID productSellWindowId = ids.isEmpty() ? null : ids.get(0);
+        return new ProductOpenSellWindowResponse(productSellWindowId);
     }
 
     @Transactional

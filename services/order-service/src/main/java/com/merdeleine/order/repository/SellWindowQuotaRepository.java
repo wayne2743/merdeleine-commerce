@@ -90,6 +90,15 @@ public interface SellWindowQuotaRepository extends JpaRepository<SellWindowQuota
     """)
     int close(UUID sellWindowId, UUID productId, String closedStatus, OffsetDateTime now);
 
+    @Modifying
+    @Query("""
+        update SellWindowQuota q
+        set q.status = :closedStatus, q.updatedAt = :now
+        where q.sellWindowId = :sellWindowId
+          and q.status <> :closedStatus
+    """)
+    int closeAllBySellWindowId(UUID sellWindowId, String closedStatus, OffsetDateTime now);
+
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
