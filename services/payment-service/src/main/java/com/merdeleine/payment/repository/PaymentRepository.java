@@ -2,6 +2,8 @@ package com.merdeleine.payment.repository;
 
 import com.merdeleine.enums.PaymentStatus;
 import com.merdeleine.payment.entity.Payment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,12 +18,20 @@ import java.util.UUID;
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
     List<Payment> findByOrderId(UUID orderId);
+    Page<Payment> findByOrderId(UUID orderId, Pageable pageable);
+    Optional<Payment> findTopByOrderIdOrderByCreatedAtDesc(UUID orderId);
 
     List<Payment> findByStatus(PaymentStatus status);
+    Page<Payment> findByStatus(PaymentStatus status, Pageable pageable);
 
     @Query("SELECT p FROM Payment p WHERE p.orderId = :orderId AND p.status = :status")
-    List<Payment> findByOrderIdAndStatus(@Param("orderId") UUID orderId, 
+    List<Payment> findByOrderIdAndStatus(@Param("orderId") UUID orderId,
                                           @Param("status") PaymentStatus status);
+
+    @Query("SELECT p FROM Payment p WHERE p.orderId = :orderId AND p.status = :status")
+    Page<Payment> findByOrderIdAndStatus(@Param("orderId") UUID orderId,
+                                         @Param("status") PaymentStatus status,
+                                         Pageable pageable);
 
     boolean existsByOrderId(UUID uuid);
 
@@ -41,4 +51,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             @Param("now") OffsetDateTime now,
             @Param("limit") int limit
     );
+
+
 }

@@ -23,4 +23,17 @@ public interface NotificationJobRepository extends JpaRepository<NotificationJob
     boolean existsByPaymentIdAndTemplateKeyAndChannel(String paymentId,
                                                       String templateKey,
                                                       String channel);
+
+    @Query(value = """
+        select exists(
+            select 1
+            from notification_job nj
+            where nj.channel = :channel
+              and nj.template_key = :templateKey
+              and (nj.payload ->> 'orderId') = :orderId
+        )
+        """, nativeQuery = true)
+    boolean existsByOrderIdAndTemplateKeyAndChannel(String orderId,
+                                                    String templateKey,
+                                                    String channel);
 }

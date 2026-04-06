@@ -48,13 +48,17 @@ public class OrderMapper {
                 order.getCustomerId(),
                 order.getStatus(),
                 order.getSellWindowId(),
-                item.getProductId(),
-                item.getQuantity(),
-                item.getUnitPriceCents(),
-                item.getSubtotalCents(),
+                item != null ? item.getProductId() : null,
+                item != null ? item.getQuantity() : null,
+                item != null ? item.getUnitPriceCents() : null,
+                item != null ? item.getSubtotalCents() : null,
                 order.getTotalAmountCents(),
                 order.getCurrency(),
-                order.getCreatedAt()
+                order.getPaymentDueAt(),
+                order.getPaymentFailedCount(),
+                order.getLastPaymentError(),
+                order.getCreatedAt(),
+                order.getUpdatedAt()
         );
     }
 

@@ -39,6 +39,9 @@ public class SecurityConfig {
                         // ✅ /auth/register：新用戶攜帶 JWT 完成註冊，無需 Session
                         .pathMatchers("/auth/register").permitAll()
 
+                        // ✅ 內部服務 API（由 X-Internal-Secret header 自行驗證）
+                        .pathMatchers("/internal/**").permitAll()
+
                         // 商品瀏覽開放
                         .pathMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
                         .pathMatchers("/api/catalog/customer/**").permitAll()

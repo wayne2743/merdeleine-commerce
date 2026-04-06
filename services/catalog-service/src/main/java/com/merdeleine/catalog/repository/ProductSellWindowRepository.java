@@ -4,6 +4,7 @@ package com.merdeleine.catalog.repository;
 import com.merdeleine.catalog.entity.Product;
 import com.merdeleine.catalog.entity.ProductSellWindow;
 import com.merdeleine.catalog.entity.SellWindow;
+import com.merdeleine.catalog.enums.ProductStatus;
 import com.merdeleine.catalog.enums.SellWindowStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -93,7 +94,7 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
         join psw.product p
         join psw.sellWindow sw
         where psw.isClosed = false
-          and sw.status <> com.merdeleine.catalog.enums.SellWindowStatus.CLOSED
+          and sw.status = com.merdeleine.catalog.enums.SellWindowStatus.OPEN
         order by sw.startAt desc, p.name asc
     """)
     Page<ProductSellWindowRow> pageRows(Pageable pageable);
@@ -110,6 +111,56 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
         order by sw.endAt asc
     """)
     Optional<ProductSellWindow> findFirstActiveByProductId(UUID productId, SellWindowStatus status, OffsetDateTime now);
+
+    @Query(
+            value = """
+                select
+                    psw.id as id,
+                    psw.minTotalQty as minTotalQty,
+                    psw.maxTotalQty as maxTotalQty,
+                    psw.leadDays as leadDays,
+                    psw.shipDays as shipDays,
+                    psw.isClosed as isClosed,
+                    p.id as productId,
+                    p.name as productName,
+                    p.description as productDescription,
+                    p.status as productStatus,
+                    p.unitPriceCents as productUnitPriceCents,
+                    p.currency as productCurrency,
+                    p.defaultMinQty as productDefaultMinQty,
+                    p.defaultMaxQty as productDefaultMaxQty,
+                    p.defaultLeadDays as productDefaultLeadDays,
+                    p.defaultShipDays as productDefaultShipDays,
+                    sw.id as sellWindowId,
+                    sw.name as sellWindowName,
+                    sw.status as sellWindowStatus,
+                    sw.startAt as sellWindowStartAt,
+                    sw.endAt as sellWindowEndAt,
+                    sw.timezone as sellWindowTimezone,
+                    sw.paymentCloseAt as sellWindowPaymentCloseAt,
+                    sw.predictedPaymentDate as sellWindowPredictedPaymentDate,
+                    sw.predictedProdDate as sellWindowPredictedProdDate,
+                    sw.predictedShipDate as sellWindowPredictedShipDate
+                from ProductSellWindow psw
+                join psw.product p
+                join psw.sellWindow sw
+                where (:productId is null or p.id = :productId)
+                  and (:sellWindowId is null or sw.id = :sellWindowId)
+            """,
+            countQuery = """
+                select count(psw.id)
+                from ProductSellWindow psw
+                join psw.product p
+                join psw.sellWindow sw
+                where (:productId is null or p.id = :productId)
+                  and (:sellWindowId is null or sw.id = :sellWindowId)
+            """
+    )
+    Page<ProductSellWindowWithRefsRow> pageWithRefs(
+            @Param("productId") UUID productId,
+            @Param("sellWindowId") UUID sellWindowId,
+            Pageable pageable
+    );
 
 
     @Query("""
@@ -137,6 +188,37 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
         where psw.id = :productSellWindowId
     """)
     Optional<ProductSellWindowRow> findRowByProductSellWindowId(@Param("productSellWindowId") UUID productSellWindowId);
+
+    interface ProductSellWindowWithRefsRow {
+        UUID getId();
+        Integer getMinTotalQty();
+        Integer getMaxTotalQty();
+        Integer getLeadDays();
+        Integer getShipDays();
+        Boolean getIsClosed();
+
+        UUID getProductId();
+        String getProductName();
+        String getProductDescription();
+        ProductStatus getProductStatus();
+        Integer getProductUnitPriceCents();
+        String getProductCurrency();
+        Integer getProductDefaultMinQty();
+        Integer getProductDefaultMaxQty();
+        Integer getProductDefaultLeadDays();
+        Integer getProductDefaultShipDays();
+
+        UUID getSellWindowId();
+        String getSellWindowName();
+        SellWindowStatus getSellWindowStatus();
+        OffsetDateTime getSellWindowStartAt();
+        OffsetDateTime getSellWindowEndAt();
+        String getSellWindowTimezone();
+        OffsetDateTime getSellWindowPaymentCloseAt();
+        OffsetDateTime getSellWindowPredictedPaymentDate();
+        OffsetDateTime getSellWindowPredictedProdDate();
+        OffsetDateTime getSellWindowPredictedShipDate();
+    }
 
 
     interface ProductSellWindowRow {

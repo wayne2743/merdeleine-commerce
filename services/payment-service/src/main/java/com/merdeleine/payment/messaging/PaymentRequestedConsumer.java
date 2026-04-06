@@ -85,9 +85,8 @@ public class PaymentRequestedConsumer {
                         paymentCreatedTopic,
                         payment.getOrderId(),
                         payment.getId(),
+                        event.customerId(),
                         payment.getProviderPaymentId(),
-                        event.customerEmail(),
-                        event.customerName(),
                         payment.getAmountCents(),
                         event.provider(),
                         event.expiresAt()

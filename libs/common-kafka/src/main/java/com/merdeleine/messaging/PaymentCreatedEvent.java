@@ -10,9 +10,8 @@ public record PaymentCreatedEvent (
         String eventType,
         UUID orderId,
         UUID paymentId,
+        UUID customerId,
         String providerPaymentId,
-        String customerEmail,
-        String customerName,
         int totalAmount,
         PaymentProvider paymentProvider,
         OffsetDateTime expireAt

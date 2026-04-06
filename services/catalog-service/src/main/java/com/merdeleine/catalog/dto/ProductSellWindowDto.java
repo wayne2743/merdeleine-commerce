@@ -2,6 +2,9 @@ package com.merdeleine.catalog.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+
+import java.time.OffsetDateTime;
 
 import java.util.UUID;
 
@@ -90,6 +93,51 @@ public final class ProductSellWindowDto {
         public void setEnabled(Boolean isClosed) { this.isClosed = isClosed; }
     }
 
+    public static final class CreateWithSellWindowRequest {
+        @NotNull
+        private UUID productId;
+
+        @Valid
+        @NotNull
+        private SellWindowDto.CreateRequest sellWindow;
+
+        @Min(1)
+        private Integer minTotalQty;
+
+        private Integer maxTotalQty;
+
+        @Min(0)
+        private Integer leadDays;
+
+        @Min(0)
+        private Integer shipDays;
+
+        private Boolean isClosed;
+
+        public CreateWithSellWindowRequest() {}
+
+        public UUID getProductId() { return productId; }
+        public void setProductId(UUID productId) { this.productId = productId; }
+
+        public SellWindowDto.CreateRequest getSellWindow() { return sellWindow; }
+        public void setSellWindow(SellWindowDto.CreateRequest sellWindow) { this.sellWindow = sellWindow; }
+
+        public Integer getMinTotalQty() { return minTotalQty; }
+        public void setMinTotalQty(Integer minTotalQty) { this.minTotalQty = minTotalQty; }
+
+        public Integer getMaxTotalQty() { return maxTotalQty; }
+        public void setMaxTotalQty(Integer maxTotalQty) { this.maxTotalQty = maxTotalQty; }
+
+        public Integer getLeadDays() { return leadDays; }
+        public void setLeadDays(Integer leadDays) { this.leadDays = leadDays; }
+
+        public Integer getShipDays() { return shipDays; }
+        public void setShipDays(Integer shipDays) { this.shipDays = shipDays; }
+
+        public Boolean getIsClosed() { return isClosed; }
+        public void setIsClosed(Boolean isClosed) { this.isClosed = isClosed; }
+    }
+
     public static final class Response {
         private UUID id;
         private UUID productId;
@@ -141,4 +189,41 @@ public final class ProductSellWindowDto {
         public boolean isEnabled() { return enabled; }
         public void setEnabled(boolean enabled) { this.enabled = enabled; }
     }
+
+    public record PageItem(
+            UUID id,
+            Integer minTotalQty,
+            Integer maxTotalQty,
+            Integer leadDays,
+            Integer shipDays,
+            boolean isClosed,
+            ProductInfo product,
+            SellWindowInfo sellWindow
+    ) {}
+
+    public record ProductInfo(
+            UUID id,
+            String name,
+            String description,
+            String status,
+            Integer unitPriceCents,
+            String currency,
+            Integer defaultMinQty,
+            Integer defaultMaxQty,
+            Integer defaultLeadDays,
+            Integer defaultShipDays
+    ) {}
+
+    public record SellWindowInfo(
+            UUID id,
+            String name,
+            String status,
+            OffsetDateTime startAt,
+            OffsetDateTime endAt,
+            String timezone,
+            OffsetDateTime paymentCloseAt,
+            OffsetDateTime predictedPaymentDate,
+            OffsetDateTime predictedProdDate,
+            OffsetDateTime predictedShipDate
+    ) {}
 }

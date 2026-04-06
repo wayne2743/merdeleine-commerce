@@ -19,8 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class SellWindowService {
@@ -66,6 +69,21 @@ public class SellWindowService {
     @Transactional(readOnly = true)
     public List<SellWindowDto.Response> list() {
         return sellWindowRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SellWindowNameRef> batchGetNames(List<UUID> sellWindowIds) {
+        if (sellWindowIds == null || sellWindowIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<UUID> uniqueSellWindowIds = new LinkedHashSet<>(sellWindowIds).stream().toList();
+        Map<UUID, String> idNameMap = sellWindowRepository.findAllById(uniqueSellWindowIds).stream()
+                .collect(Collectors.toMap(SellWindow::getId, SellWindow::getName, (a, b) -> a));
+
+        return uniqueSellWindowIds.stream()
+                .map(id -> new SellWindowNameRef(id, idNameMap.get(id)))
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -192,5 +210,8 @@ public class SellWindowService {
                 sw.getStatus().name(),
                 sw.getVersion()
         );
+    }
+
+    public record SellWindowNameRef(UUID sellWindowId, String sellWindowName) {
     }
 }

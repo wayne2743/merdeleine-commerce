@@ -1,0 +1,18 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: Arial, sans-serif; line-height: 1.6;">
+<p th:text="'您好 ' + (${customerName} ?: '顧客') + '，'">您好，</p>
+
+<p>您的銀行轉帳已經完成人工審查並確認入帳，感謝您的付款！</p>
+
+<ul>
+    <li>訂單 ID：<span th:text="${orderId}">ORDER_ID</span></li>
+    <li>入帳確認時間：<span th:text="${occurredAt}">YYYY-MM-DD HH:mm</span></li>
+</ul>
+
+<p>如有任何問題，歡迎隨時聯繫我們。</p>
+
+<p>— merdeleine.tw</p>
+</body>
+</html>
+

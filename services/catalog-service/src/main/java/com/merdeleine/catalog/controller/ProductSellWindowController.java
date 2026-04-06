@@ -1,9 +1,11 @@
 package com.merdeleine.catalog.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.merdeleine.catalog.dto.PageResponse;
 import com.merdeleine.catalog.dto.ProductSellWindowDto;
 import com.merdeleine.catalog.service.ProductSellWindowService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,14 @@ public class ProductSellWindowController {
         return pswService.create(req);
     }
 
+    @PostMapping("/with-sell-window")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductSellWindowDto.Response createWithSellWindow(
+            @Valid @RequestBody ProductSellWindowDto.CreateWithSellWindowRequest req
+    ) throws JsonProcessingException {
+        return pswService.createWithSellWindow(req);
+    }
+
     @GetMapping("/{id}")
     public ProductSellWindowDto.Response get(@PathVariable UUID id) {
         return pswService.get(id);
@@ -37,6 +47,15 @@ public class ProductSellWindowController {
             @RequestParam(required = false) UUID sellWindowId
     ) {
         return pswService.list(productId, sellWindowId);
+    }
+
+    @GetMapping("/page")
+    public PageResponse<ProductSellWindowDto.PageItem> page(
+            @RequestParam(required = false) UUID productId,
+            @RequestParam(required = false) UUID sellWindowId,
+            Pageable pageable
+    ) {
+        return pswService.page(productId, sellWindowId, pageable);
     }
 
     @PutMapping("/{id}")

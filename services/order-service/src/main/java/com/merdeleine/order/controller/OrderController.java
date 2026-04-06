@@ -1,5 +1,6 @@
 package com.merdeleine.order.controller;
 
+import com.merdeleine.enums.OrderStatus;
 import com.merdeleine.order.dto.AutoReserveOrderDtos;
 import com.merdeleine.order.dto.CreateOrderRequest;
 import com.merdeleine.order.dto.OrderResponse;
@@ -38,7 +39,8 @@ public class OrderController {
     @GetMapping
     public List<OrderResponse> list(
             @RequestParam(required = false) UUID customerId,
-            @RequestParam(required = false) UUID sellWindowId
+            @RequestParam(required = false) UUID sellWindowId,
+            @RequestParam(required = false) OrderStatus status
     ) {
         if (customerId != null && sellWindowId != null) {
             throw new BadRequestException("Provide either customerId or sellWindowId, not both");
@@ -47,9 +49,9 @@ public class OrderController {
             throw new BadRequestException("Either customerId or sellWindowId is required");
         }
         if (customerId != null) {
-            return orderService.listByCustomerId(customerId);
+            return orderService.listByCustomerId(customerId, status);
         }
-        return orderService.listBySellWindowId(sellWindowId);
+        return orderService.listBySellWindowId(sellWindowId, status);
     }
 
     @PutMapping("/{orderId}")

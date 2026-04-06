@@ -48,6 +48,7 @@ app:
       order-cancelled-events: order.cancelled.v1
       payment-paid-events: payment.paid.v1
       threshold-reached-events: threshold.reached.v1
+      payment-paid-notification-events: payment.paid.notification.v1
 
 
 logging:

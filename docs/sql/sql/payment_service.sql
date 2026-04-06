@@ -6,6 +6,8 @@ CREATE TABLE public.payment (
                                 amount_cents int4 NOT NULL,
                                 currency varchar(10) NOT NULL,
                                 provider_payment_id varchar(100) NULL,
+                                bank_last_five varchar(5) NULL,
+                                transfer_at timestamptz NULL,
                                 created_at timestamptz DEFAULT now() NOT NULL,
                                 updated_at timestamptz DEFAULT now() NOT NULL,
                                 expire_at timestamptz NULL,

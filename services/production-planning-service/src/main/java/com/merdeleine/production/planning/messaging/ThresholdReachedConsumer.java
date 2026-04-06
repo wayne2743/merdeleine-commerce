@@ -16,6 +16,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
+import jakarta.transaction.Transactional;
 import java.util.UUID;
 
 
@@ -45,32 +46,39 @@ public class ThresholdReachedConsumer {
             topics = "${app.kafka.topic.threshold-reached-events}",
             groupId = "${app.kafka.consumer.group-id}"
     )
+    @Transactional
     public void onMessage(
             ThresholdReachedEvent event,
             Acknowledgment ack
     ) {
-        // 先檢查是否已經有 batch 存在，避免重複處理同一個 event
-        batchRepository.findByProductIdAndSellWindowId(
-                event.productId(),
-                event.sellWindowId()
-        ).ifPresent(v-> {;
-            log.warn(
-                    "Batch already exists for productId={} and sellWindowId={}, skipping. existing batchId={}",
-                    event.productId(),
-                    event.sellWindowId(),
-                    v.getId()
-            );
-            ack.acknowledge();
-            return;
-        });
-
         log.info(
-                "[QuotaConfigured] eventId={}, sellWindowId={}, productId={}, counterId={}",
+                "[ThresholdReached] eventId={}, sellWindowId={}, productId={}, counterId={}",
                 event.eventId(),
                 event.sellWindowId(),
                 event.productId(),
                 event.counterId()
         );
+
+        // 若 batch 已存在（正常情況：admin 已確認過），直接更新狀態為 PAID
+        var existing = batchRepository.findByProductIdAndSellWindowId(
+                event.productId(),
+                event.sellWindowId()
+        );
+
+        if (existing.isPresent()) {
+            Batch batch = existing.get();
+            if (batch.getStatus() != BatchStatus.CANCELLED) {
+                batch.setStatus(BatchStatus.PAID);
+                batchRepository.save(batch);
+                log.info("[ThresholdReached] updated existing batch={} to PAID", batch.getId());
+            } else {
+                log.warn("[ThresholdReached] batch={} is CANCELLED, skipping", batch.getId());
+            }
+            ack.acknowledge();
+            return;
+        }
+
+        // Batch 不存在時建立（fallback，正常流程不應走到這裡）
         Batch saved = batchRepository.save(BatchMappers.toBatch(event, BatchStatus.CREATED, UUID.randomUUID()));
 
         writeOutbox(

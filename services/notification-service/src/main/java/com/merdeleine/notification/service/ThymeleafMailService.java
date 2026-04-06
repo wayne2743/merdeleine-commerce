@@ -54,6 +54,8 @@ public class ThymeleafMailService {
         helper.setTo(to);
         helper.setSubject("訂單成立通知");
         helper.setText(html, true);
+        helper.setFrom(from);
+
 
         mailSender.send(message);
     }

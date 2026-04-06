@@ -14,6 +14,8 @@ CREATE TABLE payment (
                          currency VARCHAR(10) NOT NULL,
 
                          provider_payment_id VARCHAR(100),
+                          bank_last_five VARCHAR(5),
+                          transfer_at TIMESTAMPTZ,
 
                          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

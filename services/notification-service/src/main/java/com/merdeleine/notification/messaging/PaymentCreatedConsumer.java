@@ -1,5 +1,7 @@
 package com.merdeleine.notification.messaging;
 
+import com.merdeleine.notification.client.ApiGatewayClient;
+import com.merdeleine.notification.dto.UserLookupResponse;
 import com.merdeleine.messaging.PaymentCreatedEvent;
 import com.merdeleine.notification.entity.NotificationJob;
 import com.merdeleine.notification.enums.NotificationChannel;
@@ -20,11 +22,14 @@ public class PaymentCreatedConsumer {
 
     private final Logger log = LoggerFactory.getLogger(PaymentCreatedConsumer.class);
 
+    private final ApiGatewayClient apiGatewayClient;
     private final NotificationJobRepository notificationJobRepository;
     private final ThymeleafMailService thymeleafMailService;
 
-    public PaymentCreatedConsumer(NotificationJobRepository notificationJobRepository,
+    public PaymentCreatedConsumer(ApiGatewayClient apiGatewayClient,
+                                  NotificationJobRepository notificationJobRepository,
                                   ThymeleafMailService thymeleafMailService) {
+        this.apiGatewayClient = apiGatewayClient;
         this.notificationJobRepository = notificationJobRepository;
         this.thymeleafMailService = thymeleafMailService;
     }
@@ -35,12 +40,12 @@ public class PaymentCreatedConsumer {
     )
     @Transactional
     public void onMessage(PaymentCreatedEvent event, Acknowledgment ack) {
-        log.info("[PaymentCreated] eventId={}, orderId={}, paymentId={}, providerPaymentId={}, email={}, amount={}, provider={}, expireAt={}",
+        log.info("[PaymentCreated] eventId={}, orderId={}, paymentId={}, providerPaymentId={}, customerId={}, amount={}, provider={}, expireAt={}",
                 event.eventId(),
                 event.orderId(),
                 event.paymentId(),
                 event.providerPaymentId(),
-                event.customerEmail(),
+                event.customerId(),
                 event.totalAmount(),
                 event.paymentProvider(),
                 event.expireAt()
@@ -53,6 +58,13 @@ public class PaymentCreatedConsumer {
                 NotificationChannel.EMAIL.name()
         );
 
+        if(event.customerId() == null){
+            log.warn("[PaymentCreated] customerId is null for paymentId={}, eventId={}. Skipping notification.",
+                    event.paymentId(), event.eventId());
+            ack.acknowledge();
+            return;
+        }
+
         if (exists) {
             log.info("[PaymentCreated] duplicated paymentId={}, templateKey={} -> skip",
                     event.paymentId(), NotificationMapper.TEMPLATE_KEY);
@@ -61,7 +73,20 @@ public class PaymentCreatedConsumer {
         }
 
         // 1) 建立 job（REQUESTED）
-        NotificationJob job = NotificationMapper.toJob(event);
+        UserLookupResponse user = apiGatewayClient.getUserByCustomerId(event.customerId());
+        if (user == null || user.email() == null || user.email().isBlank()) {
+            throw new IllegalStateException("Customer email not found for customerId=" + event.customerId());
+        }
+
+        String customerName = user.contactName();
+        if (customerName == null || customerName.isBlank()) {
+            customerName = user.displayName();
+        }
+        if (customerName == null || customerName.isBlank()) {
+            customerName = "Customer";
+        }
+
+        NotificationJob job = NotificationMapper.toJob(event, user.email(), customerName);
         NotificationJob saved = notificationJobRepository.save(job);
 
         try {

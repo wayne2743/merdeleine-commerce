@@ -1,6 +1,7 @@
 package com.merdeleine.production.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merdeleine.messaging.PaymentPaidNotificationEvent;
 import com.merdeleine.messaging.ThresholdReachedEvent;
 import com.merdeleine.production.entity.OutboxEvent;
 import com.merdeleine.production.enums.OutboxEventStatus;
@@ -46,6 +47,8 @@ public class ThresholdPublisher {
                 switch (e.getEventType()) {
                     case "threshold.reached.v1" ->
                             event = objectMapper.treeToValue(e.getPayload(), ThresholdReachedEvent.class);
+                    case "payment.paid.notification.v1" ->
+                            event = objectMapper.treeToValue(e.getPayload(), PaymentPaidNotificationEvent.class);
                     default ->
                             throw new IllegalStateException("Unknown eventType: " + e.getEventType());
                 }

@@ -17,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -95,7 +98,10 @@ public class EcpayCheckoutService {
     }
 
     @Transactional
-    public void preparePaymentCompletedEvent(String merchantTradeNo, String rtnCode) {
+    public void preparePaymentCompletedEvent(String merchantTradeNo,
+                                             String rtnCode,
+                                             String virtualAccount,
+                                             String paymentDate) {
         Payment payment = paymentRepository.findByProviderPaymentId(merchantTradeNo)
                 .orElseThrow(()->new RuntimeException("Payment not found for providerPaymentId: " + merchantTradeNo));
 
@@ -103,6 +109,15 @@ public class EcpayCheckoutService {
             // 已經處理過的 payment 就不要重複發 event 了
             logger.info("Payment with providerPaymentId {} already in status {}, skip processing", merchantTradeNo, payment.getStatus());
             return;
+        }
+
+        String bankLastFive = resolveBankLastFive(virtualAccount);
+        if (bankLastFive != null) {
+            payment.setBankLastFive(bankLastFive);
+        }
+        OffsetDateTime transferAt = parsePaymentDate(paymentDate);
+        if (transferAt != null) {
+            payment.setTransferAt(transferAt);
         }
 
         if ("1".equals(rtnCode)) {
@@ -130,6 +145,30 @@ public class EcpayCheckoutService {
     private static String escape(String s) {
         return s == null ? "" : s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
                 .replace("\"","&quot;").replace("'","&#39;");
+    }
+
+    private String resolveBankLastFive(String virtualAccount) {
+        if (virtualAccount == null) {
+            return null;
+        }
+        String digitsOnly = virtualAccount.replaceAll("\\D", "");
+        if (digitsOnly.length() < 5) {
+            return null;
+        }
+        return digitsOnly.substring(digitsOnly.length() - 5);
+    }
+
+    private OffsetDateTime parsePaymentDate(String paymentDate) {
+        if (paymentDate == null || paymentDate.isBlank()) {
+            return null;
+        }
+        try {
+            LocalDateTime localDateTime = LocalDateTime.parse(paymentDate, ECPAY_DT);
+            return localDateTime.atOffset(ZoneOffset.ofHours(8));
+        } catch (DateTimeParseException ex) {
+            logger.warn("Cannot parse ECPay payment date: {}", paymentDate);
+            return null;
+        }
     }
 
 

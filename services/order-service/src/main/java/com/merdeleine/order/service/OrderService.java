@@ -1,12 +1,12 @@
 package com.merdeleine.order.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merdeleine.enums.OrderStatus;
 import com.merdeleine.order.dto.CreateOrderRequest;
 import com.merdeleine.order.dto.OrderResponse;
 import com.merdeleine.order.dto.UpdateOrderRequest;
 import com.merdeleine.order.entity.Order;
 import com.merdeleine.order.entity.OutboxEvent;
-import com.merdeleine.enums.OrderStatus;
 import com.merdeleine.order.enums.OutboxEventStatus;
 import com.merdeleine.order.mapper.OrderEventMapper;
 import com.merdeleine.order.mapper.OrderMapper;
@@ -16,8 +16,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -94,16 +97,44 @@ public class OrderService {
     }
 
     @Transactional
-    public List<OrderResponse> listByCustomerId(UUID customerId) {
-        return orderRepository.findByCustomerIdAndStatusNot(customerId, OrderStatus.CANCELLED).stream()
+    public List<OrderResponse> listByCustomerId(UUID customerId, OrderStatus status) {
+        List<Order> orders = status == null
+                ? orderRepository.findByCustomerIdAndStatusNot(customerId, OrderStatus.CANCELLED)
+                : orderRepository.findByCustomerIdAndStatus(customerId, status);
+
+        return orders.stream()
                 .map(OrderMapper::toResponse)
                 .toList();
     }
 
     @Transactional
-    public List<OrderResponse> listBySellWindowId(UUID sellWindowId) {
-        return orderRepository.findBySellWindowIdAndStatusNot(sellWindowId, OrderStatus.CANCELLED).stream()
+    public List<OrderResponse> listBySellWindowId(UUID sellWindowId, OrderStatus status) {
+        List<Order> orders = status == null
+                ? orderRepository.findBySellWindowIdAndStatusNot(sellWindowId, OrderStatus.CANCELLED)
+                : orderRepository.findBySellWindowIdAndStatus(sellWindowId, status);
+
+        return orders.stream()
                 .map(OrderMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public List<OrderSellWindowRef> batchGetSellWindowRefs(List<UUID> orderIds) {
+        if (orderIds == null || orderIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<UUID> uniqueOrderIds = new LinkedHashSet<>(orderIds).stream().toList();
+        Map<UUID, Order> orderMap = orderRepository.findAllById(uniqueOrderIds).stream()
+                .collect(Collectors.toMap(Order::getId, o -> o, (a, b) -> a));
+
+        return uniqueOrderIds.stream()
+                .map(orderId -> {
+                    Order o = orderMap.get(orderId);
+                    return o == null
+                            ? new OrderSellWindowRef(orderId, null, null)
+                            : new OrderSellWindowRef(orderId, o.getSellWindowId(), o.getCustomerId());
+                })
                 .toList();
     }
 
@@ -201,5 +232,8 @@ public class OrderService {
             // 讓 transaction rollback，確保「業務寫入 + outbox」同生共死
             throw new RuntimeException("Failed to write outbox event", e);
         }
+    }
+
+    public record OrderSellWindowRef(UUID orderId, UUID sellWindowId, UUID customerId) {
     }
 }

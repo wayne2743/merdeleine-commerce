@@ -54,9 +54,23 @@ public class Payment {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
+    @Column(name = "provider_capture_id", length = 100)
+    private String providerCaptureId;
+
+    @Column(name = "approve_url", length = 500)
+    private String approveUrl;
+
+    @Column(name = "bank_last_five", length = 5)
+    private String bankLastFive;
+
+    @Column(name = "transfer_at")
+    private OffsetDateTime transferAt;
+
+
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+
 
     @PrePersist
     void prePersist() {
@@ -87,6 +101,18 @@ public class Payment {
     public String getProviderPaymentId() { return providerPaymentId; }
     public void setProviderPaymentId(String providerPaymentId) { this.providerPaymentId = providerPaymentId; }
 
+    public String getProviderCaptureId() { return providerCaptureId; }
+    public void setProviderCaptureId(String providerCaptureId) { this.providerCaptureId = providerCaptureId; }
+
+    public String getApproveUrl() { return approveUrl; }
+    public void setApproveUrl(String approveUrl) { this.approveUrl = approveUrl; }
+
+    public String getBankLastFive() { return bankLastFive; }
+    public void setBankLastFive(String bankLastFive) { this.bankLastFive = bankLastFive; }
+
+    public OffsetDateTime getTransferAt() { return transferAt; }
+    public void setTransferAt(OffsetDateTime transferAt) { this.transferAt = transferAt; }
+
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
 
@@ -95,4 +121,12 @@ public class Payment {
 
     public OffsetDateTime getExpiredAt() { return expiredAt; }
     public void setExpiredAt(OffsetDateTime expiredAt) { this.expiredAt = expiredAt; }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

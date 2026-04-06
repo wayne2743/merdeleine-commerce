@@ -17,5 +17,9 @@ public record OrderResponse(
         Integer subtotalCents,
         Integer totalAmountCents,
         String currency,
-        OffsetDateTime createdAt
+        OffsetDateTime paymentDueAt,
+        Integer paymentFailedCount,
+        String lastPaymentError,
+        OffsetDateTime createdAt,
+        OffsetDateTime updatedAt
 ) {}

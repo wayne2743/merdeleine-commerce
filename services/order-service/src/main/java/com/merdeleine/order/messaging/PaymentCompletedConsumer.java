@@ -82,7 +82,8 @@ public class PaymentCompletedConsumer {
                         order.getItem().getProductId(),
                         order.getItem().getQuantity(),
                         order.getStatus(),
-                        OffsetDateTime.now()
+                        OffsetDateTime.now(),
+                        order.getCustomerId()
                 )
         );
 

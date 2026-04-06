@@ -14,7 +14,9 @@ import com.merdeleine.catalog.repository.SellWindowRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.temporal.WeekFields;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -148,7 +150,7 @@ public class AutoGroupOrderService {
         OffsetDateTime predictedShipDate = predictedProdDate.plusDays(req.leadsDay());
 
         SellWindow sw = new SellWindow();
-        sw.setName("AUTO-" + UUID.randomUUID()); // name unique
+        sw.setName(product.getName() +  " 第" + LocalDate.now().get(WeekFields.ISO.weekOfYear()) + "週 客戶發起開團"); // name unique
         sw.setStartAt(startAt);
         sw.setEndAt(endAt);
         sw.setClosedAt(null);

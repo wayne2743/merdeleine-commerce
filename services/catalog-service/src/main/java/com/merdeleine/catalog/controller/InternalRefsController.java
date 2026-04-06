@@ -1,12 +1,16 @@
 package com.merdeleine.catalog.controller;
 
 
+import com.merdeleine.catalog.dto.OpenPaymentRequest;
+import com.merdeleine.catalog.dto.OpenPaymentResponse;
 import com.merdeleine.catalog.dto.RefsResponse;
 import com.merdeleine.catalog.service.InternalRefsService;
 import com.merdeleine.catalog.service.SellWindowExpireService;
+import com.merdeleine.catalog.service.SellWindowService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -15,10 +19,14 @@ public class InternalRefsController {
 
     private final InternalRefsService refsService;
     private final SellWindowExpireService sellWindowExpireService;
+    private final SellWindowService sellWindowService;
 
-    public InternalRefsController(InternalRefsService refsService, SellWindowExpireService sellWindowExpireService) {
+    public InternalRefsController(InternalRefsService refsService,
+                                  SellWindowExpireService sellWindowExpireService,
+                                  SellWindowService sellWindowService) {
         this.refsService = refsService;
         this.sellWindowExpireService = sellWindowExpireService;
+        this.sellWindowService = sellWindowService;
     }
 
     @GetMapping("/refs")
@@ -45,5 +53,25 @@ public class InternalRefsController {
             @RequestParam(name = "limit", defaultValue = "200") int limit
     ) {
         return sellWindowExpireService.closeExpired(limit);
+    }
+
+    @PostMapping("/sell-windows/{sellWindowId}/open-payment")
+    public ResponseEntity<OpenPaymentResponse> openPayment(
+            @PathVariable UUID sellWindowId,
+            @RequestBody(required = false) OpenPaymentRequest req
+    ) {
+        OpenPaymentResponse resp = sellWindowService.openPayment(sellWindowId, req);
+        return ResponseEntity.ok(resp);
+    }
+
+    @PostMapping("/sell-windows/_batch-names")
+    public List<SellWindowService.SellWindowNameRef> batchGetSellWindowNames(
+            @RequestBody(required = false) BatchSellWindowNameRequest request
+    ) {
+        List<UUID> sellWindowIds = request == null ? List.of() : request.sellWindowIds();
+        return sellWindowService.batchGetNames(sellWindowIds);
+    }
+
+    public record BatchSellWindowNameRequest(List<UUID> sellWindowIds) {
     }
 }

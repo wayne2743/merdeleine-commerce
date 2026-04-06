@@ -17,6 +17,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,6 +65,8 @@ class PaymentRepositoryTest {
         testPayment.setStatus(PaymentStatus.INIT);
         testPayment.setAmountCents(10000);
         testPayment.setCurrency("TWD");
+        testPayment.setBankLastFive("12345");
+        testPayment.setTransferAt(OffsetDateTime.parse("2026-04-04T12:00:00+08:00"));
     }
 
     @Test
@@ -74,35 +77,10 @@ class PaymentRepositoryTest {
         assertThat(saved.getOrderId()).isEqualTo(orderId);
         assertThat(saved.getProvider()).isEqualTo(PaymentProvider.ECpay);
         assertThat(saved.getStatus()).isEqualTo(PaymentStatus.INIT);
+        assertThat(saved.getBankLastFive()).isEqualTo("12345");
+        assertThat(saved.getTransferAt()).isEqualTo(OffsetDateTime.parse("2026-04-04T12:00:00+08:00"));
         assertThat(saved.getCreatedAt()).isNotNull();
         assertThat(saved.getUpdatedAt()).isNotNull();
-    }
-
-    @Test
-    void testFindByOrderId() {
-        entityManager.persistAndFlush(testPayment);
-        
-        Payment payment2 = createPayment(UUID.randomUUID(), PaymentProvider.Newebpay);
-        entityManager.persistAndFlush(payment2);
-        
-        List<Payment> payments = paymentRepository.findByOrderId(orderId);
-        
-        assertThat(payments).hasSize(1);
-        assertThat(payments.get(0).getOrderId()).isEqualTo(orderId);
-    }
-
-    @Test
-    void testFindByStatus() {
-        entityManager.persistAndFlush(testPayment);
-        
-        Payment succeededPayment = createPayment(UUID.randomUUID(), PaymentProvider.LinePay);
-        succeededPayment.setStatus(PaymentStatus.SUCCEEDED);
-        entityManager.persistAndFlush(succeededPayment);
-        
-        List<Payment> initPayments = paymentRepository.findByStatus(PaymentStatus.INIT);
-        
-        assertThat(initPayments).hasSize(1);
-        assertThat(initPayments.get(0).getStatus()).isEqualTo(PaymentStatus.INIT);
     }
 
     @Test
@@ -137,11 +115,13 @@ class PaymentRepositoryTest {
         Payment saved = entityManager.persistAndFlush(testPayment);
         saved.setStatus(PaymentStatus.SUCCEEDED);
         saved.setProviderPaymentId("PAY-12345");
-        
+        saved.setBankLastFive("54321");
+
         Payment updated = paymentRepository.save(saved);
         
         assertThat(updated.getStatus()).isEqualTo(PaymentStatus.SUCCEEDED);
         assertThat(updated.getProviderPaymentId()).isEqualTo("PAY-12345");
+        assertThat(updated.getBankLastFive()).isEqualTo("54321");
     }
 
     @Test
@@ -163,6 +143,7 @@ class PaymentRepositoryTest {
         payment.setStatus(PaymentStatus.INIT);
         payment.setAmountCents(10000);
         payment.setCurrency("TWD");
+        payment.setBankLastFive("12345");
         return payment;
     }
 

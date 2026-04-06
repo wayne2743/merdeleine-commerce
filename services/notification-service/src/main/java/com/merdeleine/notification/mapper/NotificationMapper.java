@@ -35,15 +35,15 @@ public class NotificationMapper {
     }
 
 
-    public static NotificationJob toJob(PaymentCreatedEvent event) {
+    public static NotificationJob toJob(PaymentCreatedEvent event, String customerEmail, String customerName) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", event.eventId().toString());
         payload.put("eventType", event.eventType());
         payload.put("orderId", event.orderId().toString());
         payload.put("paymentId", event.paymentId().toString());
         payload.put("providerPaymentId", event.providerPaymentId());
-        payload.put("customerName", event.customerName());
-        payload.put("customerEmail", event.customerEmail());
+        payload.put("customerName", customerName);
+        payload.put("customerEmail", customerEmail);
         payload.put("totalAmount", event.totalAmount());
         payload.put("paymentProvider", event.paymentProvider().name());
         payload.put("expireAtText", EXPIRE_FMT.format(event.expireAt().toInstant()));
@@ -53,7 +53,7 @@ public class NotificationMapper {
 
         return new NotificationJob(
                 NotificationChannel.EMAIL,
-                event.customerEmail(),
+                customerEmail,
                 TEMPLATE_KEY,
                 payload,
                 0,

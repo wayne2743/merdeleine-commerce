@@ -1,18 +1,9 @@
 // EcpayController.java
 package com.merdeleine.payment.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.merdeleine.enums.PaymentStatus;
 import com.merdeleine.payment.ecpay.EcpayCheckMacValue;
 import com.merdeleine.payment.ecpay.EcpayProperties;
-import com.merdeleine.payment.entity.OutboxEvent;
-import com.merdeleine.payment.entity.Payment;
-import com.merdeleine.payment.enums.OutboxEventStatus;
-import com.merdeleine.payment.mapper.PaymentMapper;
-import com.merdeleine.payment.repository.OutboxEventRepository;
-import com.merdeleine.payment.repository.PaymentRepository;
 import com.merdeleine.payment.service.EcpayCheckoutService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -20,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/payments/ecpay")
@@ -66,10 +56,12 @@ public class EcpayController {
         // RtnCode=1 通常表示付款成功（不同付款方式會有不同回傳節點）
         String rtnCode = params.getOrDefault("RtnCode", "");
         String merchantTradeNo = params.getOrDefault("MerchantTradeNo", "");
+        String virtualAccount = params.getOrDefault("vAccount", "");
+        String paymentDate = params.getOrDefault("PaymentDate", "");
         // TODO: 查 DB 依 merchantTradeNo 找到你的 payment/order，做 idempotent update
 
 
-        checkoutService.preparePaymentCompletedEvent(merchantTradeNo, rtnCode);
+        checkoutService.preparePaymentCompletedEvent(merchantTradeNo, rtnCode, virtualAccount, paymentDate);
 
         // 3) 務必回這個字串，完全一致：1|OK:contentReference[oaicite:10]{index=10}
         return "1|OK";

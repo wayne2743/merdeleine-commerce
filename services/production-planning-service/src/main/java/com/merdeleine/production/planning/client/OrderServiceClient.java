@@ -21,7 +21,7 @@ public class OrderServiceClient {
         CloseQuotaRequest req = new CloseQuotaRequest(sellWindowId, productId, reasonEventId, reason);
 
         return restClient.post()
-                .uri("/internal/sell-window-quotas/close")
+                .uri("/order/internal/sell-window-quotas/close")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(req)
                 .retrieve()

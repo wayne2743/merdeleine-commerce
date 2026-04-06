@@ -14,7 +14,7 @@ public class ThresholdEventMapper {
                 batchCounter.getProductId(),
                 batchCounter.getSellWindowId(),
                 batchCounter.getId(),
-                batchCounter.getPaidQty(),
+                batchCounter.getReservedQty(),
                 batchCounter.getThresholdQty()
         );
     }

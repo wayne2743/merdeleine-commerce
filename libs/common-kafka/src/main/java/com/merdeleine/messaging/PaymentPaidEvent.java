@@ -13,6 +13,7 @@ public record PaymentPaidEvent (
         UUID productId,
         int quantity,
         OrderStatus orderStatus,
-        OffsetDateTime occurredAt
+        OffsetDateTime occurredAt,
+        UUID customerId              // 新增：用於 notification-service 寄信
 ){
 }

@@ -52,8 +52,26 @@ app:
       payment-failed-events: payment.failed.v1
   outbox:
     publish-interval-ms: 5000
+  internal:
+    secret: ${INTERNAL_SECRET:merdeleine-internal-secret}
 
+services:
+  order-service:
+    base-url: ${ORDER_SERVICE_BASE_URL:http://localhost:8083}
+  catalog-service:
+    base-url: ${CATALOG_SERVICE_BASE_URL:http://localhost:8081}
+  api-gateway:
+    base-url: ${API_GATEWAY_BASE_URL:http://localhost:8089}
 
+paypal:
+  env: sandbox   # sandbox | live
+  client-id: ${PAYPAL_CLIENT_ID}
+  client-secret: ${PAYPAL_CLIENT_SECRET}
+  sandbox-base-url: https://api-m.sandbox.paypal.com
+  live-base-url: https://api-m.paypal.com
+  brand-name: merdeleine.tw
+  return-url: http://localhost:5173/payment/paypal/success
+  cancel-url: http://localhost:5173/payment/paypal/cancel
 
 
 
