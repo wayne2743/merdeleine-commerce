@@ -31,10 +31,11 @@ public class ClientsConfig {
     }
 
     @Bean(name = "orderServiceRestClient")
-    RestClient orderServiceRestClient() {
+    RestClient orderServiceRestClient(
+            @Value("${services.order-service.base-url}") String orderServiceBaseUrl
+    ) {
         return RestClient.builder()
-                // 你可以用 service discovery 或從 application.yml 讀
-                .baseUrl("http://localhost:8083")
+                .baseUrl(orderServiceBaseUrl)
                 .build();
     }
 }

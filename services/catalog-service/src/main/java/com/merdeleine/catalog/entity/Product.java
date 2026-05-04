@@ -44,6 +44,9 @@ public class Product {
     @Column(name = "default_ship_days")
     private Integer defaultShipDays;
 
+    @Column(name = "default_open_days")
+    private Integer defaultOpenDays;
+
     @Column(nullable = false)
     private OffsetDateTime createdAt;
 
@@ -159,5 +162,13 @@ public class Product {
 
     public void setDefaultShipDays(Integer defaultShipDays) {
         this.defaultShipDays = defaultShipDays;
+    }
+
+    public Integer getDefaultOpenDays() {
+        return defaultOpenDays;
+    }
+
+    public void setDefaultOpenDays(Integer defaultOpenDays) {
+        this.defaultOpenDays = defaultOpenDays;
     }
 }

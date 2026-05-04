@@ -1,0 +1,11 @@
+.git
+.gitignore
+.gradle
+build
+buildSrc/build
+**/build
+**/out
+**/.idea
+.idea
+*.iml
+

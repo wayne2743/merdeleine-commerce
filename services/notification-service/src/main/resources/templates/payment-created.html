@@ -14,6 +14,19 @@
     <li>到期時間：<span th:text="${expireAtText}">YYYY-MM-DD HH:mm</span></li>
 </ul>
 
+<h3 style="margin: 20px 0 8px;">銀行轉帳帳戶資訊</h3>
+<ul>
+    <li>中文戶名：<b><span th:text="${bankAccountName}">林明煇</span></b></li>
+    <li>銀行代號：<b><span th:text="${bankCode}">807</span></b></li>
+    <li>銀行帳號：<b><span th:text="${bankAccountNumber}">19801800501931</span></b></li>
+    <li>分支機構 / 代號：<b><span th:text="${bankBranch}">營業部 / 1217</span></b></li>
+</ul>
+
+<p>
+    請點以下連結前往填寫「銀行帳號後 5 碼」與「匯款時間」：
+    <a th:href="${paymentInputUrl}" th:text="${paymentInputUrl}">付款填寫頁面</a>
+</p>
+
 <p>— merdeleine.tw</p>
 </body>
 </html>

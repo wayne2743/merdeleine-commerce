@@ -42,8 +42,9 @@ public class ProductService {
         Integer defaultMaxQty = request.getDefaultMaxQty();
         Integer defaultLeadDays = request.getDefaultLeadDays();
         Integer defaultShipDays = request.getDefaultShipDays();
+        Integer defaultOpenDays = request.getDefaultOpenDays();
         validateDefaultQtyRange(defaultMinQty, defaultMaxQty);
-        validateDefaultDayRange(defaultLeadDays, defaultShipDays);
+        validateDefaultDayRange(defaultLeadDays, defaultShipDays, defaultOpenDays);
 
         Product product = new Product();
         product.setName(request.getName());
@@ -55,6 +56,7 @@ public class ProductService {
         product.setDefaultMaxQty(defaultMaxQty);
         product.setDefaultLeadDays(defaultLeadDays);
         product.setDefaultShipDays(defaultShipDays);
+        product.setDefaultOpenDays(defaultOpenDays);
 
         Product saved = productRepository.save(product);
         return ProductResponse.fromEntity(saved);
@@ -93,7 +95,8 @@ public class ProductService {
                 product.getDefaultMinQty(),
                 product.getDefaultMaxQty(),
                 product.getDefaultLeadDays(),
-                product.getDefaultShipDays()
+                product.getDefaultShipDays(),
+                product.getDefaultOpenDays()
         );
     }
 
@@ -113,9 +116,12 @@ public class ProductService {
         Integer targetShipDays = request.getDefaultShipDays() != null
                 ? request.getDefaultShipDays()
                 : product.getDefaultShipDays();
+        Integer targetOpenDays = request.getDefaultOpenDays() != null
+                ? request.getDefaultOpenDays()
+                : product.getDefaultOpenDays();
         validateDefaultQtyRange(targetMinQty, targetMaxQty);
-        validateDefaultDayRange(targetLeadDays, targetShipDays);
-        
+        validateDefaultDayRange(targetLeadDays, targetShipDays, targetOpenDays);
+
         if (request.getName() != null) {
             product.setName(request.getName());
         }
@@ -143,7 +149,10 @@ public class ProductService {
         if (request.getDefaultShipDays() != null) {
             product.setDefaultShipDays(request.getDefaultShipDays());
         }
-        
+        if (request.getDefaultOpenDays() != null) {
+            product.setDefaultOpenDays(request.getDefaultOpenDays());
+        }
+
         Product updated = productRepository.save(product);
         return ProductResponse.fromEntity(updated);
     }
@@ -169,12 +178,15 @@ public class ProductService {
         }
     }
 
-    private void validateDefaultDayRange(Integer leadDays, Integer shipDays) {
+    private void validateDefaultDayRange(Integer leadDays, Integer shipDays, Integer openDays) {
         if (leadDays != null && leadDays < 0) {
             throw new IllegalArgumentException("defaultLeadDays must be >= 0");
         }
         if (shipDays != null && shipDays < 0) {
             throw new IllegalArgumentException("defaultShipDays must be >= 0");
+        }
+        if (openDays != null && openDays < 0) {
+            throw new IllegalArgumentException("defaultOpenDays must be >= 0");
         }
     }
 }

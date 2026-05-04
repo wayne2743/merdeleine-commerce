@@ -12,10 +12,13 @@ import com.merdeleine.notification.repository.NotificationJobRepository;
 import com.merdeleine.notification.service.ThymeleafMailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Component
 public class PaymentCreatedConsumer {
@@ -25,13 +28,28 @@ public class PaymentCreatedConsumer {
     private final ApiGatewayClient apiGatewayClient;
     private final NotificationJobRepository notificationJobRepository;
     private final ThymeleafMailService thymeleafMailService;
+    private final String frontendBaseUrl;
+    private final String bankAccountName;
+    private final String bankCode;
+    private final String bankAccountNumber;
+    private final String bankBranch;
 
     public PaymentCreatedConsumer(ApiGatewayClient apiGatewayClient,
                                   NotificationJobRepository notificationJobRepository,
-                                  ThymeleafMailService thymeleafMailService) {
+                                  ThymeleafMailService thymeleafMailService,
+                                  @Value("${app.payment.bank-transfer.frontend-base-url:http://localhost:5173}") String frontendBaseUrl,
+                                  @Value("${app.payment.bank-transfer.account-name:林明煇}") String bankAccountName,
+                                  @Value("${app.payment.bank-transfer.bank-code:807}") String bankCode,
+                                  @Value("${app.payment.bank-transfer.account-number:19801800501931}") String bankAccountNumber,
+                                  @Value("${app.payment.bank-transfer.branch:營業部 / 1217}") String bankBranch) {
         this.apiGatewayClient = apiGatewayClient;
         this.notificationJobRepository = notificationJobRepository;
         this.thymeleafMailService = thymeleafMailService;
+        this.frontendBaseUrl = frontendBaseUrl;
+        this.bankAccountName = bankAccountName;
+        this.bankCode = bankCode;
+        this.bankAccountNumber = bankAccountNumber;
+        this.bankBranch = bankBranch;
     }
 
     @KafkaListener(
@@ -86,7 +104,17 @@ public class PaymentCreatedConsumer {
             customerName = "Customer";
         }
 
-        NotificationJob job = NotificationMapper.toJob(event, user.email(), customerName);
+        String paymentInputUrl = buildPaymentInputUrl(event.orderId());
+        NotificationJob job = NotificationMapper.toJob(
+                event,
+                user.email(),
+                customerName,
+                paymentInputUrl,
+                bankAccountName,
+                bankCode,
+                bankAccountNumber,
+                bankBranch
+        );
         NotificationJob saved = notificationJobRepository.save(job);
 
         try {
@@ -119,5 +147,12 @@ public class PaymentCreatedConsumer {
             // 交給 Kafka 的 retry/DLQ（你若還沒配，至少先讓它重試）
             throw ex;
         }
+    }
+
+    private String buildPaymentInputUrl(UUID orderId) {
+        String normalizedBase = frontendBaseUrl.endsWith("/")
+                ? frontendBaseUrl.substring(0, frontendBaseUrl.length() - 1)
+                : frontendBaseUrl;
+        return normalizedBase + "/customer/orders/" + orderId + "/payment?method=bank-transfer";
     }
 }

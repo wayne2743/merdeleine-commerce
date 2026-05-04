@@ -17,5 +17,6 @@ run_sql "payment_db"              "/docker-entrypoint-initdb.d/sql/payment_servi
 run_sql "notification_db"         "/docker-entrypoint-initdb.d/sql/notification_service.sql"
 run_sql "production_db"           "/docker-entrypoint-initdb.d/sql/production_service.sql"
 run_sql "production_planning_db"  "/docker-entrypoint-initdb.d/sql/production_planning_service.sql"
+run_sql "gateway_db"              "/docker-entrypoint-initdb.d/sql/api_gateway_service.sql"
 
 echo "Per-database init done."

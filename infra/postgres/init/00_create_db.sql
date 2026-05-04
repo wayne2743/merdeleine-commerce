@@ -8,3 +8,4 @@ CREATE DATABASE payment_db OWNER merdeleine;
 CREATE DATABASE notification_db OWNER merdeleine;
 CREATE DATABASE production_db OWNER merdeleine;
 CREATE DATABASE production_planning_db OWNER merdeleine;
+CREATE DATABASE gateway_db OWNER merdeleine;

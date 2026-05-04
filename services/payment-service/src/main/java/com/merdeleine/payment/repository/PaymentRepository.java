@@ -40,7 +40,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     @Query(value = """
         SELECT *
         FROM payment
-        WHERE status = 'INIT'
+        WHERE status IN ('INIT', 'PENDING', 'AUTHORIZED', 'FAILED')
           AND expire_at IS NOT NULL
           AND expire_at < :now
         ORDER BY expire_at ASC

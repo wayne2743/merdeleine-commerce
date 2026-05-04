@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <title>PayPal Card Fields Checkout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 720px;
+            margin: 40px auto;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .pp-field {
+            border: 1px solid #ccc;
+            padding: 12px;
+            border-radius: 6px;
+            min-height: 22px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            background: #f7f7f7;
+            padding: 12px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<h1>信用卡付款</h1>
+
+<div class="field">
+    <label class="label">持卡人姓名</label>
+    <input type="text" id="card-holder-name" placeholder="例如：WAYNE LIN" />
+</div>
+
+<div class="field">
+    <label class="label">帳單地址 - 國家</label>
+    <input type="text" id="country-code" value="TW" />
+</div>
+
+<div class="field">
+    <label class="label">帳單地址 - 郵遞區號</label>
+    <input type="text" id="postal-code" value="106" />
+</div>
+
+<div class="field">
+    <label class="label">帳單地址 - 縣市</label>
+    <input type="text" id="admin-area-2" value="Taipei" />
+</div>
+
+<div class="field">
+    <label class="label">帳單地址 - 行政區 / 州</label>
+    <input type="text" id="admin-area-1" value="Taipei City" />
+</div>
+
+<div class="field">
+    <label class="label">帳單地址 - 路名</label>
+    <input type="text" id="address-line-1" value="Section 4, Xinyi Rd." />
+</div>
+
+<div class="field">
+    <label class="label">卡號</label>
+    <div id="card-number" class="pp-field"></div>
+</div>
+
+<div class="field">
+    <label class="label">有效期限</label>
+    <div id="expiration-date" class="pp-field"></div>
+</div>
+
+<div class="field">
+    <label class="label">CVV</label>
+    <div id="cvv" class="pp-field"></div>
+</div>
+
+<button id="pay-button" type="button">付款</button>
+
+<div id="result"></div>
+
+<script
+        src="https://www.paypal.com/sdk/js?client-id=AfVE-zGnOlG46ZM4n5AXtEAi82LeIUmRJBbWVxXjzRqNXWCxYmE9pJwq5Jf0Up_MW3lGSHZAgYc7dyZ6&components=card-fields&currency=TWD"
+        data-sdk-integration-source="developer-studio"
+></script>
+
+<script>
+    const resultEl = document.getElementById("result");
+    const payButton = document.getElementById("pay-button");
+
+    function log(message, data) {
+        if (data) {
+            resultEl.textContent = message + "\n" + JSON.stringify(data, null, 2);
+        } else {
+            resultEl.textContent = message;
+        }
+    }
+
+    async function createOrder() {
+        const res = await fetch("/api/paypal/orders", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                amount: "100.00",
+                currency: "TWD"
+            })
+        });
+
+        if (!res.ok) {
+            throw new Error("建立訂單失敗");
+        }
+
+        return res.json();
+    }
+
+    async function captureOrder(orderId) {
+        const res = await fetch(`/api/paypal/orders/${orderId}/capture`, {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.message || "請款失敗");
+        }
+
+        return data;
+    }
+
+    async function initCardFields() {
+        if (!window.paypal || !paypal.CardFields) {
+            log("PayPal SDK 載入失敗或目前帳號環境不支援 Card Fields");
+            return;
+        }
+
+        const orderRes = await createOrder();
+        const orderId = orderRes.id;
+
+        log("訂單已建立，orderId = " + orderId);
+
+        const cardFields = paypal.CardFields({
+            createOrder: () => orderId,
+
+            onApprove: async function () {
+                try {
+                    const captureRes = await captureOrder(orderId);
+                    log("付款成功", captureRes);
+                } catch (err) {
+                    log("Capture 失敗：" + err.message);
+                }
+            },
+
+            onError: function (err) {
+                console.error(err);
+                log("付款流程錯誤", err);
+            }
+        });
+
+        if (!cardFields.isEligible()) {
+            log("目前環境無法使用 Card Fields");
+            return;
+        }
+
+        const numberField = cardFields.NumberField();
+        const expiryField = cardFields.ExpiryField();
+        const cvvField = cardFields.CVVField();
+
+        numberField.render("#card-number");
+        expiryField.render("#expiration-date");
+        cvvField.render("#cvv");
+
+        payButton.addEventListener("click", async () => {
+            try {
+                payButton.disabled = true;
+                log("送出付款中...");
+
+                await cardFields.submit({
+                    cardholderName: document.getElementById("card-holder-name").value,
+                    billingAddress: {
+                        addressLine1: document.getElementById("address-line-1").value,
+                        adminArea1: document.getElementById("admin-area-1").value,
+                        adminArea2: document.getElementById("admin-area-2").value,
+                        postalCode: document.getElementById("postal-code").value,
+                        countryCode: document.getElementById("country-code").value
+                    },
+                    contingencies: ["SCA_WHEN_REQUIRED"]
+                });
+            } catch (err) {
+                console.error(err);
+                log("submit 失敗", {
+                    message: err.message || "未知錯誤"
+                });
+            } finally {
+                payButton.disabled = false;
+            }
+        });
+    }
+
+    initCardFields().catch(err => {
+        console.error(err);
+        log("初始化失敗：" + err.message);
+    });
+</script>
+</body>
+</html>

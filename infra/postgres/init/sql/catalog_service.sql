@@ -9,6 +9,7 @@ CREATE TABLE product (
                          default_max_qty INTEGER,
                          default_lead_days INTEGER,
                          default_ship_days INTEGER,
+                         default_open_days INTEGER,
                          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                          CONSTRAINT product_default_qty_range_check
@@ -16,7 +17,9 @@ CREATE TABLE product (
                          CONSTRAINT product_default_lead_days_check
                              CHECK (default_lead_days IS NULL OR default_lead_days >= 0),
                          CONSTRAINT product_default_ship_days_check
-                             CHECK (default_ship_days IS NULL OR default_ship_days >= 0)
+                             CHECK (default_ship_days IS NULL OR default_ship_days >= 0),
+                         CONSTRAINT product_default_open_days_check
+                             CHECK (default_open_days IS NULL OR default_open_days >= 0)
 );
 
 

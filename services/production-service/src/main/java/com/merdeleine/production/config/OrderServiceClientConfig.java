@@ -1,5 +1,6 @@
 package com.merdeleine.production.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -8,10 +9,9 @@ import org.springframework.web.client.RestClient;
 public class OrderServiceClientConfig {
 
     @Bean
-    RestClient orderServiceRestClient() {
+    RestClient orderServiceRestClient(@Value("${services.order-service.base-url}") String baseUrl) {
         return RestClient.builder()
-                // 你可以用 service discovery 或從 application.yml 讀
-                .baseUrl("http://localhost:8083")
+                .baseUrl(baseUrl)
                 .build();
     }
 }

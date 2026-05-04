@@ -33,12 +33,16 @@ public class ProductUpdateRequest {
     @Min(value = 0, message = "defaultShipDays must be >= 0")
     private Integer defaultShipDays;
 
+    @Min(value = 0, message = "defaultOpenDays must be >= 0")
+    private Integer defaultOpenDays;
+
     public ProductUpdateRequest() {
     }
 
     public ProductUpdateRequest(String name, String description, ProductStatus status, Integer unitPriceCents, String currency,
                                 Integer defaultMinQty, Integer defaultMaxQty,
-                                Integer defaultLeadDays, Integer defaultShipDays) {
+                                Integer defaultLeadDays, Integer defaultShipDays,
+                                Integer defaultOpenDays) {
         this.name = name;
         this.description = description;
         this.status = status;
@@ -48,6 +52,7 @@ public class ProductUpdateRequest {
         this.defaultMaxQty = defaultMaxQty;
         this.defaultLeadDays = defaultLeadDays;
         this.defaultShipDays = defaultShipDays;
+        this.defaultOpenDays = defaultOpenDays;
     }
 
     public String getName() {
@@ -120,5 +125,13 @@ public class ProductUpdateRequest {
 
     public void setDefaultShipDays(Integer defaultShipDays) {
         this.defaultShipDays = defaultShipDays;
+    }
+
+    public Integer getDefaultOpenDays() {
+        return defaultOpenDays;
+    }
+
+    public void setDefaultOpenDays(Integer defaultOpenDays) {
+        this.defaultOpenDays = defaultOpenDays;
     }
 }

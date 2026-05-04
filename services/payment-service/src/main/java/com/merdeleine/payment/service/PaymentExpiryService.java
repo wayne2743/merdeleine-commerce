@@ -42,8 +42,13 @@ public class PaymentExpiryService {
         if (due.isEmpty()) return 0;
 
         for (Payment p : due) {
-            // 冪等保護：理論上 due query 已過濾，但保險
-            if (p.getStatus() != PaymentStatus.INIT) continue;
+            // 幂等保護：確保支付狀態確實為待過期狀態
+            if (p.getStatus() != PaymentStatus.INIT &&
+                p.getStatus() != PaymentStatus.PENDING &&
+                p.getStatus() != PaymentStatus.AUTHORIZED &&
+                p.getStatus() != PaymentStatus.FAILED) {
+                continue;
+            }
 
             p.setStatus(PaymentStatus.EXPIRED);
             p.setExpiredAt(now);

@@ -93,13 +93,28 @@ public class UserAuthService {
         return Mono.fromCallable(() -> {
                     AppUser u = appUserRepository.findByEmail(email)
                             .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
-                    if (req.contactName() != null) u.setContactName(req.contactName());
-                    if (req.contactPhone() != null) u.setContactPhone(req.contactPhone());
-                    if (req.contactEmail() != null) u.setContactEmail(req.contactEmail());
-                    if (req.shippingAddress() != null) u.setShippingAddress(req.shippingAddress());
+                    applyProfileUpdates(u, req);
                     return appUserRepository.save(u);
                 })
                 .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<AppUser> updateProfileByUserId(UUID userId, UpdateUserProfileRequest req) {
+        return Mono.fromCallable(() -> {
+                    AppUser u = appUserRepository.findById(userId)
+                            .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+                    applyProfileUpdates(u, req);
+                    return appUserRepository.save(u);
+                })
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    private void applyProfileUpdates(AppUser user, UpdateUserProfileRequest req) {
+        if (req.displayName() != null) user.setDisplayName(req.displayName());
+        if (req.contactName() != null) user.setContactName(req.contactName());
+        if (req.contactPhone() != null) user.setContactPhone(req.contactPhone());
+        if (req.contactEmail() != null) user.setContactEmail(req.contactEmail());
+        if (req.shippingAddress() != null) user.setShippingAddress(req.shippingAddress());
     }
 
     public Mono<List<AppRole>> loadRoles(UUID userId) {

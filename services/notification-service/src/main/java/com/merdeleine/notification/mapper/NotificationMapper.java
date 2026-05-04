@@ -35,7 +35,16 @@ public class NotificationMapper {
     }
 
 
-    public static NotificationJob toJob(PaymentCreatedEvent event, String customerEmail, String customerName) {
+    public static NotificationJob toJob(
+            PaymentCreatedEvent event,
+            String customerEmail,
+            String customerName,
+            String paymentInputUrl,
+            String bankAccountName,
+            String bankCode,
+            String bankAccountNumber,
+            String bankBranch
+    ) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", event.eventId().toString());
         payload.put("eventType", event.eventType());
@@ -47,9 +56,11 @@ public class NotificationMapper {
         payload.put("totalAmount", event.totalAmount());
         payload.put("paymentProvider", event.paymentProvider().name());
         payload.put("expireAtText", EXPIRE_FMT.format(event.expireAt().toInstant()));
-
-        // 你之後若有付款連結可加：
-        // payload.put("payUrl", "...");
+        payload.put("paymentInputUrl", paymentInputUrl);
+        payload.put("bankAccountName", bankAccountName);
+        payload.put("bankCode", bankCode);
+        payload.put("bankAccountNumber", bankAccountNumber);
+        payload.put("bankBranch", bankBranch);
 
         return new NotificationJob(
                 NotificationChannel.EMAIL,

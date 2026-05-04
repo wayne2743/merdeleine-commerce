@@ -16,9 +16,12 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.IsoFields;
+import java.time.temporal.TemporalAdjusters;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +91,20 @@ public class SellWindowService {
 
     @Transactional(readOnly = true)
     public NextGroupOpenAtResponse getNextGroupOpenAt() {
-        return new NextGroupOpenAtResponse(sellWindowRepository.findMaxEndAt());
+        OffsetDateTime dbMaxEndAt = sellWindowRepository.findMaxEndAt();
+        OffsetDateTime now = OffsetDateTime.now();
+
+        // 基準點：取 DB 最大 endAt 與現在兩者的較晚值，確保不早於現在
+        OffsetDateTime base = (dbMaxEndAt == null || dbMaxEndAt.isBefore(now)) ? now : dbMaxEndAt;
+
+        // 調整到下一個禮拜一（若 base 本身已是禮拜一，則推到再下一個禮拜一）
+        OffsetDateTime nextMonday = base
+                .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+                .withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+        int weekOfYear = nextMonday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+
+        return new NextGroupOpenAtResponse(nextMonday, weekOfYear);
     }
 
     @Transactional
@@ -169,15 +185,6 @@ public class SellWindowService {
             return toPaymentResponse(sw);
         }
 
-        // ---- 狀態檢查（你可按實際需求調整）----
-        // 例如：DRAFT 不給開付款；OPEN/CLOSED 視你流程允許
-        if (sw.getStatus() == SellWindowStatus.DRAFT) {
-            throw new IllegalStateException("SellWindow is DRAFT, cannot open payment: " + sellWindowId);
-        }
-        if (sw.getStatus() == SellWindowStatus.PAYMENT_CLOSED || sw.getStatus() == SellWindowStatus.CLOSED) {
-            throw new IllegalStateException("SellWindow already closed, cannot open payment: " + sellWindowId);
-        }
-
         int ttl = sw.getPaymentTtlMinutes();
         if (req != null && req.getOverrideTtlMinutes() != null) {
             ttl = req.getOverrideTtlMinutes();
@@ -194,7 +201,7 @@ public class SellWindowService {
 
         sw.setPaymentOpenedAt(openedAt);
         sw.setPaymentCloseAt(closeAt);
-        sw.setStatus(SellWindowStatus.PAYMENT_OPEN);
+        sw.setStatus(SellWindowStatus.FINISHED);
 
         // save 非必須（JPA dirty checking），但寫出來更清楚
         sellWindowRepository.save(sw);

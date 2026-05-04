@@ -68,6 +68,7 @@ paypal:
   client-id: ${PAYPAL_CLIENT_ID}
   client-secret: ${PAYPAL_CLIENT_SECRET}
   sandbox-base-url: https://api-m.sandbox.paypal.com
+  base-url: https://api-m.sandbox.paypal.com
   live-base-url: https://api-m.paypal.com
   brand-name: merdeleine.tw
   return-url: http://localhost:5173/payment/paypal/success

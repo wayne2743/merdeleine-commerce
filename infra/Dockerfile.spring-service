@@ -1,0 +1,28 @@
+# syntax=docker/dockerfile:1.7
+FROM eclipse-temurin:17-jdk AS builder
+WORKDIR /workspace
+
+COPY . .
+RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
+
+ARG GRADLE_TASK
+ARG MODULE_DIR
+ENV GRADLE_USER_HOME=/root/.gradle
+RUN --mount=type=cache,target=/root/.gradle \
+	sh -c 'for i in 1 2 3; do \
+	  sh ./gradlew --no-daemon ${GRADLE_TASK} && break; \
+	  echo "Gradle build failed (attempt $i), retrying in 15s..."; \
+	  sleep 15; \
+	  if [ "$i" -eq 3 ]; then exit 1; fi; \
+	done' && cp ${MODULE_DIR}/build/libs/*.jar /tmp/app.jar
+
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+
+COPY --from=builder /tmp/app.jar /app/app.jar
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+
+
+

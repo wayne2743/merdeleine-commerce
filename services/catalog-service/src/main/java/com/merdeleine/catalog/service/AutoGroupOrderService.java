@@ -14,7 +14,6 @@ import com.merdeleine.catalog.repository.SellWindowRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.temporal.WeekFields;
 import java.util.Optional;
@@ -139,18 +138,15 @@ public class AutoGroupOrderService {
             throw new IllegalArgumentException("predictedGroupEndAt must be after or equal to predictedGroupOpenAt");
         }
 
-        // 依需求：start_at 由前端傳入；end_at = start_at + 7 天。
-        // predicted_payment_date = end_at + 1 天。
-        // predicted_prod_date    = predicted_payment_date + 2 天。
-        // predicted_ship_date    = predicted_prod_date + leads_day。
+        // 根據預測的開團時間和產品設定來計算檔期的 start/end 和預測的付款/生產/出貨時間
         OffsetDateTime startAt = req.predictedGroupOpenAt();
-        OffsetDateTime endAt = startAt.plusDays(7);
-        OffsetDateTime predictedPaymentDate = endAt.plusDays(1);
-        OffsetDateTime predictedProdDate = predictedPaymentDate.plusDays(2);
-        OffsetDateTime predictedShipDate = predictedProdDate.plusDays(req.leadsDay());
+        OffsetDateTime endAt = startAt.plusDays(product.getDefaultOpenDays());
+        OffsetDateTime predictedPaymentDate = endAt.plusDays(2);
+        OffsetDateTime predictedProdDate = predictedPaymentDate.plusDays(product.getDefaultLeadDays());
+        OffsetDateTime predictedShipDate = predictedProdDate.plusDays(product.getDefaultShipDays());
 
         SellWindow sw = new SellWindow();
-        sw.setName(product.getName() +  " 第" + LocalDate.now().get(WeekFields.ISO.weekOfYear()) + "週 客戶發起開團"); // name unique
+        sw.setName(product.getName() +  " 第" + req.predictedGroupOpenAt().get(WeekFields.ISO.weekOfYear()) + "週 客戶發起開團"); // name unique
         sw.setStartAt(startAt);
         sw.setEndAt(endAt);
         sw.setClosedAt(null);

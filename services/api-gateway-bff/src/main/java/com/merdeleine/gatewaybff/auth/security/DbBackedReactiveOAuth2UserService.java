@@ -73,8 +73,10 @@ public class DbBackedReactiveOAuth2UserService
 
         log.info("Authorities = {}", authorities);
 
-        // nameAttributeKey：通常用 "sub"(google) 或 "id"(facebook)；保守做法：挑一個存在的 key
-        String nameKey = attrs.containsKey("sub") ? "sub" : (attrs.containsKey("id") ? "id" : "email");
+        // Google/LINE 常見 sub，Facebook 常見 id，LINE profile endpoint 可能用 userId。
+        String nameKey = attrs.containsKey("sub") ? "sub"
+                : (attrs.containsKey("id") ? "id"
+                : (attrs.containsKey("userId") ? "userId" : "email"));
 
         return new DefaultOAuth2User(authorities, attrs, nameKey);
     }
@@ -88,6 +90,10 @@ public class DbBackedReactiveOAuth2UserService
     private String extractName(String registrationId, Map<String, Object> attrs) {
         Object name = attrs.get("name");
         if (name != null) return String.valueOf(name);
+
+        // LINE profile endpoint 常見欄位
+        Object displayName = attrs.get("displayName");
+        if (displayName != null) return String.valueOf(displayName);
 
         // 有些 provider 用不同欄位
         Object given = attrs.get("given_name");

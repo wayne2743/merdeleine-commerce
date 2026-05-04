@@ -27,33 +27,6 @@ public class OrderQueryService {
                 .build();
     }
 
-    public PaypalPaymentService.OrderSnapshot getPayableOrder(UUID orderId) {
-        OrderResponse order = getOrder(orderId);
-
-        if (order == null) {
-            throw new IllegalArgumentException("Order not found: " + orderId);
-        }
-
-        if (order.status() != OrderStatus.PAYMENT_REQUESTED) {
-            throw new IllegalStateException("Order is not payable, status=" + order.status());
-        }
-
-        if (order.totalAmountCents() == null || order.totalAmountCents() <= 0) {
-            throw new IllegalStateException("Invalid order amount for payment: " + order.totalAmountCents());
-        }
-
-        if (order.currency() == null || order.currency().isBlank()) {
-            throw new IllegalStateException("Invalid order currency for payment");
-        }
-
-        String description = "merdeleine order " + order.orderNo();
-        return new PaypalPaymentService.OrderSnapshot(
-                order.orderId(),
-                order.totalAmountCents(),
-                order.currency(),
-                description
-        );
-    }
 
     public UUID getSellWindowIdByOrderId(UUID orderId) {
         OrderResponse order = getOrder(orderId);

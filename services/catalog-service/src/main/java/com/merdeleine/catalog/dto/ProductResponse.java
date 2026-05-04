@@ -18,6 +18,7 @@ public class ProductResponse {
     private Integer defaultMaxQty;
     private Integer defaultLeadDays;
     private Integer defaultShipDays;
+    private Integer defaultOpenDays;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -27,7 +28,7 @@ public class ProductResponse {
     public ProductResponse(UUID id, String name, String description, ProductStatus status, 
                           Integer unitPriceCents, String currency,
                           Integer defaultMinQty, Integer defaultMaxQty,
-                          Integer defaultLeadDays, Integer defaultShipDays,
+                           Integer defaultLeadDays, Integer defaultShipDays, Integer defaultOpenDays,
                           OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
         this.name = name;
@@ -39,6 +40,7 @@ public class ProductResponse {
         this.defaultMaxQty = defaultMaxQty;
         this.defaultLeadDays = defaultLeadDays;
         this.defaultShipDays = defaultShipDays;
+        this.defaultOpenDays = defaultOpenDays;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -55,6 +57,7 @@ public class ProductResponse {
             product.getDefaultMaxQty(),
             product.getDefaultLeadDays(),
             product.getDefaultShipDays(),
+            product.getDefaultOpenDays(),
             product.getCreatedAt(),
             product.getUpdatedAt()
         );
@@ -138,6 +141,14 @@ public class ProductResponse {
 
     public void setDefaultShipDays(Integer defaultShipDays) {
         this.defaultShipDays = defaultShipDays;
+    }
+
+    public Integer getDefaultOpenDays() {
+        return defaultOpenDays;
+    }
+
+    public void setDefaultOpenDays(Integer defaultOpenDays) {
+        this.defaultOpenDays = defaultOpenDays;
     }
 
     public OffsetDateTime getCreatedAt() {

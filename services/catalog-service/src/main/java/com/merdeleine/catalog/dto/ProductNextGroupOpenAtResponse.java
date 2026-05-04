@@ -9,6 +9,7 @@ public record ProductNextGroupOpenAtResponse(
         @JsonProperty("default_min_qty") Integer defaultMinQty,
         @JsonProperty("default_max_qty") Integer defaultMaxQty,
         @JsonProperty("default_leads_day") Integer defaultLeadsDay,
-        @JsonProperty("default_ship_day") Integer defaultShipDay
+        @JsonProperty("default_ship_day") Integer defaultShipDay,
+        @JsonProperty("default_open_days") Integer defaultOpenDays
 ) {}
 

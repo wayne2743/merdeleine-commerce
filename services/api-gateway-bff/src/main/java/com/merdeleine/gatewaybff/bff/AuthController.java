@@ -12,6 +12,7 @@ import com.merdeleine.gatewaybff.auth.service.JwtService;
 import com.merdeleine.gatewaybff.auth.service.UserAuthService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -132,6 +133,44 @@ public class AuthController {
         }
 
         return userAuthService.updateProfile(email, req)
+                .flatMap(user -> userAuthService.loadRoles(user.getId())
+                        .map(roles -> {
+                            String newToken = jwtService.generateToken(user, roles);
+                            List<String> roleCodes = roles.stream()
+                                    .map(r -> r.getCode())
+                                    .collect(Collectors.toList());
+                            return ResponseEntity.ok(toMeResponse(user, roleCodes, newToken));
+                        }));
+    }
+
+    /**
+     * PUT /auth/profile
+     * 前端使用 JWT 更新自己的 AppUser 資料（不依賴 OAuth2 principal）
+     */
+    @PutMapping("/profile")
+    public Mono<ResponseEntity<MeResponse>> updateMyProfileByToken(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authHeader,
+            @Valid @RequestBody UpdateUserProfileRequest req
+    ) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return Mono.just(ResponseEntity.status(401).build());
+        }
+
+        Claims claims;
+        try {
+            claims = jwtService.parseToken(authHeader.substring(7));
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(401).build());
+        }
+
+        UUID userId;
+        try {
+            userId = UUID.fromString(claims.getSubject());
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(401).build());
+        }
+
+        return userAuthService.updateProfileByUserId(userId, req)
                 .flatMap(user -> userAuthService.loadRoles(user.getId())
                         .map(roles -> {
                             String newToken = jwtService.generateToken(user, roles);

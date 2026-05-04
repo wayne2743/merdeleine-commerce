@@ -28,7 +28,7 @@ public class SellWindow {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private SellWindowStatus status = SellWindowStatus.DRAFT;
+    private SellWindowStatus status = SellWindowStatus.OPEN;
 
     @Column(name = "closed_at")
     private OffsetDateTime closedAt;
@@ -60,7 +60,7 @@ public class SellWindow {
     @PrePersist
     void prePersist() {
         if (id == null) id = UUID.randomUUID();
-        if (status == null) status = SellWindowStatus.DRAFT;
+        if (status == null) status = SellWindowStatus.OPEN;
         // paymentTtlMinutes 已有預設值
     }
 

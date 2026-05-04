@@ -46,6 +46,10 @@ app:
       group-id: production-service-group
       auto-offset-reset: earliest
 
+services:
+  order-service:
+    base-url: ${SERVICES_ORDER_SERVICE_BASE_URL:http://localhost:8083}
+
 logging:
   level:
     org.hibernate.SQL: debug

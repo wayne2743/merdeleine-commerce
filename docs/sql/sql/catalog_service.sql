@@ -35,13 +35,15 @@ CREATE TABLE public.product (
                                 default_max_qty integer,
                                 default_lead_days integer,
                                 default_ship_days integer,
+                                default_open_days integer,
                                 created_at timestamp with time zone DEFAULT now() NOT NULL,
                                 updated_at timestamp with time zone DEFAULT now() NOT NULL,
                                 CONSTRAINT product_status_check CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'ACTIVE'::character varying, 'INACTIVE'::character varying])::text[]))),
                                 CONSTRAINT product_default_min_qty_check CHECK ((default_min_qty >= 1)),
                                 CONSTRAINT product_default_qty_range_check CHECK (((default_max_qty IS NULL) OR (default_max_qty >= default_min_qty))),
                                 CONSTRAINT product_default_lead_days_check CHECK (((default_lead_days IS NULL) OR (default_lead_days >= 0))),
-                                CONSTRAINT product_default_ship_days_check CHECK (((default_ship_days IS NULL) OR (default_ship_days >= 0)))
+                                CONSTRAINT product_default_ship_days_check CHECK (((default_ship_days IS NULL) OR (default_ship_days >= 0))),
+                                CONSTRAINT product_default_open_days_check CHECK (((default_open_days IS NULL) OR (default_open_days >= 0)))
 );
 
 
