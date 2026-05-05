@@ -24,5 +24,9 @@ public record CreateOrderRequest(
 
         @NotBlank
         @Size(max = 10)
-        String currency
+        String currency,
+
+        @NotBlank
+        @Size(max = 1000)
+        String shippingAddress
 ) {}

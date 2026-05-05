@@ -51,6 +51,9 @@ public class Order {
     @Column(name = "last_payment_error", columnDefinition = "TEXT")
     private String lastPaymentError;
 
+    @Column(name = "shipping_address", columnDefinition = "TEXT")
+    private String shippingAddress;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -138,6 +141,9 @@ public class Order {
 
     public String getLastPaymentError() { return lastPaymentError; }
     public void setLastPaymentError(String lastPaymentError) { this.lastPaymentError = lastPaymentError; }
+
+    public String getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
 
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }

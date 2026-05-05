@@ -28,6 +28,7 @@ public class CustomerAutoGroupOrderController {
                     req.productId(),
                     req.qty(),
                     UUID.fromString(userId),
+                    req.shippingAddress(),
                     req.predictedGroupOpenAt(),
                     req.predictedGroupEndAt(),
                     req.leadsDay(),

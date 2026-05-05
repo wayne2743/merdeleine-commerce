@@ -10,6 +10,7 @@ CREATE TABLE orders (
 
                         total_amount_cents INTEGER NOT NULL CHECK (total_amount_cents >= 0),
                         currency VARCHAR(10) NOT NULL,
+                        shipping_address TEXT,
 
 
                         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

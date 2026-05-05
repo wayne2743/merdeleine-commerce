@@ -25,7 +25,8 @@ public class OrderServiceClient {
             Integer qty,
             Integer unitPriceCents,
             String currency,
-            UUID customerId
+            UUID customerId,
+            String shippingAddress
     ) {}
 
     public record AutoReserveResponse(

@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,14 +48,14 @@ public class OrderBffController {
     public Mono<Map<String, Object>> reserve(@RequestBody Map<String, Object> req, ServerWebExchange exchange) {
         String userId = currentUserResolver.resolve(exchange);
 
-        Map<String, Object> payload = Map.of(
-                "sellWindowId", req.get("sellWindowId"),
-                "productId", req.get("productId"),
-                "qty", req.get("qty") != null ? req.get("qty") : req.get("quantity"),
-                "unitPriceCents", req.get("unitPriceCents") != null ? req.get("unitPriceCents") : 0,
-                "currency", req.get("currency") != null ? req.get("currency") : "TWD",
-                "customerId", userId
-        );
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("sellWindowId", req.get("sellWindowId"));
+        payload.put("productId", req.get("productId"));
+        payload.put("qty", req.get("qty") != null ? req.get("qty") : req.get("quantity"));
+        payload.put("unitPriceCents", req.get("unitPriceCents") != null ? req.get("unitPriceCents") : 0);
+        payload.put("currency", req.get("currency") != null ? req.get("currency") : "TWD");
+        payload.put("customerId", userId);
+        payload.put("shippingAddress", req.get("shippingAddress"));
 
         return webClient.post()
                 .uri(orderBaseUrl + "/orders/auto-reserve")

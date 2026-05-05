@@ -81,7 +81,8 @@ public class OrderController {
                     req.qty(),
                     req.unitPriceCents(),
                     req.currency(),
-                    UUID.fromString(userId)
+                    UUID.fromString(userId),
+                    req.shippingAddress()
             );
             return service.autoReserve(newReq);
         }

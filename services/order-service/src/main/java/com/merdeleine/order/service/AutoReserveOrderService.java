@@ -96,6 +96,7 @@ public class AutoReserveOrderService {
                             req.currency()
                     );
                     newOrder.setSellWindowId(req.sellWindowId());
+                    newOrder.setShippingAddress(req.shippingAddress());
 
                     OrderItem item = new OrderItem(
                             UUID.randomUUID(),

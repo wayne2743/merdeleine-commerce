@@ -24,6 +24,7 @@ public class OrderMapper {
         );
 
         order.setSellWindowId(req.sellWindowId());
+        order.setShippingAddress(req.shippingAddress());
 
         OrderItem item = new OrderItem(
                 UUID.randomUUID(),
@@ -54,6 +55,7 @@ public class OrderMapper {
                 item != null ? item.getSubtotalCents() : null,
                 order.getTotalAmountCents(),
                 order.getCurrency(),
+                order.getShippingAddress(),
                 order.getPaymentDueAt(),
                 order.getPaymentFailedCount(),
                 order.getLastPaymentError(),

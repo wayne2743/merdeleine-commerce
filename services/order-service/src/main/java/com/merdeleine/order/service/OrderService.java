@@ -142,8 +142,12 @@ public class OrderService {
     public OrderResponse update(UUID orderId, UpdateOrderRequest req) {
         Order order = findOrder(orderId);
 
+        if (req.quantity() == null && req.shippingAddress() == null) {
+            throw new IllegalArgumentException("At least one field must be provided: quantity or shippingAddress");
+        }
+
         if (order.getStatus() != OrderStatus.RESERVED) {
-            throw new IllegalStateException("Only RESERVED orders can update quantity");
+            throw new IllegalStateException("Only RESERVED orders can be updated");
         }
 
         var item = order.getItem();
@@ -151,37 +155,45 @@ public class OrderService {
             throw new IllegalStateException("Order item not found: " + orderId);
         }
 
-        int oldQty = item.getQuantity();
-        int newQty = req.quantity();
-        int deltaQty = newQty - oldQty;
-
-        if (deltaQty > 0) {
-            quotaService.reserveOrThrow(order.getSellWindowId(), item.getProductId(), deltaQty);
-        } else if (deltaQty < 0) {
-            quotaService.release(order.getSellWindowId(), item.getProductId(), -deltaQty);
+        // 更新地址
+        if (req.shippingAddress() != null) {
+            order.setShippingAddress(req.shippingAddress());
         }
 
-        int unitPrice = item.getUnitPriceCents();
-        int newSubtotal = newQty * unitPrice;
+        // 更新數量（可選）
+        if (req.quantity() != null) {
+            int oldQty = item.getQuantity();
+            int newQty = req.quantity();
+            int deltaQty = newQty - oldQty;
 
-        item.setQuantity(newQty);
-        item.setSubtotalCents(newSubtotal);
-        order.setTotalAmountCents(newSubtotal);
+            if (deltaQty > 0) {
+                quotaService.reserveOrThrow(order.getSellWindowId(), item.getProductId(), deltaQty);
+            } else if (deltaQty < 0) {
+                quotaService.release(order.getSellWindowId(), item.getProductId(), -deltaQty);
+            }
 
-        if (deltaQty > 0) {
-            writeOutbox(
-                    "Order",
-                    order.getId(),
-                    orderReservedTopic,
-                    new OrderEventMapper().toOrderEvent(order, orderReservedTopic, deltaQty)
-            );
-        } else if (deltaQty < 0) {
-            writeOutbox(
-                    "Order",
-                    order.getId(),
-                    orderCancelledTopic,
-                    new OrderEventMapper().toOrderCancelledEvent(order, orderCancelledTopic, -deltaQty)
-            );
+            int unitPrice = item.getUnitPriceCents();
+            int newSubtotal = newQty * unitPrice;
+
+            item.setQuantity(newQty);
+            item.setSubtotalCents(newSubtotal);
+            order.setTotalAmountCents(newSubtotal);
+
+            if (deltaQty > 0) {
+                writeOutbox(
+                        "Order",
+                        order.getId(),
+                        orderReservedTopic,
+                        new OrderEventMapper().toOrderEvent(order, orderReservedTopic, deltaQty)
+                );
+            } else if (deltaQty < 0) {
+                writeOutbox(
+                        "Order",
+                        order.getId(),
+                        orderCancelledTopic,
+                        new OrderEventMapper().toOrderCancelledEvent(order, orderCancelledTopic, -deltaQty)
+                );
+            }
         }
 
         return OrderMapper.toResponse(order);
