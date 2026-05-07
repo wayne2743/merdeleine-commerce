@@ -1,5 +1,6 @@
 package com.merdeleine.order.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
@@ -8,5 +9,6 @@ import jakarta.validation.constraints.Size;
  */
 public record UpdateOrderRequest(
 		@Min(1) Integer quantity,
+		@Valid OrderDeliveryRequest delivery,
 		@Size(max = 1000) String shippingAddress
 ) {}

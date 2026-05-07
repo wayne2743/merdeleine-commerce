@@ -62,6 +62,7 @@ public class OrderService {
         );
 
         // 2) 判斷是否已有同一 sell window 的既有 RESERVED 訂單
+        var deliveryReq = OrderDeliverySupport.resolveForCreate(request.delivery(), request.shippingAddress());
         Order order = orderRepository
                 .findActiveOrderByCustomerAndSellWindow(
                         request.customerId(), request.sellWindowId(), OrderStatus.RESERVED)
@@ -71,11 +72,13 @@ public class OrderService {
                     item.setQuantity(item.getQuantity() + qty);
                     item.setSubtotalCents(item.getSubtotalCents() + subtotalDelta);
                     existing.setTotalAmountCents(existing.getTotalAmountCents() + subtotalDelta);
+                    OrderDeliverySupport.applyAndValidate(existing, deliveryReq);
                     return existing;
                 })
                 .orElseGet(() -> {
                     // --- 建新單 ---
                     Order newOrder = OrderMapper.toEntity(request, OrderStatus.RESERVED);
+                    OrderDeliverySupport.applyAndValidate(newOrder, deliveryReq);
                     return orderRepository.save(newOrder);
                 });
 
@@ -142,8 +145,8 @@ public class OrderService {
     public OrderResponse update(UUID orderId, UpdateOrderRequest req) {
         Order order = findOrder(orderId);
 
-        if (req.quantity() == null && req.shippingAddress() == null) {
-            throw new IllegalArgumentException("At least one field must be provided: quantity or shippingAddress");
+        if (req.quantity() == null && req.delivery() == null && req.shippingAddress() == null) {
+            throw new IllegalArgumentException("At least one field must be provided: quantity, delivery, or shippingAddress");
         }
 
         if (order.getStatus() != OrderStatus.RESERVED) {
@@ -156,8 +159,9 @@ public class OrderService {
         }
 
         // 更新地址
-        if (req.shippingAddress() != null) {
-            order.setShippingAddress(req.shippingAddress());
+        var deliveryReq = OrderDeliverySupport.resolveForUpdate(req.delivery(), req.shippingAddress());
+        if (deliveryReq != null) {
+            OrderDeliverySupport.applyAndValidate(order, deliveryReq);
         }
 
         // 更新數量（可選）

@@ -70,6 +70,14 @@ public class Order {
     )
     private OrderItem item;
 
+    @OneToOne(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private OrderDelivery delivery;
+
     // Constructors
     public Order() {
     }
@@ -106,6 +114,23 @@ public class Order {
         if (this.item != null) {
             this.item.setOrder(null);
             this.item = null;
+        }
+    }
+
+    public void setDelivery(OrderDelivery delivery) {
+        if (this.delivery != null) {
+            this.delivery.setOrder(null);
+        }
+        this.delivery = delivery;
+        if (delivery != null) {
+            delivery.setOrder(this);
+        }
+    }
+
+    public void clearDelivery() {
+        if (this.delivery != null) {
+            this.delivery.setOrder(null);
+            this.delivery = null;
         }
     }
 
@@ -158,6 +183,10 @@ public class Order {
 
     public OrderItem getItem() {
         return item;
+    }
+
+    public OrderDelivery getDelivery() {
+        return delivery;
     }
 
 }

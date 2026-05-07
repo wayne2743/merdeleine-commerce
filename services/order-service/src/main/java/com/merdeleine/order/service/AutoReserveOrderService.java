@@ -74,6 +74,7 @@ public class AutoReserveOrderService {
         UUID customerId = req.customerId();
         int  unitPriceCents = req.unitPriceCents();
         int  subtotalDelta  = qty * unitPriceCents;
+        var deliveryReq = OrderDeliverySupport.resolveForCreate(req.delivery(), req.shippingAddress());
 
         Order order = orderRepository
                 .findActiveOrderByCustomerAndSellWindow(customerId, req.sellWindowId(), OrderStatus.RESERVED)
@@ -83,6 +84,7 @@ public class AutoReserveOrderService {
                     item.setQuantity(item.getQuantity() + qty);
                     item.setSubtotalCents(item.getSubtotalCents() + subtotalDelta);
                     existing.setTotalAmountCents(existing.getTotalAmountCents() + subtotalDelta);
+                    OrderDeliverySupport.applyAndValidate(existing, deliveryReq);
                     return existing;
                 })
                 .orElseGet(() -> {
@@ -96,7 +98,7 @@ public class AutoReserveOrderService {
                             req.currency()
                     );
                     newOrder.setSellWindowId(req.sellWindowId());
-                    newOrder.setShippingAddress(req.shippingAddress());
+                    OrderDeliverySupport.applyAndValidate(newOrder, deliveryReq);
 
                     OrderItem item = new OrderItem(
                             UUID.randomUUID(),

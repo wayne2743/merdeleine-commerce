@@ -26,7 +26,19 @@ public class OrderServiceClient {
             Integer unitPriceCents,
             String currency,
             UUID customerId,
+            DeliveryPayload delivery,
             String shippingAddress
+    ) {}
+
+    public record DeliveryPayload(
+            String deliveryMethod,
+            String pickupLocationName,
+            String pickupLocationAddress,
+            String pickupTime,
+            String convenienceStoreCode,
+            String convenienceStoreName,
+            String convenienceStoreAddress,
+            String homeDeliveryAddress
     ) {}
 
     public record AutoReserveResponse(

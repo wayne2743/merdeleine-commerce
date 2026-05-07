@@ -108,6 +108,7 @@ public class AutoGroupOrderService {
                     psw.getUnitPriceCents(),
                     psw.getCurrency(),
                     req.customerId(),
+                    null,
                     req.shippingAddress()
             ));
         } catch (Exception e) {

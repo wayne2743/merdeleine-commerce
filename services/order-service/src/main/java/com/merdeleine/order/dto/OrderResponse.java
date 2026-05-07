@@ -17,6 +17,7 @@ public record OrderResponse(
         Integer subtotalCents,
         Integer totalAmountCents,
         String currency,
+        OrderDeliveryResponse delivery,
         String shippingAddress,
         OffsetDateTime paymentDueAt,
         Integer paymentFailedCount,

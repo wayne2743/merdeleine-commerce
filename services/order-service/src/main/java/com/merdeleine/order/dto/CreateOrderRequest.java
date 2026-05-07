@@ -1,5 +1,6 @@
 package com.merdeleine.order.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.util.UUID;
 
@@ -26,7 +27,9 @@ public record CreateOrderRequest(
         @Size(max = 10)
         String currency,
 
-        @NotBlank
+        @Valid
+        OrderDeliveryRequest delivery,
+
         @Size(max = 1000)
         String shippingAddress
 ) {}

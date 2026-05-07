@@ -55,6 +55,7 @@ public class OrderBffController {
         payload.put("unitPriceCents", req.get("unitPriceCents") != null ? req.get("unitPriceCents") : 0);
         payload.put("currency", req.get("currency") != null ? req.get("currency") : "TWD");
         payload.put("customerId", userId);
+        payload.put("delivery", req.get("delivery"));
         payload.put("shippingAddress", req.get("shippingAddress"));
 
         return webClient.post()

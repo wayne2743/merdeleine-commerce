@@ -1,7 +1,9 @@
 package com.merdeleine.order.mapper;
 
 import com.merdeleine.order.dto.CreateOrderRequest;
+import com.merdeleine.order.dto.OrderDeliveryResponse;
 import com.merdeleine.order.dto.OrderResponse;
+import com.merdeleine.order.entity.OrderDelivery;
 import com.merdeleine.order.entity.Order;
 import com.merdeleine.order.entity.OrderItem;
 import com.merdeleine.enums.OrderStatus;
@@ -42,6 +44,7 @@ public class OrderMapper {
     public static OrderResponse toResponse(Order order) {
 
         OrderItem item = order.getItem();
+        OrderDelivery delivery = order.getDelivery();
 
         return new OrderResponse(
                 order.getId(),
@@ -55,6 +58,18 @@ public class OrderMapper {
                 item != null ? item.getSubtotalCents() : null,
                 order.getTotalAmountCents(),
                 order.getCurrency(),
+                delivery != null
+                        ? new OrderDeliveryResponse(
+                        delivery.getDeliveryMethod(),
+                        delivery.getPickupLocationName(),
+                        delivery.getPickupLocationAddress(),
+                        delivery.getPickupTime(),
+                        delivery.getConvenienceStoreCode(),
+                        delivery.getConvenienceStoreName(),
+                        delivery.getConvenienceStoreAddress(),
+                        delivery.getHomeDeliveryAddress()
+                )
+                        : null,
                 order.getShippingAddress(),
                 order.getPaymentDueAt(),
                 order.getPaymentFailedCount(),
