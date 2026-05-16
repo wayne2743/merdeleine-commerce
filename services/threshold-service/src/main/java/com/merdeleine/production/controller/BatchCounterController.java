@@ -42,6 +42,11 @@ public class BatchCounterController {
         return batchCounterService.list(sellWindowId, productId);
     }
 
+    @PostMapping("/query")
+    public List<BatchCounterDto.Response> query(@Valid @RequestBody BatchCounterDto.LookupRequest req) {
+        return batchCounterService.listByPairs(req.getItems());
+    }
+
     // Update
     @PutMapping("/{id}")
     public BatchCounterDto.Response update(@PathVariable UUID id,

@@ -30,6 +30,20 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
     List<ProductSellWindow> findBySellWindow_Id(UUID sellWindowId);
 
     @Query("""
+        select psw
+        from ProductSellWindow psw
+        join fetch psw.product p
+        join fetch psw.sellWindow sw
+        where (:productId is null or p.id = :productId)
+          and (:sellWindowId is null or sw.id = :sellWindowId)
+        order by sw.startAt desc, p.name asc, psw.id asc
+    """)
+    List<ProductSellWindow> findAllWithRefs(
+            @Param("productId") UUID productId,
+            @Param("sellWindowId") UUID sellWindowId
+    );
+
+    @Query("""
         select max(sw.endAt)
         from ProductSellWindow psw
         join psw.sellWindow sw
@@ -137,6 +151,8 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
                     sw.startAt as sellWindowStartAt,
                     sw.endAt as sellWindowEndAt,
                     sw.timezone as sellWindowTimezone,
+                    sw.paymentTtlMinutes as sellWindowPaymentTtlMinutes,
+                    sw.paymentOpenedAt as sellWindowPaymentOpenedAt,
                     sw.paymentCloseAt as sellWindowPaymentCloseAt,
                     sw.predictedPaymentDate as sellWindowPredictedPaymentDate,
                     sw.predictedProdDate as sellWindowPredictedProdDate,
@@ -214,6 +230,8 @@ public interface ProductSellWindowRepository extends JpaRepository<ProductSellWi
         OffsetDateTime getSellWindowStartAt();
         OffsetDateTime getSellWindowEndAt();
         String getSellWindowTimezone();
+        Integer getSellWindowPaymentTtlMinutes();
+        OffsetDateTime getSellWindowPaymentOpenedAt();
         OffsetDateTime getSellWindowPaymentCloseAt();
         OffsetDateTime getSellWindowPredictedPaymentDate();
         OffsetDateTime getSellWindowPredictedProdDate();

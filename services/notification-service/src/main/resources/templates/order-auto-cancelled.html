@@ -1,0 +1,29 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: Arial, sans-serif; line-height: 1.6;">
+<p th:text="'您好 ' + (${customerName} ?: '顧客') + '，'">您好，</p>
+
+<p>很遺憾地通知您，您在 merdeleine 的訂單已因為未達團購門檻而被自動取消。</p>
+
+<div style="background-color: #f5f5f5; padding: 15px; margin: 15px 0; border-left: 4px solid #ff6b6b;">
+    <p style="margin: 0; color: #ff6b6b; font-weight: bold;">✗ 訂單已自動取消</p>
+    <p style="margin: 5px 0; color: #666;">原因：訂購數量不足，商家未能成功開團</p>
+</div>
+
+<ul>
+    <li>商品名稱：<span th:text="${productName}">PRODUCT_NAME</span></li>
+    <li>檔期名稱：<span th:text="${sellWindowName}">SELL_WINDOW_NAME</span></li>
+    <li>訂單編號：<span th:text="${orderNo}">ORDER_NO</span></li>
+    <li>訂單 ID：<span th:text="${orderId}">ORDER_ID</span></li>
+    <li>取消時間：<span th:text="${occurredAt}">YYYY-MM-DD HH:mm</span></li>
+</ul>
+
+<p>請再提供您的銀行帳戶，您支付或預留的金額將在 3-5 個工作日內原額返還您所提供的帳戶。</p>
+
+<p style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
+    如有任何問題或疑慮，歡迎隨時聯繫我們的客服團隊。<br/>
+    — merdeleine.tw
+</p>
+</body>
+</html>
+

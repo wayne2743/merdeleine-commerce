@@ -8,6 +8,7 @@ public class BatchCounterResponse {
     private UUID id;
     private UUID sellWindowId;
     private UUID productId;
+    private Integer reservedQty;
     private Integer paidQty;
     private Integer thresholdQty;
     private String status;
@@ -24,6 +25,9 @@ public class BatchCounterResponse {
 
     public UUID getProductId() { return productId; }
     public void setProductId(UUID productId) { this.productId = productId; }
+
+    public Integer getReservedQty() { return reservedQty; }
+    public void setReservedQty(Integer reservedQty) { this.reservedQty = reservedQty; }
 
     public Integer getPaidQty() { return paidQty; }
     public void setPaidQty(Integer paidQty) { this.paidQty = paidQty; }

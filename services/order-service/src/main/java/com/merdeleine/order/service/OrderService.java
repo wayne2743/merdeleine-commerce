@@ -2,6 +2,7 @@ package com.merdeleine.order.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.enums.OrderStatus;
+import com.merdeleine.messaging.OrderAutoCancelledNotificationEvent;
 import com.merdeleine.order.dto.CreateOrderRequest;
 import com.merdeleine.order.dto.OrderResponse;
 import com.merdeleine.order.dto.UpdateOrderRequest;
@@ -12,10 +13,13 @@ import com.merdeleine.order.mapper.OrderEventMapper;
 import com.merdeleine.order.mapper.OrderMapper;
 import com.merdeleine.order.repository.OrderRepository;
 import com.merdeleine.order.repository.OutboxEventRepository;
+import com.merdeleine.order.repository.StorePickupLocationRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,21 +33,27 @@ public class OrderService {
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
     private final QuotaService quotaService;
+    private final StorePickupLocationRepository storePickupLocationRepository;
     private final String orderReservedTopic;
     private final String orderCancelledTopic;
+    private final String orderAutoCancelledNotificationTopic;
 
     public OrderService(OrderRepository orderRepository,
                         OutboxEventRepository outboxEventRepository,
                         ObjectMapper objectMapper,
                         QuotaService quotaService,
+                         StorePickupLocationRepository storePickupLocationRepository,
                         @Value("${app.kafka.topic.order-reserved-events}") String orderReservedTopic,
-                        @Value("${app.kafka.topic.order-cancelled-events}") String orderCancelledTopic) {
+                        @Value("${app.kafka.topic.order-cancelled-events}") String orderCancelledTopic,
+                        @Value("${app.kafka.topic.order-auto-cancelled-notification-events:order.auto-cancelled.notification.v1}") String orderAutoCancelledNotificationTopic) {
         this.orderRepository = orderRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.objectMapper = objectMapper;
         this.quotaService = quotaService;
+        this.storePickupLocationRepository = storePickupLocationRepository;
         this.orderReservedTopic = orderReservedTopic;
         this.orderCancelledTopic = orderCancelledTopic;
+        this.orderAutoCancelledNotificationTopic = orderAutoCancelledNotificationTopic;
 
     }
 
@@ -72,13 +82,13 @@ public class OrderService {
                     item.setQuantity(item.getQuantity() + qty);
                     item.setSubtotalCents(item.getSubtotalCents() + subtotalDelta);
                     existing.setTotalAmountCents(existing.getTotalAmountCents() + subtotalDelta);
-                    OrderDeliverySupport.applyAndValidate(existing, deliveryReq);
+                    OrderDeliverySupport.applyAndValidate(existing, deliveryReq, storePickupLocationRepository);
                     return existing;
                 })
                 .orElseGet(() -> {
                     // --- 建新單 ---
                     Order newOrder = OrderMapper.toEntity(request, OrderStatus.RESERVED);
-                    OrderDeliverySupport.applyAndValidate(newOrder, deliveryReq);
+                    OrderDeliverySupport.applyAndValidate(newOrder, deliveryReq, storePickupLocationRepository);
                     return orderRepository.save(newOrder);
                 });
 
@@ -161,7 +171,7 @@ public class OrderService {
         // 更新地址
         var deliveryReq = OrderDeliverySupport.resolveForUpdate(req.delivery(), req.shippingAddress());
         if (deliveryReq != null) {
-            OrderDeliverySupport.applyAndValidate(order, deliveryReq);
+            OrderDeliverySupport.applyAndValidate(order, deliveryReq, storePickupLocationRepository);
         }
 
         // 更新數量（可選）
@@ -227,6 +237,48 @@ public class OrderService {
             quotaService.release(order.getSellWindowId(), item.getProductId(), item.getQuantity());
         }
         order.clearItem(); // orphanRemoval = true
+    }
+
+    @Transactional
+    public void cancelBySellWindowIdAutomatically(UUID sellWindowId) {
+        List<Order> orders = orderRepository.findBySellWindowIdAndStatusIn(
+                sellWindowId,
+                Arrays.asList(OrderStatus.RESERVED, OrderStatus.PAYMENT_REQUESTED)
+        );
+
+        for (Order order : orders) {
+            // Skip if already cancelled (idempotent)
+            if (order.getStatus() == OrderStatus.CANCELLED) {
+                continue;
+            }
+
+            var item = order.getItem();
+            order.setStatus(OrderStatus.CANCELLED);
+
+            // Release quota
+            if (item != null && order.getSellWindowId() != null) {
+                quotaService.release(order.getSellWindowId(), item.getProductId(), item.getQuantity());
+            }
+
+            // Write outbox event for notification
+            writeOutbox(
+                    "Order",
+                    order.getId(),
+                    orderAutoCancelledNotificationTopic,
+                    new OrderAutoCancelledNotificationEvent(
+                            UUID.randomUUID(),
+                            orderAutoCancelledNotificationTopic,
+                            order.getId(),
+                            order.getOrderNo(),
+                            order.getCustomerId(),
+                            order.getSellWindowId(),
+                            "訂購數量不足 而被商家自動取消 沒有開團成功",
+                            OffsetDateTime.now()
+                    )
+            );
+
+            order.clearItem();
+        }
     }
 
     private Order findOrder(UUID id) {

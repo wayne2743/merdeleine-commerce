@@ -13,6 +13,8 @@ import com.merdeleine.catalog.exception.NotFoundException;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
 import com.merdeleine.catalog.repository.SellWindowRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,16 +33,21 @@ import java.util.stream.Collectors;
 @Service
 public class SellWindowService {
 
+    private static final Logger log = LoggerFactory.getLogger(SellWindowService.class);
+
     private final SellWindowRepository sellWindowRepository;
     private final ProductSellWindowRepository productSellWindowRepository;
     private final ThresholdServiceClient thresholdServiceClient;
+    private final SellWindowExpireService sellWindowExpireService;
 
     public SellWindowService(SellWindowRepository sellWindowRepository,
                              ProductSellWindowRepository productSellWindowRepository,
-                             ThresholdServiceClient thresholdServiceClient) {
+                             ThresholdServiceClient thresholdServiceClient,
+                             SellWindowExpireService sellWindowExpireService) {
         this.sellWindowRepository = sellWindowRepository;
         this.productSellWindowRepository = productSellWindowRepository;
         this.thresholdServiceClient = thresholdServiceClient;
+        this.sellWindowExpireService = sellWindowExpireService;
     }
 
     @Transactional
@@ -134,6 +141,10 @@ public class SellWindowService {
         if (!sellWindowRepository.existsById(id)) {
             throw new NotFoundException("SellWindow not found: " + id);
         }
+
+        // Align delete flow with POST /internal/sell-windows/{sellWindowId}/close behavior.
+        sellWindowExpireService.closeBySellWindowId(id);
+
         // 1) 刪除 threshold-service 的 batch_counter（及 cascade counter_event_log）
         thresholdServiceClient.deleteBatchCountersBySellWindowId(id.toString());
         // 2) 刪除 catalog DB 的 product_sell_window（FK 保護）

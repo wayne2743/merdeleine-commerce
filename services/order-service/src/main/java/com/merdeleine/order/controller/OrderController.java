@@ -3,9 +3,12 @@ package com.merdeleine.order.controller;
 import com.merdeleine.enums.OrderStatus;
 import com.merdeleine.order.dto.AutoReserveOrderDtos;
 import com.merdeleine.order.dto.CreateOrderRequest;
+import com.merdeleine.order.dto.OrderDeliveryRequest;
+import com.merdeleine.order.dto.OrderDeliveryResponse;
 import com.merdeleine.order.dto.OrderResponse;
 import com.merdeleine.order.dto.UpdateOrderRequest;
 import com.merdeleine.order.exception.BadRequestException;
+import com.merdeleine.order.service.OrderDeliveryService;
 import com.merdeleine.order.service.AutoReserveOrderService;
 import com.merdeleine.order.service.OrderService;
 import jakarta.validation.Valid;
@@ -20,10 +23,14 @@ public class OrderController {
 
     private final OrderService orderService;
     private final AutoReserveOrderService service;
+    private final OrderDeliveryService orderDeliveryService;
 
-    public OrderController(OrderService orderService, AutoReserveOrderService service) {
+    public OrderController(OrderService orderService,
+                           AutoReserveOrderService service,
+                           OrderDeliveryService orderDeliveryService) {
         this.orderService = orderService;
         this.service = service;
+        this.orderDeliveryService = orderDeliveryService;
     }
 
     @PostMapping
@@ -65,6 +72,32 @@ public class OrderController {
     @DeleteMapping("/{orderId}")
     public void cancel(@PathVariable UUID orderId) {
         orderService.cancel(orderId);
+    }
+
+    @PostMapping("/{orderId}/delivery")
+    public OrderDeliveryResponse createDelivery(
+            @PathVariable UUID orderId,
+            @Valid @RequestBody OrderDeliveryRequest request
+    ) {
+        return orderDeliveryService.create(orderId, request);
+    }
+
+    @GetMapping("/{orderId}/delivery")
+    public OrderDeliveryResponse getDelivery(@PathVariable UUID orderId) {
+        return orderDeliveryService.get(orderId);
+    }
+
+    @PutMapping("/{orderId}/delivery")
+    public OrderDeliveryResponse updateDelivery(
+            @PathVariable UUID orderId,
+            @Valid @RequestBody OrderDeliveryRequest request
+    ) {
+        return orderDeliveryService.update(orderId, request);
+    }
+
+    @DeleteMapping("/{orderId}/delivery")
+    public void deleteDelivery(@PathVariable UUID orderId) {
+        orderDeliveryService.delete(orderId);
     }
 
     @PostMapping("/auto-reserve")

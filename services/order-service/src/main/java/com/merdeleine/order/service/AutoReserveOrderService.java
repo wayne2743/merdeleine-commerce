@@ -12,6 +12,7 @@ import com.merdeleine.order.mapper.OrderEventMapper;
 import com.merdeleine.order.repository.OrderRepository;
 import com.merdeleine.order.repository.OutboxEventRepository;
 import com.merdeleine.order.repository.SellWindowQuotaRepository;
+import com.merdeleine.order.repository.StorePickupLocationRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class AutoReserveOrderService {
     private final SellWindowQuotaRepository quotaRepository;
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
+    private final StorePickupLocationRepository storePickupLocationRepository;
     private final String orderReservedTopic;
 
     public AutoReserveOrderService(
@@ -35,12 +37,14 @@ public class AutoReserveOrderService {
             SellWindowQuotaRepository quotaRepository,
             OutboxEventRepository outboxEventRepository,
             ObjectMapper objectMapper,
+            StorePickupLocationRepository storePickupLocationRepository,
             @Value("${app.kafka.topic.order-reserved-events}") String orderReservedTopic
     ) {
         this.orderRepository = orderRepository;
         this.quotaRepository = quotaRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.objectMapper = objectMapper;
+        this.storePickupLocationRepository = storePickupLocationRepository;
         this.orderReservedTopic = orderReservedTopic;
     }
 
@@ -84,7 +88,7 @@ public class AutoReserveOrderService {
                     item.setQuantity(item.getQuantity() + qty);
                     item.setSubtotalCents(item.getSubtotalCents() + subtotalDelta);
                     existing.setTotalAmountCents(existing.getTotalAmountCents() + subtotalDelta);
-                    OrderDeliverySupport.applyAndValidate(existing, deliveryReq);
+                    OrderDeliverySupport.applyAndValidate(existing, deliveryReq, storePickupLocationRepository);
                     return existing;
                 })
                 .orElseGet(() -> {
@@ -98,7 +102,7 @@ public class AutoReserveOrderService {
                             req.currency()
                     );
                     newOrder.setSellWindowId(req.sellWindowId());
-                    OrderDeliverySupport.applyAndValidate(newOrder, deliveryReq);
+                    OrderDeliverySupport.applyAndValidate(newOrder, deliveryReq, storePickupLocationRepository);
 
                     OrderItem item = new OrderItem(
                             UUID.randomUUID(),

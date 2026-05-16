@@ -54,6 +54,9 @@ public class SellWindowQuotaOutboxPublisher {
                 }else if (e.getEventType().equals(sellWindowClosedTopic)) {
                     event = objectMapper.treeToValue(e.getPayload(), SellWindowClosedEvent.class);
                 }
+                if (event == null) {
+                    throw new IllegalStateException("Unsupported outbox eventType: " + e.getEventType());
+                }
                 String key = e.getAggregateId().toString();
                 producer.publish(e.getEventType(), key, event);
                 e.setStatus(OutboxEventStatus.SENT);

@@ -16,6 +16,8 @@ public interface BatchCounterRepository extends JpaRepository<BatchCounter, UUID
 
     List<BatchCounter> findBySellWindowId(UUID sellWindowId);
 
+    List<BatchCounter> findBySellWindowIdInAndProductIdIn(List<UUID> sellWindowIds, List<UUID> productIds);
+
     List<BatchCounter> findByProductId(UUID productId);
 
     List<BatchCounter> findByStatus(CounterStatus status);

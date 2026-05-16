@@ -1,6 +1,7 @@
 package com.merdeleine.order.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merdeleine.messaging.OrderAutoCancelledNotificationEvent;
 import com.merdeleine.messaging.OrderCancelledEvent;
 import com.merdeleine.messaging.OrderReservedEvent;
 import com.merdeleine.messaging.PaymentPaidEvent;
@@ -50,6 +51,8 @@ public class OutboxPublisher {
                             event = objectMapper.treeToValue(e.getPayload(), PaymentRequestedEvent.class);
                     case "payment.paid.v1" ->
                             event = objectMapper.treeToValue(e.getPayload(), PaymentPaidEvent.class);
+                    case "order.auto-cancelled.notification.v1" ->
+                            event = objectMapper.treeToValue(e.getPayload(), OrderAutoCancelledNotificationEvent.class);
                     default ->
                             throw new IllegalStateException("Unknown eventType: " + e.getEventType());
                 }

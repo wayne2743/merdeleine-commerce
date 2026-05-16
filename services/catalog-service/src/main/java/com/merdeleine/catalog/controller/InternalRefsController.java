@@ -48,6 +48,13 @@ public class InternalRefsController {
         return sellWindowExpireService.closeExpired(limit);
     }
 
+    @PostMapping("/sell-windows/{sellWindowId}/close")
+    public SellWindowExpireService.CloseSellWindowResult closeExpiredBySellWindowId(
+            @PathVariable UUID sellWindowId
+    ) {
+        return sellWindowExpireService.closeBySellWindowId(sellWindowId);
+    }
+
     @PostMapping("/sell-windows/{sellWindowId}/open-payment")
     public ResponseEntity<OpenPaymentResponse> openPayment(
             @PathVariable UUID sellWindowId,

@@ -6,6 +6,9 @@ import com.merdeleine.catalog.client.ThresholdServiceClient;
 import com.merdeleine.catalog.dto.PageResponse;
 import com.merdeleine.catalog.dto.ProductOpenSellWindowResponse;
 import com.merdeleine.catalog.dto.ProductSellWindowDto;
+import com.merdeleine.catalog.dto.SellWindowDto;
+import com.merdeleine.catalog.dto.threshold.BatchCounterLookupRequest;
+import com.merdeleine.catalog.dto.threshold.BatchCounterResponse;
 import com.merdeleine.catalog.dto.threshold.BatchCounterRequest;
 import com.merdeleine.catalog.entity.OutboxEvent;
 import com.merdeleine.catalog.entity.Product;
@@ -27,7 +30,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -190,6 +195,38 @@ public class ProductSellWindowService {
     }
 
     @Transactional(readOnly = true)
+    public ProductSellWindowDto.CombinedResponse getCombined(UUID id) {
+        ProductSellWindow e = pswRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("ProductSellWindow not found: " + id));
+        return toCombinedResponse(e, loadCounterMap(List.of(e)).get(key(e.getSellWindow().getId(), e.getProduct().getId())));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductSellWindowDto.CombinedResponse> listCombined(UUID productId, UUID sellWindowId) {
+        var rows = pswRepository.findAllWithRefs(productId, sellWindowId);
+        var countersByKey = loadCounterMap(rows);
+
+        return rows.stream()
+                .map(e -> toCombinedResponse(e, countersByKey.get(key(e.getSellWindow().getId(), e.getProduct().getId()))))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ProductSellWindowDto.CombinedResponse> pageCombined(UUID productId, UUID sellWindowId, Pageable pageable) {
+        int safePage = Math.max(pageable.getPageNumber(), 0);
+        int safeSize = Math.min(Math.max(pageable.getPageSize(), 1), 100);
+        PageRequest safePageRequest = PageRequest.of(safePage, safeSize, pageable.getSort());
+
+        var rowsPage = pswRepository.pageWithRefs(productId, sellWindowId, safePageRequest);
+        var countersByKey = loadCounterMap(rowsPage.getContent());
+        var items = rowsPage.getContent().stream()
+                .map(row -> toCombinedResponseFromRow(row, countersByKey.get(key(row.getSellWindowId(), row.getProductId()))))
+                .toList();
+
+        return new PageResponse<>(items, safePage, safeSize, rowsPage.getTotalElements());
+    }
+
+    @Transactional(readOnly = true)
     public List<ProductSellWindowDto.Response> list(UUID productId, UUID sellWindowId) {
         if (productId != null && sellWindowId != null) {
             return pswRepository.findByProduct_IdAndSellWindow_Id(productId, sellWindowId)
@@ -270,6 +307,91 @@ public class ProductSellWindowService {
         );
     }
 
+    private ProductSellWindowDto.CombinedResponse toCombinedResponse(ProductSellWindow e) {
+        return toCombinedResponse(e, null);
+    }
+
+    private ProductSellWindowDto.CombinedResponse toCombinedResponse(ProductSellWindow e, BatchCounterResponse counter) {
+        return new ProductSellWindowDto.CombinedResponse(
+                toResponse(e, counter),
+                toSellWindowResponse(e.getSellWindow())
+        );
+    }
+
+    private ProductSellWindowDto.CombinedResponse toCombinedResponseFromRow(ProductSellWindowRepository.ProductSellWindowWithRefsRow row, BatchCounterResponse counter) {
+        ProductSellWindowDto.Response psw = new ProductSellWindowDto.Response(
+                row.getId(),
+                row.getProductId(),
+                row.getSellWindowId(),
+                row.getMinTotalQty() != null ? row.getMinTotalQty() : 0,
+                qtyOrZero(counter != null ? counter.getReservedQty() : null),
+                qtyOrZero(counter != null ? counter.getPaidQty() : null),
+                row.getMaxTotalQty(),
+                row.getLeadDays(),
+                row.getShipDays(),
+                Boolean.TRUE.equals(row.getIsClosed())
+        );
+        SellWindowDto.Response sw = new SellWindowDto.Response(
+                row.getSellWindowId(),
+                row.getSellWindowName(),
+                row.getSellWindowStartAt(),
+                row.getSellWindowEndAt(),
+                row.getSellWindowTimezone(),
+                row.getSellWindowStatus(),
+                row.getSellWindowPaymentTtlMinutes() != null ? row.getSellWindowPaymentTtlMinutes() : 0,
+                row.getSellWindowPaymentOpenedAt(),
+                row.getSellWindowPaymentCloseAt(),
+                row.getSellWindowPredictedPaymentDate(),
+                row.getSellWindowPredictedProdDate(),
+                row.getSellWindowPredictedShipDate()
+        );
+        return new ProductSellWindowDto.CombinedResponse(psw, sw);
+    }
+
+    private ProductSellWindowDto.Response toResponse(ProductSellWindow e, BatchCounterResponse counter) {
+        ProductSellWindowDto.Response response = toResponse(e);
+        response.setReservedQty(qtyOrZero(counter != null ? counter.getReservedQty() : null));
+        response.setPaidQty(qtyOrZero(counter != null ? counter.getPaidQty() : null));
+        return response;
+    }
+
+    private Map<String, BatchCounterResponse> loadCounterMap(List<?> sourceRows) {
+        if (sourceRows == null || sourceRows.isEmpty()) {
+            return Map.of();
+        }
+
+        List<BatchCounterLookupRequest.Item> items = sourceRows.stream()
+                .map(this::toLookupItem)
+                .filter(item -> item != null)
+                .distinct()
+                .toList();
+
+        if (items.isEmpty()) {
+            return Map.of();
+        }
+
+        return thresholdClient.queryBatchCounters(items).stream()
+                .collect(HashMap::new, (map, counter) -> map.put(key(counter.getSellWindowId(), counter.getProductId()), counter), HashMap::putAll);
+    }
+
+    private BatchCounterLookupRequest.Item toLookupItem(Object source) {
+        if (source instanceof ProductSellWindow e) {
+            return new BatchCounterLookupRequest.Item(e.getSellWindow().getId(), e.getProduct().getId());
+        }
+        if (source instanceof ProductSellWindowRepository.ProductSellWindowWithRefsRow row) {
+            return new BatchCounterLookupRequest.Item(row.getSellWindowId(), row.getProductId());
+        }
+        return null;
+    }
+
+    private int qtyOrZero(Integer value) {
+        return value == null ? 0 : value;
+    }
+
+    private String key(UUID sellWindowId, UUID productId) {
+        return sellWindowId + ":" + productId;
+    }
+
     private ProductSellWindowDto.PageItem toPageItem(ProductSellWindowRepository.ProductSellWindowWithRefsRow row) {
         return new ProductSellWindowDto.PageItem(
                 row.getId(),
@@ -302,6 +424,23 @@ public class ProductSellWindowService {
                         row.getSellWindowPredictedProdDate(),
                         row.getSellWindowPredictedShipDate()
                 )
+        );
+    }
+
+    private SellWindowDto.Response toSellWindowResponse(SellWindow e) {
+        return new SellWindowDto.Response(
+                e.getId(),
+                e.getName(),
+                e.getStartAt(),
+                e.getEndAt(),
+                e.getTimezone(),
+                e.getStatus(),
+                e.getPaymentTtlMinutes(),
+                e.getPaymentOpenedAt(),
+                e.getPaymentCloseAt(),
+                e.getPredictedPaymentDate(),
+                e.getPredictedProdDate(),
+                e.getPredictedShipDate()
         );
     }
 

@@ -29,6 +29,13 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("BAD_REQUEST", ex.getMessage(), OffsetDateTime.now()));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("BAD_REQUEST", ex.getMessage(), OffsetDateTime.now()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
         log.error(ex.getMessage(), ex);

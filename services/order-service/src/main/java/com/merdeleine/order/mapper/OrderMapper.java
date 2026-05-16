@@ -58,24 +58,30 @@ public class OrderMapper {
                 item != null ? item.getSubtotalCents() : null,
                 order.getTotalAmountCents(),
                 order.getCurrency(),
-                delivery != null
-                        ? new OrderDeliveryResponse(
-                        delivery.getDeliveryMethod(),
-                        delivery.getPickupLocationName(),
-                        delivery.getPickupLocationAddress(),
-                        delivery.getPickupTime(),
-                        delivery.getConvenienceStoreCode(),
-                        delivery.getConvenienceStoreName(),
-                        delivery.getConvenienceStoreAddress(),
-                        delivery.getHomeDeliveryAddress()
-                )
-                        : null,
+                toDeliveryResponse(delivery),
                 order.getShippingAddress(),
                 order.getPaymentDueAt(),
                 order.getPaymentFailedCount(),
                 order.getLastPaymentError(),
                 order.getCreatedAt(),
                 order.getUpdatedAt()
+        );
+    }
+
+    public static OrderDeliveryResponse toDeliveryResponse(OrderDelivery delivery) {
+        if (delivery == null) {
+            return null;
+        }
+        return new OrderDeliveryResponse(
+                delivery.getDeliveryMethod(),
+                delivery.getPickupLocationId(),
+                delivery.getPickupLocationName(),
+                delivery.getPickupLocationAddress(),
+                delivery.getPickupTime(),
+                delivery.getConvenienceStoreCode(),
+                delivery.getConvenienceStoreName(),
+                delivery.getConvenienceStoreAddress(),
+                delivery.getHomeDeliveryAddress()
         );
     }
 

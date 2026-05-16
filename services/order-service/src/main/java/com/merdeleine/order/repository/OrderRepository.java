@@ -28,6 +28,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     List<Order> findBySellWindowIdAndStatusNot(UUID sellWindowId, OrderStatus status);
 
+    List<Order> findBySellWindowIdAndStatusIn(UUID sellWindowId, List<OrderStatus> statuses);
+
     @Query("SELECT o FROM Order o WHERE o.customerId = :customerId AND o.status = :status")
     List<Order> findByCustomerIdAndStatus(@Param("customerId") UUID customerId,
                                           @Param("status") OrderStatus status);

@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public class SellWindowQuotaBatchDto {
 
+public class SellWindowQuotaBatchDto {
     public record Key(UUID sellWindowId, UUID productId) {}
 
     public record BatchRequest(List<Key> keys) {}

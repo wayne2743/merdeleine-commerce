@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -66,6 +68,33 @@ public class BatchCounterService {
                     .orElse(List.of());
         }
         return batchCounterRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<BatchCounterDto.Response> listByPairs(List<BatchCounterDto.LookupItem> items) {
+        if (items == null || items.isEmpty()) {
+            return List.of();
+        }
+
+        Set<UUID> sellWindowIds = new HashSet<>();
+        Set<UUID> productIds = new HashSet<>();
+        Set<String> requestedKeys = new HashSet<>();
+
+        for (BatchCounterDto.LookupItem item : items) {
+            if (item == null || item.getSellWindowId() == null || item.getProductId() == null) {
+                throw new BadRequestException("each item requires sellWindowId and productId");
+            }
+            sellWindowIds.add(item.getSellWindowId());
+            productIds.add(item.getProductId());
+            requestedKeys.add(key(item.getSellWindowId(), item.getProductId()));
+        }
+
+        return batchCounterRepository
+                .findBySellWindowIdInAndProductIdIn(List.copyOf(sellWindowIds), List.copyOf(productIds))
+                .stream()
+                .filter(counter -> requestedKeys.contains(key(counter.getSellWindowId(), counter.getProductId())))
+                .map(this::toResponse)
+                .toList();
     }
 
     @Transactional
@@ -170,6 +199,7 @@ public class BatchCounterService {
                 e.getId(),
                 e.getSellWindowId(),
                 e.getProductId(),
+                e.getReservedQty(),
                 e.getPaidQty(),
                 e.getThresholdQty(),
                 e.getStatus(),
@@ -177,6 +207,10 @@ public class BatchCounterService {
                 e.getReachedEventId(),
                 e.getUpdatedAt()
         );
+    }
+
+    private String key(UUID sellWindowId, UUID productId) {
+        return sellWindowId + ":" + productId;
     }
 
     private CounterEventLogDto.Response toLogResponse(CounterEventLog e) {

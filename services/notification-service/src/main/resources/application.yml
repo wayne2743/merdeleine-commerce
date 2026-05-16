@@ -58,6 +58,7 @@ app:
       batch-created-notification: batch.created.notification.v1
       payment-created-events: payment.created.v1
       payment-paid-notification-events: payment.paid.notification.v1
+      order-auto-cancelled-notification-events: order.auto-cancelled.notification.v1
     consumer:
       group-id: notification-service-group
       auto-offset-reset: earliest
@@ -73,6 +74,9 @@ app:
 
 services:
   order-service:
+    base-url: http://100.113.120.124:8083
+    timeout-ms: 3000
+  catalog-service:
     base-url: http://100.113.120.124:8081
     timeout-ms: 3000
   api-gateway:

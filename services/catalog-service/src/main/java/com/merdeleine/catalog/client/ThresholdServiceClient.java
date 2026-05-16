@@ -2,10 +2,14 @@ package com.merdeleine.catalog.client;
 
 import com.merdeleine.catalog.dto.threshold.BatchCounterRequest;
 import com.merdeleine.catalog.dto.threshold.BatchCounterResponse;
+import com.merdeleine.catalog.dto.threshold.BatchCounterLookupRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Component
 public class ThresholdServiceClient {
@@ -66,5 +70,25 @@ public class ThresholdServiceClient {
     public void deleteBatchCountersBySellWindowId(String sellWindowId) {
         String url = baseUrl + "/api/batch-counters/by-sell-window/" + sellWindowId;
         restTemplate.delete(url);
+    }
+
+    public List<BatchCounterResponse> queryBatchCounters(List<BatchCounterLookupRequest.Item> items) {
+        if (items == null || items.isEmpty()) {
+            return List.of();
+        }
+
+        String url = baseUrl + "/api/batch-counters/query";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<BatchCounterLookupRequest> entity = new HttpEntity<>(new BatchCounterLookupRequest(items), headers);
+
+        ResponseEntity<List<BatchCounterResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                entity,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        return response.getBody() == null ? List.of() : response.getBody();
     }
 }

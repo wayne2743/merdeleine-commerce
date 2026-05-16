@@ -2,7 +2,6 @@ package com.merdeleine.catalog.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.merdeleine.catalog.client.OrderQuotaClient;
 import com.merdeleine.catalog.entity.OutboxEvent;
 import com.merdeleine.catalog.entity.SellWindow;
@@ -12,6 +11,7 @@ import com.merdeleine.catalog.repository.OutboxEventRepository;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
 import com.merdeleine.catalog.repository.SellWindowCandidate;
 import com.merdeleine.catalog.repository.SellWindowRepository;
+import com.merdeleine.messaging.SellWindowClosedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +39,7 @@ public class SellWindowExpireService {
             OutboxEventRepository outboxEventRepository,
             OrderQuotaClient orderQuotaClient,
             ObjectMapper objectMapper,
-            @Value("${app.outbox.event-types.sell-window-closed:sellwindow.closed.v1}") String sellWindowClosedTopic
+            @Value("${merdeleine.kafka.topics.sell-window-closed}") String sellWindowClosedTopic
     ) {
         this.sellWindowRepository = sellWindowRepository;
         this.productSellWindowRepository = productSellWindowRepository;
@@ -78,29 +78,16 @@ public class SellWindowExpireService {
 
             casWonCount++;
 
-            // 勝者才關閉 ProductSellWindow
-            int closedPsw = productSellWindowRepository.closeAllOpenBySellWindowId(id);
-            totalClosedPsw += closedPsw;
-
-            int closedQuotas = 0;
-            try {
-                var quotaResp = orderQuotaClient.closeBySellWindow(id, "sell_window_expired");
-                if (quotaResp != null) {
-                    closedQuotas = quotaResp.closedCount();
-                    totalClosedQuotas += closedQuotas;
-                }
-            } catch (Exception ex) {
-                throw new RuntimeException("Failed to close order quotas for sellWindowId=" + id, ex);
-            }
-
             // 重新讀 SellWindow 拿 name/endAt/timezone（也可改用 native returning，但先簡單穩）
             SellWindow sw = sellWindowRepository.findById(id)
                     .orElseThrow(() -> new IllegalStateException("SellWindow disappeared: " + id));
 
-            boolean outboxInserted = insertSellWindowClosedOutboxOnce(sw, now);
-            if (outboxInserted) outboxInsertedCount++;
+            CloseSellWindowResult closeResult = closeSellWindow(sw, now, "sell_window_expired");
+            totalClosedPsw += closeResult.closedProductSellWindows();
+            totalClosedQuotas += closeResult.closedSellWindowQuotas();
+            if (closeResult.outboxInserted()) outboxInsertedCount++;
 
-            items.add(new Item(id, true, closedPsw, closedQuotas, outboxInserted));
+            items.add(new Item(id, true, closeResult.closedProductSellWindows(), closeResult.closedSellWindowQuotas(), closeResult.outboxInserted()));
         }
 
         return new CloseExpiredResult(
@@ -112,6 +99,17 @@ public class SellWindowExpireService {
                 outboxInsertedCount,
                 items
         );
+    }
+
+    @Transactional
+    public CloseSellWindowResult closeBySellWindowId(UUID sellWindowId) {
+        OffsetDateTime now = OffsetDateTime.now();
+
+        SellWindow sw = sellWindowRepository.findByIdForUpdate(sellWindowId)
+                .orElseThrow(() -> new IllegalArgumentException("SellWindow not found: " + sellWindowId));
+
+        ensureClosable(sw, now);
+        return closeSellWindow(sw, now, "admin close sell_window");
     }
 
     private boolean insertSellWindowClosedOutboxOnce(SellWindow sw, OffsetDateTime closedAt) {
@@ -133,6 +131,35 @@ public class SellWindowExpireService {
             // ✅ idempotency_key unique 命中：代表事件早已寫過
             return false;
         }
+    }
+
+    private void ensureClosable(SellWindow sw, OffsetDateTime now) {
+//        if (sw.getStatus() != SellWindowStatus.OPEN) {
+//            throw new IllegalStateException("SellWindow is not OPEN: " + sw.getId() + ", status=" + sw.getStatus());
+//        }
+        if (sw.getEndAt() != null && sw.getEndAt().isAfter(now)) {
+            throw new IllegalStateException("SellWindow is not expired yet: " + sw.getId());
+        }
+    }
+
+    private CloseSellWindowResult closeSellWindow(SellWindow sw, OffsetDateTime now, String reason) {
+        sw.setStatus(SellWindowStatus.CLOSED);
+        sw.setClosedAt(now);
+
+        int closedPsw = productSellWindowRepository.closeAllOpenBySellWindowId(sw.getId());
+
+        int closedQuotas = 0;
+        try {
+            var quotaResp = orderQuotaClient.closeBySellWindow(sw.getId(), reason);
+            if (quotaResp != null) {
+                closedQuotas = quotaResp.closedCount();
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to close order quotas for sellWindowId=" + sw.getId(), ex);
+        }
+
+        boolean outboxInserted = insertSellWindowClosedOutboxOnce(sw, now);
+        return new CloseSellWindowResult(sw.getId(), closedPsw, closedQuotas, outboxInserted);
     }
 
     private String toJson(Object obj) {
@@ -171,14 +198,22 @@ public class SellWindowExpireService {
             boolean outboxInserted
     ) {}
 
+    public record CloseSellWindowResult(
+            UUID sellWindowId,
+            int closedProductSellWindows,
+            int closedSellWindowQuotas,
+            boolean outboxInserted
+    ) {}
+
     // DTO -> JsonNode
     private JsonNode buildSellWindowClosedPayload(SellWindow sw, OffsetDateTime closedAt) {
-        ObjectNode node = objectMapper.createObjectNode();
-        node.put("sellWindowId", sw.getId().toString());
-        node.put("sellWindowName", sw.getName());
-        node.put("endAt", sw.getEndAt().toString());
-        node.put("timezone", sw.getTimezone());
-        node.put("closedAt", closedAt.toString());
-        return node;
+        SellWindowClosedEvent payload = new SellWindowClosedEvent(
+                UUID.randomUUID(),
+                sellWindowClosedTopic,
+                sw.getId(),
+                null,
+                closedAt
+        );
+        return objectMapper.valueToTree(payload);
     }
 }

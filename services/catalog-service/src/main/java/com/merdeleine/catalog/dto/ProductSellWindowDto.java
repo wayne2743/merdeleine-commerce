@@ -146,6 +146,8 @@ public final class ProductSellWindowDto {
         private String sellWindowName;
 
         private Integer thresholdQty;
+        private Integer reservedQty;
+        private Integer paidQty;
         private Integer maxTotalQty;
         private Integer leadDays;
         private Integer shipDays;
@@ -155,10 +157,18 @@ public final class ProductSellWindowDto {
 
         public Response(UUID id, UUID productId, UUID sellWindowId,
                         int thresholdQty, Integer maxTotalQty, Integer leadDays, Integer shipDays, boolean enabled) {
+            this(id, productId, sellWindowId, thresholdQty, null, null, maxTotalQty, leadDays, shipDays, enabled);
+        }
+
+        public Response(UUID id, UUID productId, UUID sellWindowId,
+                        int thresholdQty, Integer reservedQty, Integer paidQty,
+                        Integer maxTotalQty, Integer leadDays, Integer shipDays, boolean enabled) {
             this.id = id;
             this.productId = productId;
             this.sellWindowId = sellWindowId;
             this.thresholdQty = thresholdQty;
+            this.reservedQty = reservedQty;
+            this.paidQty = paidQty;
             this.maxTotalQty = maxTotalQty;
             this.leadDays = leadDays;
             this.shipDays = shipDays;
@@ -177,6 +187,12 @@ public final class ProductSellWindowDto {
         public int getThresholdQty() { return thresholdQty; }
         public void setThresholdQty(int thresholdQty) { this.thresholdQty = thresholdQty; }
 
+        public Integer getReservedQty() { return reservedQty; }
+        public void setReservedQty(Integer reservedQty) { this.reservedQty = reservedQty; }
+
+        public Integer getPaidQty() { return paidQty; }
+        public void setPaidQty(Integer paidQty) { this.paidQty = paidQty; }
+
         public Integer getMaxTotalQty() { return maxTotalQty; }
         public void setMaxTotalQty(Integer maxTotalQty) { this.maxTotalQty = maxTotalQty; }
 
@@ -189,6 +205,11 @@ public final class ProductSellWindowDto {
         public boolean isEnabled() { return enabled; }
         public void setEnabled(boolean enabled) { this.enabled = enabled; }
     }
+
+    public record CombinedResponse(
+            Response productSellWindow,
+            SellWindowDto.Response sellWindow
+    ) {}
 
     public record PageItem(
             UUID id,

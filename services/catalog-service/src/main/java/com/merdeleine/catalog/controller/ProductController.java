@@ -3,12 +3,14 @@ package com.merdeleine.catalog.controller;
 import com.merdeleine.catalog.dto.ProductCreateRequest;
 import com.merdeleine.catalog.dto.ProductNextGroupOpenAtResponse;
 import com.merdeleine.catalog.dto.ProductOpenSellWindowResponse;
+import com.merdeleine.catalog.dto.PageResponse;
 import com.merdeleine.catalog.dto.ProductResponse;
 import com.merdeleine.catalog.dto.ProductUpdateRequest;
 import com.merdeleine.catalog.enums.ProductStatus;
 import com.merdeleine.catalog.service.ProductSellWindowService;
 import com.merdeleine.catalog.service.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,6 +65,14 @@ public class ProductController {
             products = productService.getAllProducts();
         }
         return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<PageResponse<ProductResponse>> pageProducts(
+            @RequestParam(required = false) ProductStatus status,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.pageProducts(status, pageable));
     }
 
     @PutMapping("/{id}")

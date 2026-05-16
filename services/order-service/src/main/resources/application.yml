@@ -55,8 +55,14 @@ app:
       payment-completed-events: payment.completed.v1
       payment-expired-events: payment.expired.v1
       payment-paid-events: payment.paid.v1
+      order-auto-cancelled-notification-events: order.auto-cancelled.notification.v1
   outbox:
     publish-interval-ms: 5000
+
+merdeleine:
+  kafka:
+    topics:
+      sell-window-closed: sell-window.closed.v1
 
 
 logging:

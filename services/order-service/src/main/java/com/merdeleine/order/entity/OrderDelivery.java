@@ -34,6 +34,9 @@ public class OrderDelivery {
     @Column(name = "pickup_location_name", length = 255)
     private String pickupLocationName;
 
+    @Column(name = "pickup_location_id", columnDefinition = "UUID")
+    private UUID pickupLocationId;
+
     @Column(name = "pickup_location_address", columnDefinition = "TEXT")
     private String pickupLocationAddress;
 
@@ -89,6 +92,14 @@ public class OrderDelivery {
 
     public void setPickupLocationName(String pickupLocationName) {
         this.pickupLocationName = pickupLocationName;
+    }
+
+    public UUID getPickupLocationId() {
+        return pickupLocationId;
+    }
+
+    public void setPickupLocationId(UUID pickupLocationId) {
+        this.pickupLocationId = pickupLocationId;
     }
 
     public String getPickupLocationAddress() {

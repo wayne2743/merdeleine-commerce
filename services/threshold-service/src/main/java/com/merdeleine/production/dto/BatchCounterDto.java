@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public final class BatchCounterDto {
@@ -61,6 +62,7 @@ public final class BatchCounterDto {
         private UUID id;
         private UUID sellWindowId;
         private UUID productId;
+        private Integer reservedQty;
         private Integer paidQty;
         private Integer thresholdQty;
         private CounterStatus status;
@@ -70,11 +72,12 @@ public final class BatchCounterDto {
 
         public Response() {}
 
-        public Response(UUID id, UUID sellWindowId, UUID productId, Integer paidQty, Integer thresholdQty,
+        public Response(UUID id, UUID sellWindowId, UUID productId, Integer reservedQty, Integer paidQty, Integer thresholdQty,
                         CounterStatus status, OffsetDateTime reachedAt, UUID reachedEventId, OffsetDateTime updatedAt) {
             this.id = id;
             this.sellWindowId = sellWindowId;
             this.productId = productId;
+            this.reservedQty = reservedQty;
             this.paidQty = paidQty;
             this.thresholdQty = thresholdQty;
             this.status = status;
@@ -91,6 +94,9 @@ public final class BatchCounterDto {
 
         public UUID getProductId() { return productId; }
         public void setProductId(UUID productId) { this.productId = productId; }
+
+        public Integer getReservedQty() { return reservedQty; }
+        public void setReservedQty(Integer reservedQty) { this.reservedQty = reservedQty; }
 
         public Integer getPaidQty() { return paidQty; }
         public void setPaidQty(Integer paidQty) { this.paidQty = paidQty; }
@@ -109,6 +115,37 @@ public final class BatchCounterDto {
 
         public OffsetDateTime getUpdatedAt() { return updatedAt; }
         public void setUpdatedAt(OffsetDateTime updatedAt) { this.updatedAt = updatedAt; }
+    }
+
+    public static final class LookupItem {
+        @NotNull
+        private UUID sellWindowId;
+
+        @NotNull
+        private UUID productId;
+
+        public LookupItem() {}
+
+        public LookupItem(UUID sellWindowId, UUID productId) {
+            this.sellWindowId = sellWindowId;
+            this.productId = productId;
+        }
+
+        public UUID getSellWindowId() { return sellWindowId; }
+        public void setSellWindowId(UUID sellWindowId) { this.sellWindowId = sellWindowId; }
+
+        public UUID getProductId() { return productId; }
+        public void setProductId(UUID productId) { this.productId = productId; }
+    }
+
+    public static final class LookupRequest {
+        @NotNull
+        private List<LookupItem> items;
+
+        public LookupRequest() {}
+
+        public List<LookupItem> getItems() { return items; }
+        public void setItems(List<LookupItem> items) { this.items = items; }
     }
 
     /** 用來做「加總 paidQty」+ 寫入事件 log 的 request */

@@ -3,6 +3,7 @@ package com.merdeleine.catalog.service;
 
 import com.merdeleine.catalog.dto.ProductCreateRequest;
 import com.merdeleine.catalog.dto.ProductNextGroupOpenAtResponse;
+import com.merdeleine.catalog.dto.PageResponse;
 import com.merdeleine.catalog.dto.ProductResponse;
 import com.merdeleine.catalog.dto.ProductUpdateRequest;
 import com.merdeleine.catalog.entity.Product;
@@ -11,6 +12,8 @@ import com.merdeleine.catalog.exception.ProductNotFoundException;
 import com.merdeleine.catalog.repository.ProductImageRepository;
 import com.merdeleine.catalog.repository.ProductRepository;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +84,23 @@ public class ProductService {
         return productRepository.findByStatus(status).stream()
                 .map(ProductResponse::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ProductResponse> pageProducts(ProductStatus status, Pageable pageable) {
+        int safePage = Math.max(pageable.getPageNumber(), 0);
+        int safeSize = Math.min(Math.max(pageable.getPageSize(), 1), 100);
+        PageRequest safePageRequest = PageRequest.of(safePage, safeSize, pageable.getSort());
+
+        var page = status == null
+                ? productRepository.findAll(safePageRequest)
+                : productRepository.findByStatus(status, safePageRequest);
+
+        List<ProductResponse> items = page.getContent().stream()
+                .map(ProductResponse::fromEntity)
+                .toList();
+
+        return new PageResponse<>(items, safePage, safeSize, page.getTotalElements());
     }
 
     @Transactional(readOnly = true)

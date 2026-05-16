@@ -36,9 +36,31 @@ public class ProductSellWindowController {
         return pswService.createWithSellWindow(req);
     }
 
+    @GetMapping("/combined")
+    public List<ProductSellWindowDto.CombinedResponse> listCombined(
+            @RequestParam(required = false) UUID productId,
+            @RequestParam(required = false) UUID sellWindowId
+    ) {
+        return pswService.listCombined(productId, sellWindowId);
+    }
+
+    @GetMapping("/combined/page")
+    public PageResponse<ProductSellWindowDto.CombinedResponse> pageCombined(
+            @RequestParam(required = false) UUID productId,
+            @RequestParam(required = false) UUID sellWindowId,
+            Pageable pageable
+    ) {
+        return pswService.pageCombined(productId, sellWindowId, pageable);
+    }
+
     @GetMapping("/{id}")
     public ProductSellWindowDto.Response get(@PathVariable UUID id) {
         return pswService.get(id);
+    }
+
+    @GetMapping("/{id}/combined")
+    public ProductSellWindowDto.CombinedResponse getCombined(@PathVariable UUID id) {
+        return pswService.getCombined(id);
     }
 
     @GetMapping
