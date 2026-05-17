@@ -4,12 +4,18 @@ package com.merdeleine.catalog.service;
 import com.merdeleine.catalog.dto.ProductCreateRequest;
 import com.merdeleine.catalog.dto.ProductNextGroupOpenAtResponse;
 import com.merdeleine.catalog.dto.PageResponse;
+import com.merdeleine.catalog.dto.ProductIngredientRequest;
 import com.merdeleine.catalog.dto.ProductResponse;
 import com.merdeleine.catalog.dto.ProductUpdateRequest;
+import com.merdeleine.catalog.entity.Ingredient;
 import com.merdeleine.catalog.entity.Product;
+import com.merdeleine.catalog.entity.ProductIngredient;
 import com.merdeleine.catalog.enums.ProductStatus;
+import com.merdeleine.catalog.exception.BadRequestException;
 import com.merdeleine.catalog.exception.ProductNotFoundException;
+import com.merdeleine.catalog.repository.IngredientRepository;
 import com.merdeleine.catalog.repository.ProductImageRepository;
+import com.merdeleine.catalog.repository.ProductIngredientRepository;
 import com.merdeleine.catalog.repository.ProductRepository;
 import com.merdeleine.catalog.repository.ProductSellWindowRepository;
 import org.springframework.data.domain.PageRequest;
@@ -18,8 +24,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,13 +41,19 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductSellWindowRepository productSellWindowRepository;
     private final ProductImageRepository productImageRepository;
+    private final IngredientRepository ingredientRepository;
+    private final ProductIngredientRepository productIngredientRepository;
 
     public ProductService(ProductRepository productRepository,
                           ProductSellWindowRepository productSellWindowRepository,
-                          ProductImageRepository productImageRepository) {
+                          ProductImageRepository productImageRepository,
+                          IngredientRepository ingredientRepository,
+                          ProductIngredientRepository productIngredientRepository) {
         this.productRepository = productRepository;
         this.productSellWindowRepository = productSellWindowRepository;
         this.productImageRepository = productImageRepository;
+        this.ingredientRepository = ingredientRepository;
+        this.productIngredientRepository = productIngredientRepository;
     }
 
     public ProductResponse createProduct(ProductCreateRequest request) {
@@ -60,6 +76,10 @@ public class ProductService {
         product.setDefaultLeadDays(defaultLeadDays);
         product.setDefaultShipDays(defaultShipDays);
         product.setDefaultOpenDays(defaultOpenDays);
+        product.setIngredients(request.getIngredients());
+        product.setAllergens(request.getAllergens());
+        product.setCalories(request.getCalories());
+        applyProductIngredients(product, request.getProductIngredients());
 
         Product saved = productRepository.save(product);
         return ProductResponse.fromEntity(saved);
@@ -67,21 +87,21 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public ProductResponse getProductById(UUID id) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdWithIngredients(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
         return ProductResponse.fromEntity(product);
     }
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
+        return productRepository.findAllWithIngredients().stream()
                 .map(ProductResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByStatus(ProductStatus status) {
-        return productRepository.findByStatus(status).stream()
+        return productRepository.findByStatusWithIngredients(status).stream()
                 .map(ProductResponse::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -96,7 +116,16 @@ public class ProductService {
                 ? productRepository.findAll(safePageRequest)
                 : productRepository.findByStatus(status, safePageRequest);
 
-        List<ProductResponse> items = page.getContent().stream()
+        List<UUID> productIds = page.getContent().stream()
+                .map(Product::getId)
+                .toList();
+
+        Map<UUID, Product> productMap = productRepository.findByIdInWithIngredients(productIds).stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity(), (left, right) -> left, LinkedHashMap::new));
+
+        List<ProductResponse> items = productIds.stream()
+                .map(productMap::get)
+                .filter(java.util.Objects::nonNull)
                 .map(ProductResponse::fromEntity)
                 .toList();
 
@@ -172,6 +201,18 @@ public class ProductService {
         if (request.getDefaultOpenDays() != null) {
             product.setDefaultOpenDays(request.getDefaultOpenDays());
         }
+        if (request.getIngredients() != null) {
+            product.setIngredients(request.getIngredients());
+        }
+        if (request.getAllergens() != null) {
+            product.setAllergens(request.getAllergens());
+        }
+        if (request.getCalories() != null) {
+            product.setCalories(request.getCalories());
+        }
+        if (request.getProductIngredients() != null) {
+            applyProductIngredients(product, request.getProductIngredients());
+        }
 
         Product updated = productRepository.save(product);
         return ProductResponse.fromEntity(updated);
@@ -185,28 +226,62 @@ public class ProductService {
         // Delete dependent rows first to avoid FK violations on product delete.
         productImageRepository.deleteByProductId(id);
         productSellWindowRepository.deleteByProductId(id);
+        productIngredientRepository.deleteByProductId(id);
 
         productRepository.deleteById(id);
     }
 
     private void validateDefaultQtyRange(int minQty, Integer maxQty) {
         if (minQty < 1) {
-            throw new IllegalArgumentException("defaultMinQty must be >= 1");
+            throw new BadRequestException("defaultMinQty must be >= 1");
         }
         if (maxQty != null && maxQty < minQty) {
-            throw new IllegalArgumentException("defaultMaxQty must be >= defaultMinQty");
+            throw new BadRequestException("defaultMaxQty must be >= defaultMinQty");
         }
     }
 
     private void validateDefaultDayRange(Integer leadDays, Integer shipDays, Integer openDays) {
         if (leadDays != null && leadDays < 0) {
-            throw new IllegalArgumentException("defaultLeadDays must be >= 0");
+            throw new BadRequestException("defaultLeadDays must be >= 0");
         }
         if (shipDays != null && shipDays < 0) {
-            throw new IllegalArgumentException("defaultShipDays must be >= 0");
+            throw new BadRequestException("defaultShipDays must be >= 0");
         }
         if (openDays != null && openDays < 0) {
-            throw new IllegalArgumentException("defaultOpenDays must be >= 0");
+            throw new BadRequestException("defaultOpenDays must be >= 0");
+        }
+    }
+
+    private void applyProductIngredients(Product product, List<ProductIngredientRequest> requests) {
+        product.getProductIngredients().clear();
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        Set<UUID> uniqueIngredientIds = requests.stream()
+                .map(ProductIngredientRequest::getIngredientId)
+                .collect(Collectors.toSet());
+        if (uniqueIngredientIds.size() != requests.size()) {
+            throw new BadRequestException("Duplicate ingredientId found in productIngredients payload");
+        }
+        List<Ingredient> ingredients = ingredientRepository.findAllById(uniqueIngredientIds);
+        Map<UUID, Ingredient> ingredientMap = ingredients.stream()
+                .collect(Collectors.toMap(Ingredient::getId, Function.identity()));
+
+        if (ingredientMap.size() != uniqueIngredientIds.size()) {
+            Set<UUID> missing = uniqueIngredientIds.stream()
+                    .filter(id -> !ingredientMap.containsKey(id))
+                    .collect(Collectors.toSet());
+            throw new BadRequestException("Ingredient not found: " + missing);
+        }
+
+        for (ProductIngredientRequest request : requests) {
+            ProductIngredient pi = new ProductIngredient();
+            pi.setProduct(product);
+            pi.setIngredient(ingredientMap.get(request.getIngredientId()));
+            pi.setRequiredAmount(request.getRequiredAmount());
+            pi.setUnit(request.getUnit());
+            product.getProductIngredients().add(pi);
         }
     }
 }

@@ -36,6 +36,9 @@ CREATE TABLE public.product (
                                 default_lead_days integer,
                                 default_ship_days integer,
                                 default_open_days integer,
+                                 ingredients text,
+                                 allergens text,
+                                 calories integer,
                                 created_at timestamp with time zone DEFAULT now() NOT NULL,
                                 updated_at timestamp with time zone DEFAULT now() NOT NULL,
                                 CONSTRAINT product_status_check CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'ACTIVE'::character varying, 'INACTIVE'::character varying])::text[]))),
@@ -43,11 +46,48 @@ CREATE TABLE public.product (
                                 CONSTRAINT product_default_qty_range_check CHECK (((default_max_qty IS NULL) OR (default_max_qty >= default_min_qty))),
                                 CONSTRAINT product_default_lead_days_check CHECK (((default_lead_days IS NULL) OR (default_lead_days >= 0))),
                                 CONSTRAINT product_default_ship_days_check CHECK (((default_ship_days IS NULL) OR (default_ship_days >= 0))),
-                                CONSTRAINT product_default_open_days_check CHECK (((default_open_days IS NULL) OR (default_open_days >= 0)))
+                                 CONSTRAINT product_default_open_days_check CHECK (((default_open_days IS NULL) OR (default_open_days >= 0))),
+                                 CONSTRAINT product_calories_check CHECK (((calories IS NULL) OR (calories >= 0)))
 );
 
 
 ALTER TABLE public.product OWNER TO merdeleine;
+
+CREATE TABLE public.ingredient (
+                                    id uuid NOT NULL,
+                                    name character varying(100) NOT NULL,
+                                    unit_price_cents integer NOT NULL,
+                                    brand character varying(100),
+                                    origin character varying(100),
+                                    government_registration_info character varying(1000),
+                                    attribute character varying(20) NOT NULL,
+                                    stocked_at date,
+                                    expires_at date,
+                                    stock_quantity numeric(14,3) DEFAULT 0 NOT NULL,
+                                    created_at timestamp with time zone DEFAULT now() NOT NULL,
+                                    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+                                    CONSTRAINT ingredient_attribute_check CHECK (((attribute)::text = ANY ((ARRAY['DRY'::character varying, 'WET'::character varying])::text[]))),
+                                    CONSTRAINT ingredient_unit_price_check CHECK ((unit_price_cents >= 0)),
+                                    CONSTRAINT ingredient_stock_quantity_check CHECK ((stock_quantity >= (0)::numeric)),
+                                    CONSTRAINT ingredient_date_range_check CHECK (((expires_at IS NULL) OR (stocked_at IS NULL) OR (expires_at >= stocked_at)))
+);
+
+ALTER TABLE public.ingredient OWNER TO merdeleine;
+
+CREATE TABLE public.product_ingredient (
+                                            id uuid NOT NULL,
+                                            product_id uuid NOT NULL,
+                                            ingredient_id uuid NOT NULL,
+                                            required_amount numeric(12,3) NOT NULL,
+                                            unit character varying(30) NOT NULL,
+                                            created_at timestamp with time zone DEFAULT now() NOT NULL,
+                                            updated_at timestamp with time zone DEFAULT now() NOT NULL,
+                                            CONSTRAINT product_ingredient_required_amount_check CHECK ((required_amount > (0)::numeric)),
+                                            CONSTRAINT product_ingredient_unit_check CHECK (((unit)::text = ANY ((ARRAY['G'::character varying, 'KG'::character varying, 'ML'::character varying, 'L'::character varying, 'PCS'::character varying])::text[]))),
+                                            CONSTRAINT uq_product_ingredient UNIQUE (product_id, ingredient_id)
+);
+
+ALTER TABLE public.product_ingredient OWNER TO merdeleine;
 
 --
 -- TOC entry 217 (class 1259 OID 24799)
@@ -116,6 +156,12 @@ ALTER TABLE ONLY public.outbox_event
 ALTER TABLE ONLY public.product
     ADD CONSTRAINT product_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.ingredient
+    ADD CONSTRAINT ingredient_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.product_ingredient
+    ADD CONSTRAINT product_ingredient_pkey PRIMARY KEY (id);
+
 
 --
 -- TOC entry 3299 (class 2606 OID 24805)
@@ -167,6 +213,10 @@ CREATE INDEX idx_sell_window_payment_close_at ON public.sell_window USING btree 
 
 CREATE UNIQUE INDEX uk_outbox_idempotency_key ON public.outbox_event USING btree (idempotency_key);
 
+CREATE INDEX idx_product_ingredient_product_id ON public.product_ingredient USING btree (product_id);
+
+CREATE INDEX idx_product_ingredient_ingredient_id ON public.product_ingredient USING btree (ingredient_id);
+
 
 --
 -- TOC entry 3306 (class 2606 OID 24808)
@@ -184,6 +234,12 @@ ALTER TABLE ONLY public.product_sell_window
 
 ALTER TABLE ONLY public.product_sell_window
     ADD CONSTRAINT fk_psw_sell_window FOREIGN KEY (sell_window_id) REFERENCES public.sell_window(id);
+
+ALTER TABLE ONLY public.product_ingredient
+    ADD CONSTRAINT fk_product_ingredient_product FOREIGN KEY (product_id) REFERENCES public.product(id);
+
+ALTER TABLE ONLY public.product_ingredient
+    ADD CONSTRAINT fk_product_ingredient_ingredient FOREIGN KEY (ingredient_id) REFERENCES public.ingredient(id);
 
 
 

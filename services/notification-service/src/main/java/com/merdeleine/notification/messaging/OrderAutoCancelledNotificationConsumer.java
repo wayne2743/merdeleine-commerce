@@ -86,6 +86,7 @@ public class OrderAutoCancelledNotificationConsumer {
         if (customerName == null || customerName.isBlank()) customerName = user.displayName();
         if (customerName == null || customerName.isBlank()) customerName = "顧客";
 
+
         UUID productId = null;
         UUID sellWindowId = event.sellWindowId();
         try {
@@ -102,6 +103,7 @@ public class OrderAutoCancelledNotificationConsumer {
 
         String productName = "(unknown product)";
         String sellWindowName = "(unknown sell window)";
+        log.info("[OrderAutoCancelled] load order info: productId={}, sellWindowId={}", productId, sellWindowId);
         if (productId != null && sellWindowId != null) {
             var mailContext = thresholdMailContextService.build(productId, sellWindowId);
             productName = mailContext.productName();

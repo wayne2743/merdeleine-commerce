@@ -2,6 +2,8 @@ package com.merdeleine.notification.service;
 
 import com.merdeleine.notification.client.CatalogServiceClient;
 import com.merdeleine.notification.dto.RefsResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -9,6 +11,7 @@ import java.util.UUID;
 @Service
 public class ThresholdMailContextService {
 
+    private static final Logger log = LoggerFactory.getLogger(ThresholdMailContextService.class);
     private final CatalogServiceClient catalogServiceClient;
 
     public ThresholdMailContextService(CatalogServiceClient catalogServiceClient) {
@@ -18,6 +21,7 @@ public class ThresholdMailContextService {
 
     public MailContext build(UUID productId, UUID sellWindowId) {
         try {
+            log.info("Fetching refs for productId={}, sellWindowId={}", productId, sellWindowId);
             RefsResponse refs = catalogServiceClient.getRefs(productId, sellWindowId);
             return new MailContext(
                     productId,

@@ -46,6 +46,14 @@ public class ProductSellWindow {
     @PrePersist
     void prePersist() {
         if (id == null) id = UUID.randomUUID();
+        if (unitPriceCents == null) {
+            unitPriceCents = product != null && product.getUnitPriceCents() != null ? product.getUnitPriceCents() : 0;
+        }
+        if (currency == null || currency.isBlank()) {
+            currency = product != null && product.getCurrency() != null && !product.getCurrency().isBlank()
+                    ? product.getCurrency()
+                    : "TWD";
+        }
     }
 
     // getters / setters

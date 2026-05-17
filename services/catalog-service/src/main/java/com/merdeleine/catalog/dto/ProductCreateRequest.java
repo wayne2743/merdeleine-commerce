@@ -2,10 +2,13 @@ package com.merdeleine.catalog.dto;
 
 
 import com.merdeleine.catalog.enums.ProductStatus;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 public class ProductCreateRequest {
     
@@ -40,6 +43,20 @@ public class ProductCreateRequest {
 
     @Min(value = 0, message = "defaultOpenDays must be >= 0")
     private Integer defaultOpenDays;
+
+    /** 商品成分 */
+    private String ingredients;
+
+    /** 商品過敏原 */
+    private String allergens;
+
+    /** 每份卡路里 (kcal)，需 >= 0 */
+    @Min(value = 0, message = "calories must be >= 0")
+    private Integer calories;
+
+    /** 商品所需原料清單 */
+    @Valid
+    private List<ProductIngredientRequest> productIngredients;
 
     public ProductCreateRequest() {
     }
@@ -138,5 +155,37 @@ public class ProductCreateRequest {
 
     public void setDefaultOpenDays(Integer defaultOpenDays) {
         this.defaultOpenDays = defaultOpenDays;
+    }
+
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public String getAllergens() {
+        return allergens;
+    }
+
+    public void setAllergens(String allergens) {
+        this.allergens = allergens;
+    }
+
+    public Integer getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Integer calories) {
+        this.calories = calories;
+    }
+
+    public List<ProductIngredientRequest> getProductIngredients() {
+        return productIngredients;
+    }
+
+    public void setProductIngredients(List<ProductIngredientRequest> productIngredients) {
+        this.productIngredients = productIngredients;
     }
 }

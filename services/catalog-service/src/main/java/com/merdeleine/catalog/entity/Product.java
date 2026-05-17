@@ -4,6 +4,8 @@ import com.merdeleine.catalog.enums.ProductStatus;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -47,6 +49,21 @@ public class Product {
     @Column(name = "default_open_days")
     private Integer defaultOpenDays;
 
+    /** 商品成分 */
+    @Column(columnDefinition = "TEXT")
+    private String ingredients;
+
+    /** 商品過敏原 */
+    @Column(columnDefinition = "TEXT")
+    private String allergens;
+
+    /** 每份卡路里 (kcal) */
+    @Column
+    private Integer calories;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductIngredient> productIngredients = new LinkedHashSet<>();
+
     @Column(nullable = false)
     private OffsetDateTime createdAt;
 
@@ -57,6 +74,8 @@ public class Product {
     void prePersist() {
         if (id == null) id = UUID.randomUUID();
         if (status == null) status = ProductStatus.DRAFT;
+        if (unitPriceCents == null) unitPriceCents = 0;
+        if (currency == null || currency.isBlank()) currency = "TWD";
         if (defaultMinQty == null || defaultMinQty < 1) defaultMinQty = 1;
         createdAt = OffsetDateTime.now();
         updatedAt = createdAt;
@@ -170,5 +189,37 @@ public class Product {
 
     public void setDefaultOpenDays(Integer defaultOpenDays) {
         this.defaultOpenDays = defaultOpenDays;
+    }
+
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public String getAllergens() {
+        return allergens;
+    }
+
+    public void setAllergens(String allergens) {
+        this.allergens = allergens;
+    }
+
+    public Integer getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Integer calories) {
+        this.calories = calories;
+    }
+
+    public Set<ProductIngredient> getProductIngredients() {
+        return productIngredients;
+    }
+
+    public void setProductIngredients(Set<ProductIngredient> productIngredients) {
+        this.productIngredients = productIngredients;
     }
 }
