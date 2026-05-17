@@ -40,6 +40,8 @@ public class IngredientService {
         ingredient.setAttribute(request.getAttribute());
         ingredient.setStockedAt(request.getStockedAt());
         ingredient.setExpiresAt(request.getExpiresAt());
+        ingredient.setCaloriesPer100g(request.getCaloriesPer100g());
+        ingredient.setAllergens(request.getAllergens());
         ingredient.setStockQuantity(request.getStockQuantity());
 
         return IngredientResponse.fromEntity(ingredientRepository.save(ingredient));
@@ -74,6 +76,8 @@ public class IngredientService {
         if (request.getAttribute() != null) ingredient.setAttribute(request.getAttribute());
         if (request.getStockedAt() != null) ingredient.setStockedAt(request.getStockedAt());
         if (request.getExpiresAt() != null) ingredient.setExpiresAt(request.getExpiresAt());
+        if (request.getCaloriesPer100g() != null) ingredient.setCaloriesPer100g(request.getCaloriesPer100g());
+        if (request.getAllergens() != null) ingredient.setAllergens(request.getAllergens());
         if (request.getStockQuantity() != null) ingredient.setStockQuantity(request.getStockQuantity());
 
         return IngredientResponse.fromEntity(ingredientRepository.save(ingredient));

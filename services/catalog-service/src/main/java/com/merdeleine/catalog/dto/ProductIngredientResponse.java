@@ -11,6 +11,8 @@ public record ProductIngredientResponse(
         UUID ingredientId,
         String ingredientName,
         IngredientAttribute ingredientAttribute,
+        Integer caloriesPer100g,
+        String allergens,
         BigDecimal requiredAmount,
         IngredientUnit unit
 ) {
@@ -19,9 +21,10 @@ public record ProductIngredientResponse(
                 entity.getIngredient().getId(),
                 entity.getIngredient().getName(),
                 entity.getIngredient().getAttribute(),
+                entity.getIngredient().getCaloriesPer100g(),
+                entity.getIngredient().getAllergens(),
                 entity.getRequiredAmount(),
                 entity.getUnit()
         );
     }
 }
-

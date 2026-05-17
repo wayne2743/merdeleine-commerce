@@ -48,6 +48,12 @@ public class Ingredient {
     @Column(name = "expires_at")
     private LocalDate expiresAt;
 
+    @Column(name = "calories_per_100g")
+    private Integer caloriesPer100g;
+
+    @Column(length = 500)
+    private String allergens;
+
     @Column(name = "stock_quantity", nullable = false, precision = 14, scale = 3)
     private BigDecimal stockQuantity;
 
@@ -140,6 +146,22 @@ public class Ingredient {
 
     public void setExpiresAt(LocalDate expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    public Integer getCaloriesPer100g() {
+        return caloriesPer100g;
+    }
+
+    public void setCaloriesPer100g(Integer caloriesPer100g) {
+        this.caloriesPer100g = caloriesPer100g;
+    }
+
+    public String getAllergens() {
+        return allergens;
+    }
+
+    public void setAllergens(String allergens) {
+        this.allergens = allergens;
     }
 
     public BigDecimal getStockQuantity() {

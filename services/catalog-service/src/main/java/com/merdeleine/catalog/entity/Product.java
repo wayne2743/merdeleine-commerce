@@ -49,18 +49,6 @@ public class Product {
     @Column(name = "default_open_days")
     private Integer defaultOpenDays;
 
-    /** 商品成分 */
-    @Column(columnDefinition = "TEXT")
-    private String ingredients;
-
-    /** 商品過敏原 */
-    @Column(columnDefinition = "TEXT")
-    private String allergens;
-
-    /** 每份卡路里 (kcal) */
-    @Column
-    private Integer calories;
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductIngredient> productIngredients = new LinkedHashSet<>();
 
@@ -189,30 +177,6 @@ public class Product {
 
     public void setDefaultOpenDays(Integer defaultOpenDays) {
         this.defaultOpenDays = defaultOpenDays;
-    }
-
-    public String getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(String ingredients) {
-        this.ingredients = ingredients;
-    }
-
-    public String getAllergens() {
-        return allergens;
-    }
-
-    public void setAllergens(String allergens) {
-        this.allergens = allergens;
-    }
-
-    public Integer getCalories() {
-        return calories;
-    }
-
-    public void setCalories(Integer calories) {
-        this.calories = calories;
     }
 
     public Set<ProductIngredient> getProductIngredients() {

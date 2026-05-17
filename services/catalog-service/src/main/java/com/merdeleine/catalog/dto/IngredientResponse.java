@@ -18,6 +18,8 @@ public record IngredientResponse(
         IngredientAttribute attribute,
         LocalDate stockedAt,
         LocalDate expiresAt,
+        Integer caloriesPer100g,
+        String allergens,
         BigDecimal stockQuantity,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
@@ -33,10 +35,11 @@ public record IngredientResponse(
                 ingredient.getAttribute(),
                 ingredient.getStockedAt(),
                 ingredient.getExpiresAt(),
+                ingredient.getCaloriesPer100g(),
+                ingredient.getAllergens(),
                 ingredient.getStockQuantity(),
                 ingredient.getCreatedAt(),
                 ingredient.getUpdatedAt()
         );
     }
 }
-

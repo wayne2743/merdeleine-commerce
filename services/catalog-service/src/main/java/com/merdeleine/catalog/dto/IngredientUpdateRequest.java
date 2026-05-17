@@ -31,6 +31,12 @@ public class IngredientUpdateRequest {
 
     private LocalDate expiresAt;
 
+    @Min(value = 0, message = "caloriesPer100g must be >= 0")
+    private Integer caloriesPer100g;
+
+    @Size(max = 500, message = "allergens must not exceed 500 characters")
+    private String allergens;
+
     @DecimalMin(value = "0.000", inclusive = true, message = "stockQuantity must be >= 0")
     private BigDecimal stockQuantity;
 
@@ -96,6 +102,22 @@ public class IngredientUpdateRequest {
 
     public void setExpiresAt(LocalDate expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    public Integer getCaloriesPer100g() {
+        return caloriesPer100g;
+    }
+
+    public void setCaloriesPer100g(Integer caloriesPer100g) {
+        this.caloriesPer100g = caloriesPer100g;
+    }
+
+    public String getAllergens() {
+        return allergens;
+    }
+
+    public void setAllergens(String allergens) {
+        this.allergens = allergens;
     }
 
     public BigDecimal getStockQuantity() {

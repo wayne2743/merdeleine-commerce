@@ -21,9 +21,6 @@ public class ProductResponse {
     private Integer defaultLeadDays;
     private Integer defaultShipDays;
     private Integer defaultOpenDays;
-    private String ingredients;
-    private String allergens;
-    private Integer calories;
     private List<ProductIngredientResponse> productIngredients;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -35,7 +32,6 @@ public class ProductResponse {
                           Integer unitPriceCents, String currency,
                           Integer defaultMinQty, Integer defaultMaxQty,
                            Integer defaultLeadDays, Integer defaultShipDays, Integer defaultOpenDays,
-                          String ingredients, String allergens, Integer calories,
                            List<ProductIngredientResponse> productIngredients,
                           OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
@@ -49,9 +45,6 @@ public class ProductResponse {
         this.defaultLeadDays = defaultLeadDays;
         this.defaultShipDays = defaultShipDays;
         this.defaultOpenDays = defaultOpenDays;
-        this.ingredients = ingredients;
-        this.allergens = allergens;
-        this.calories = calories;
         this.productIngredients = productIngredients;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -70,9 +63,6 @@ public class ProductResponse {
             product.getDefaultLeadDays(),
             product.getDefaultShipDays(),
             product.getDefaultOpenDays(),
-            product.getIngredients(),
-            product.getAllergens(),
-            product.getCalories(),
             product.getProductIngredients().stream()
                     .sorted(Comparator.comparing(pi -> pi.getIngredient().getName(), String.CASE_INSENSITIVE_ORDER))
                     .map(ProductIngredientResponse::fromEntity)
@@ -168,30 +158,6 @@ public class ProductResponse {
 
     public void setDefaultOpenDays(Integer defaultOpenDays) {
         this.defaultOpenDays = defaultOpenDays;
-    }
-
-    public String getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(String ingredients) {
-        this.ingredients = ingredients;
-    }
-
-    public String getAllergens() {
-        return allergens;
-    }
-
-    public void setAllergens(String allergens) {
-        this.allergens = allergens;
-    }
-
-    public Integer getCalories() {
-        return calories;
-    }
-
-    public void setCalories(Integer calories) {
-        this.calories = calories;
     }
 
     public List<ProductIngredientResponse> getProductIngredients() {

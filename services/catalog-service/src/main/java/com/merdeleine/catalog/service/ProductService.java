@@ -76,9 +76,6 @@ public class ProductService {
         product.setDefaultLeadDays(defaultLeadDays);
         product.setDefaultShipDays(defaultShipDays);
         product.setDefaultOpenDays(defaultOpenDays);
-        product.setIngredients(request.getIngredients());
-        product.setAllergens(request.getAllergens());
-        product.setCalories(request.getCalories());
         applyProductIngredients(product, request.getProductIngredients());
 
         Product saved = productRepository.save(product);
@@ -200,15 +197,6 @@ public class ProductService {
         }
         if (request.getDefaultOpenDays() != null) {
             product.setDefaultOpenDays(request.getDefaultOpenDays());
-        }
-        if (request.getIngredients() != null) {
-            product.setIngredients(request.getIngredients());
-        }
-        if (request.getAllergens() != null) {
-            product.setAllergens(request.getAllergens());
-        }
-        if (request.getCalories() != null) {
-            product.setCalories(request.getCalories());
         }
         if (request.getProductIngredients() != null) {
             applyProductIngredients(product, request.getProductIngredients());
