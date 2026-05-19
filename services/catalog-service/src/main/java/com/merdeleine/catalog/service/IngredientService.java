@@ -11,7 +11,6 @@ import com.merdeleine.catalog.repository.ProductIngredientRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,20 +28,14 @@ public class IngredientService {
     }
 
     public IngredientResponse create(IngredientCreateRequest request) {
-        validateDateRange(request.getStockedAt(), request.getExpiresAt());
-
         Ingredient ingredient = new Ingredient();
         ingredient.setName(request.getName());
-        ingredient.setUnitPriceCents(request.getUnitPriceCents());
         ingredient.setBrand(request.getBrand());
         ingredient.setOrigin(request.getOrigin());
         ingredient.setGovernmentRegistrationInfo(request.getGovernmentRegistrationInfo());
         ingredient.setAttribute(request.getAttribute());
-        ingredient.setStockedAt(request.getStockedAt());
-        ingredient.setExpiresAt(request.getExpiresAt());
         ingredient.setCaloriesPer100g(request.getCaloriesPer100g());
         ingredient.setAllergens(request.getAllergens());
-        ingredient.setStockQuantity(request.getStockQuantity());
 
         return IngredientResponse.fromEntity(ingredientRepository.save(ingredient));
     }
@@ -62,23 +55,15 @@ public class IngredientService {
     public IngredientResponse update(UUID id, IngredientUpdateRequest request) {
         Ingredient ingredient = findIngredient(id);
 
-        LocalDate targetStockedAt = request.getStockedAt() != null ? request.getStockedAt() : ingredient.getStockedAt();
-        LocalDate targetExpiresAt = request.getExpiresAt() != null ? request.getExpiresAt() : ingredient.getExpiresAt();
-        validateDateRange(targetStockedAt, targetExpiresAt);
-
         if (request.getName() != null) ingredient.setName(request.getName());
-        if (request.getUnitPriceCents() != null) ingredient.setUnitPriceCents(request.getUnitPriceCents());
         if (request.getBrand() != null) ingredient.setBrand(request.getBrand());
         if (request.getOrigin() != null) ingredient.setOrigin(request.getOrigin());
         if (request.getGovernmentRegistrationInfo() != null) {
             ingredient.setGovernmentRegistrationInfo(request.getGovernmentRegistrationInfo());
         }
         if (request.getAttribute() != null) ingredient.setAttribute(request.getAttribute());
-        if (request.getStockedAt() != null) ingredient.setStockedAt(request.getStockedAt());
-        if (request.getExpiresAt() != null) ingredient.setExpiresAt(request.getExpiresAt());
         if (request.getCaloriesPer100g() != null) ingredient.setCaloriesPer100g(request.getCaloriesPer100g());
         if (request.getAllergens() != null) ingredient.setAllergens(request.getAllergens());
-        if (request.getStockQuantity() != null) ingredient.setStockQuantity(request.getStockQuantity());
 
         return IngredientResponse.fromEntity(ingredientRepository.save(ingredient));
     }
@@ -97,11 +82,4 @@ public class IngredientService {
         return ingredientRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Ingredient not found: " + id));
     }
-
-    private void validateDateRange(LocalDate stockedAt, LocalDate expiresAt) {
-        if (stockedAt != null && expiresAt != null && expiresAt.isBefore(stockedAt)) {
-            throw new BadRequestException("expiresAt must be on or after stockedAt");
-        }
-    }
 }
-
