@@ -19,6 +19,8 @@ public class ProductIngredientRequest {
     @NotNull(message = "unit is required")
     private IngredientUnit unit;
 
+    private UUID ingredientGroupId;
+
     public UUID getIngredientId() {
         return ingredientId;
     }
@@ -41,6 +43,14 @@ public class ProductIngredientRequest {
 
     public void setUnit(IngredientUnit unit) {
         this.unit = unit;
+    }
+
+    public UUID getIngredientGroupId() {
+        return ingredientGroupId;
+    }
+
+    public void setIngredientGroupId(UUID ingredientGroupId) {
+        this.ingredientGroupId = ingredientGroupId;
     }
 }
 

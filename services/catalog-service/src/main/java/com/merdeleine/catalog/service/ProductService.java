@@ -13,6 +13,8 @@ import com.merdeleine.catalog.entity.ProductIngredient;
 import com.merdeleine.catalog.enums.ProductStatus;
 import com.merdeleine.catalog.exception.BadRequestException;
 import com.merdeleine.catalog.exception.ProductNotFoundException;
+import com.merdeleine.catalog.entity.IngredientGroup;
+import com.merdeleine.catalog.repository.IngredientGroupRepository;
 import com.merdeleine.catalog.repository.IngredientRepository;
 import com.merdeleine.catalog.repository.ProductImageRepository;
 import com.merdeleine.catalog.repository.ProductIngredientRepository;
@@ -43,17 +45,20 @@ public class ProductService {
     private final ProductImageRepository productImageRepository;
     private final IngredientRepository ingredientRepository;
     private final ProductIngredientRepository productIngredientRepository;
+    private final IngredientGroupRepository ingredientGroupRepository;
 
     public ProductService(ProductRepository productRepository,
                           ProductSellWindowRepository productSellWindowRepository,
                           ProductImageRepository productImageRepository,
                           IngredientRepository ingredientRepository,
-                          ProductIngredientRepository productIngredientRepository) {
+                          ProductIngredientRepository productIngredientRepository,
+                          IngredientGroupRepository ingredientGroupRepository) {
         this.productRepository = productRepository;
         this.productSellWindowRepository = productSellWindowRepository;
         this.productImageRepository = productImageRepository;
         this.ingredientRepository = ingredientRepository;
         this.productIngredientRepository = productIngredientRepository;
+        this.ingredientGroupRepository = ingredientGroupRepository;
     }
 
     public ProductResponse createProduct(ProductCreateRequest request) {
@@ -76,6 +81,9 @@ public class ProductService {
         product.setDefaultLeadDays(defaultLeadDays);
         product.setDefaultShipDays(defaultShipDays);
         product.setDefaultOpenDays(defaultOpenDays);
+        if (request.getRecipeQuantity() != null) {
+            product.setRecipeQuantity(request.getRecipeQuantity());
+        }
         applyProductIngredients(product, request.getProductIngredients());
 
         Product saved = productRepository.save(product);
@@ -198,6 +206,9 @@ public class ProductService {
         if (request.getDefaultOpenDays() != null) {
             product.setDefaultOpenDays(request.getDefaultOpenDays());
         }
+        if (request.getRecipeQuantity() != null) {
+            product.setRecipeQuantity(request.getRecipeQuantity());
+        }
         if (request.getProductIngredients() != null) {
             applyProductIngredients(product, request.getProductIngredients());
         }
@@ -252,12 +263,18 @@ public class ProductService {
             return;
         }
 
+        // Uniqueness check on (ingredientId, ingredientGroupId)
+        long uniquePairs = requests.stream()
+                .map(r -> r.getIngredientId() + ":" + r.getIngredientGroupId())
+                .distinct()
+                .count();
+        if (uniquePairs != requests.size()) {
+            throw new BadRequestException("Duplicate (ingredientId, ingredientGroupId) combination found in productIngredients payload");
+        }
+
         Set<UUID> uniqueIngredientIds = requests.stream()
                 .map(ProductIngredientRequest::getIngredientId)
                 .collect(Collectors.toSet());
-        if (uniqueIngredientIds.size() != requests.size()) {
-            throw new BadRequestException("Duplicate ingredientId found in productIngredients payload");
-        }
         List<Ingredient> ingredients = ingredientRepository.findAllById(uniqueIngredientIds);
         Map<UUID, Ingredient> ingredientMap = ingredients.stream()
                 .collect(Collectors.toMap(Ingredient::getId, Function.identity()));
@@ -269,12 +286,36 @@ public class ProductService {
             throw new BadRequestException("Ingredient not found: " + missing);
         }
 
+        // Resolve ingredient groups if specified
+        Set<UUID> groupIds = requests.stream()
+                .map(ProductIngredientRequest::getIngredientGroupId)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<UUID, IngredientGroup> groupMap = groupIds.isEmpty()
+                ? Map.of()
+                : ingredientGroupRepository.findAllById(groupIds).stream()
+                        .collect(Collectors.toMap(IngredientGroup::getId, Function.identity()));
+
+        if (groupMap.size() != groupIds.size()) {
+            Set<UUID> missingGroups = groupIds.stream()
+                    .filter(id -> !groupMap.containsKey(id))
+                    .collect(Collectors.toSet());
+            throw new BadRequestException("IngredientGroup not found: " + missingGroups);
+        }
+
         for (ProductIngredientRequest request : requests) {
             ProductIngredient pi = new ProductIngredient();
             pi.setProduct(product);
             pi.setIngredient(ingredientMap.get(request.getIngredientId()));
             pi.setRequiredAmount(request.getRequiredAmount());
             pi.setUnit(request.getUnit());
+            if (request.getIngredientGroupId() != null) {
+                IngredientGroup group = groupMap.get(request.getIngredientGroupId());
+                if (!group.getProduct().getId().equals(product.getId())) {
+                    throw new BadRequestException("IngredientGroup " + group.getId() + " does not belong to this product");
+                }
+                pi.setIngredientGroup(group);
+            }
             product.getProductIngredients().add(pi);
         }
     }

@@ -44,6 +44,9 @@ public class ProductCreateRequest {
     @Min(value = 0, message = "defaultOpenDays must be >= 0")
     private Integer defaultOpenDays;
 
+    @Min(value = 1, message = "recipeQuantity must be >= 1")
+    private Integer recipeQuantity;
+
     /** 商品所需原料清單 */
     @Valid
     private List<ProductIngredientRequest> productIngredients;
@@ -145,6 +148,14 @@ public class ProductCreateRequest {
 
     public void setDefaultOpenDays(Integer defaultOpenDays) {
         this.defaultOpenDays = defaultOpenDays;
+    }
+
+    public Integer getRecipeQuantity() {
+        return recipeQuantity;
+    }
+
+    public void setRecipeQuantity(Integer recipeQuantity) {
+        this.recipeQuantity = recipeQuantity;
     }
 
     public List<ProductIngredientRequest> getProductIngredients() {

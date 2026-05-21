@@ -21,6 +21,7 @@ public class ProductResponse {
     private Integer defaultLeadDays;
     private Integer defaultShipDays;
     private Integer defaultOpenDays;
+    private Integer recipeQuantity;
     private List<ProductIngredientResponse> productIngredients;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -32,6 +33,7 @@ public class ProductResponse {
                           Integer unitPriceCents, String currency,
                           Integer defaultMinQty, Integer defaultMaxQty,
                            Integer defaultLeadDays, Integer defaultShipDays, Integer defaultOpenDays,
+                           Integer recipeQuantity,
                            List<ProductIngredientResponse> productIngredients,
                           OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
@@ -45,6 +47,7 @@ public class ProductResponse {
         this.defaultLeadDays = defaultLeadDays;
         this.defaultShipDays = defaultShipDays;
         this.defaultOpenDays = defaultOpenDays;
+        this.recipeQuantity = recipeQuantity;
         this.productIngredients = productIngredients;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -63,6 +66,7 @@ public class ProductResponse {
             product.getDefaultLeadDays(),
             product.getDefaultShipDays(),
             product.getDefaultOpenDays(),
+            product.getRecipeQuantity(),
             product.getProductIngredients().stream()
                     .sorted(Comparator.comparing(pi -> pi.getIngredient().getName(), String.CASE_INSENSITIVE_ORDER))
                     .map(ProductIngredientResponse::fromEntity)
@@ -158,6 +162,14 @@ public class ProductResponse {
 
     public void setDefaultOpenDays(Integer defaultOpenDays) {
         this.defaultOpenDays = defaultOpenDays;
+    }
+
+    public Integer getRecipeQuantity() {
+        return recipeQuantity;
+    }
+
+    public void setRecipeQuantity(Integer recipeQuantity) {
+        this.recipeQuantity = recipeQuantity;
     }
 
     public List<ProductIngredientResponse> getProductIngredients() {
