@@ -1,5 +1,7 @@
 package com.merdeleine.catalog.exception;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -11,7 +13,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -70,8 +74,47 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleMessageNotReadable(HttpMessageNotReadableException ex) {
         log.error(ex.getMessage(), ex);
+
+        Throwable cause = ex.getCause();
+        if (cause instanceof InvalidFormatException ife) {
+            String field = pathToField(ife.getPath());
+            String message;
+            if (ife.getTargetType() != null && ife.getTargetType().isEnum()) {
+                String allowed = Arrays.stream(ife.getTargetType().getEnumConstants())
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", "));
+                message = "Invalid value '" + ife.getValue() + "' for " + field
+                        + "; allowed values: [" + allowed + "]";
+            } else {
+                message = "Invalid value '" + ife.getValue() + "' for " + field;
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiErrorResponse.of("BAD_REQUEST", message,
+                            List.of(new ApiErrorResponse.FieldViolation(field, message))));
+        }
+        if (cause instanceof JsonMappingException jme) {
+            String field = pathToField(jme.getPath());
+            String message = "Malformed request body at '" + field + "': " + jme.getOriginalMessage();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiErrorResponse.of("BAD_REQUEST", message,
+                            List.of(new ApiErrorResponse.FieldViolation(field, message))));
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiErrorResponse.of("BAD_REQUEST", "Malformed request body or invalid enum value"));
+                .body(ApiErrorResponse.of("BAD_REQUEST", "Malformed request body"));
+    }
+
+    private String pathToField(List<JsonMappingException.Reference> path) {
+        if (path == null || path.isEmpty()) return "unknown";
+        StringBuilder sb = new StringBuilder();
+        for (JsonMappingException.Reference ref : path) {
+            if (ref.getFieldName() != null) {
+                if (sb.length() > 0) sb.append('.');
+                sb.append(ref.getFieldName());
+            } else if (ref.getIndex() >= 0) {
+                sb.append('[').append(ref.getIndex()).append(']');
+            }
+        }
+        return sb.length() == 0 ? "unknown" : sb.toString();
     }
 
     @ExceptionHandler(Exception.class)
