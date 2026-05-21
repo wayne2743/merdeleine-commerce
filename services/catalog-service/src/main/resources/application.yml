@@ -33,6 +33,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   jackson:
     time-zone: UTC
+    mapper:
+      accept-case-insensitive-enums: true
 
 aws:
   s3:
