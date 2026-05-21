@@ -241,7 +241,13 @@ public class ProductService {
     }
 
     private void applyProductIngredients(Product product, List<ProductIngredientRequest> requests) {
-        product.getProductIngredients().clear();
+        if (!product.getProductIngredients().isEmpty()) {
+            product.getProductIngredients().clear();
+            // Force DELETE to execute before subsequent INSERTs, otherwise Hibernate
+            // flush order (insert -> update -> delete) violates uq_product_ingredient
+            // when the new list overlaps with the previous one.
+            productRepository.flush();
+        }
         if (requests == null || requests.isEmpty()) {
             return;
         }
