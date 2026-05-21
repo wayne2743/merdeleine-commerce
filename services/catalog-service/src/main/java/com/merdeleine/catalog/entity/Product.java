@@ -49,6 +49,9 @@ public class Product {
     @Column(name = "default_open_days")
     private Integer defaultOpenDays;
 
+    @Column(name = "recipe_quantity", nullable = false)
+    private Integer recipeQuantity = 1;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductIngredient> productIngredients = new LinkedHashSet<>();
 
@@ -65,6 +68,7 @@ public class Product {
         if (unitPriceCents == null) unitPriceCents = 0;
         if (currency == null || currency.isBlank()) currency = "TWD";
         if (defaultMinQty == null || defaultMinQty < 1) defaultMinQty = 1;
+        if (recipeQuantity == null || recipeQuantity < 1) recipeQuantity = 1;
         createdAt = OffsetDateTime.now();
         updatedAt = createdAt;
     }
@@ -177,6 +181,14 @@ public class Product {
 
     public void setDefaultOpenDays(Integer defaultOpenDays) {
         this.defaultOpenDays = defaultOpenDays;
+    }
+
+    public Integer getRecipeQuantity() {
+        return recipeQuantity;
+    }
+
+    public void setRecipeQuantity(Integer recipeQuantity) {
+        this.recipeQuantity = recipeQuantity;
     }
 
     public Set<ProductIngredient> getProductIngredients() {

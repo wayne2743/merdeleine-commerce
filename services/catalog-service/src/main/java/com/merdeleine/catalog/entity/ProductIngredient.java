@@ -40,6 +40,10 @@ public class ProductIngredient {
     @Column(nullable = false, length = 30)
     private IngredientUnit unit;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ingredient_group_id")
+    private IngredientGroup ingredientGroup;
+
     @Column(nullable = false)
     private OffsetDateTime createdAt;
 
@@ -112,6 +116,14 @@ public class ProductIngredient {
 
     public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public IngredientGroup getIngredientGroup() {
+        return ingredientGroup;
+    }
+
+    public void setIngredientGroup(IngredientGroup ingredientGroup) {
+        this.ingredientGroup = ingredientGroup;
     }
 }
 

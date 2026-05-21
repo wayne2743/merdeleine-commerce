@@ -14,9 +14,13 @@ public record ProductIngredientResponse(
         Integer caloriesPer100g,
         String allergens,
         BigDecimal requiredAmount,
-        IngredientUnit unit
+        IngredientUnit unit,
+        UUID ingredientGroupId,
+        String ingredientGroupName
 ) {
     public static ProductIngredientResponse fromEntity(ProductIngredient entity) {
+        UUID groupId = entity.getIngredientGroup() != null ? entity.getIngredientGroup().getId() : null;
+        String groupName = entity.getIngredientGroup() != null ? entity.getIngredientGroup().getName() : null;
         return new ProductIngredientResponse(
                 entity.getIngredient().getId(),
                 entity.getIngredient().getName(),
@@ -24,7 +28,9 @@ public record ProductIngredientResponse(
                 entity.getIngredient().getCaloriesPer100g(),
                 entity.getIngredient().getAllergens(),
                 entity.getRequiredAmount(),
-                entity.getUnit()
+                entity.getUnit(),
+                groupId,
+                groupName
         );
     }
 }
