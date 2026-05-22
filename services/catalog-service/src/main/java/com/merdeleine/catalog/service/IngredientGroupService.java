@@ -4,7 +4,6 @@ import com.merdeleine.catalog.dto.IngredientGroupCreateRequest;
 import com.merdeleine.catalog.dto.IngredientGroupResponse;
 import com.merdeleine.catalog.dto.IngredientGroupUpdateRequest;
 import com.merdeleine.catalog.entity.IngredientGroup;
-import com.merdeleine.catalog.entity.Product;
 import com.merdeleine.catalog.exception.BadRequestException;
 import com.merdeleine.catalog.exception.NotFoundException;
 import com.merdeleine.catalog.repository.IngredientGroupRepository;
@@ -29,10 +28,7 @@ public class IngredientGroupService {
     }
 
     public IngredientGroupResponse create(IngredientGroupCreateRequest request) {
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new NotFoundException("Product not found: " + request.getProductId()));
         IngredientGroup group = new IngredientGroup();
-        group.setProduct(product);
         group.setName(request.getName());
         return IngredientGroupResponse.fromEntity(ingredientGroupRepository.save(group));
     }
@@ -40,6 +36,13 @@ public class IngredientGroupService {
     @Transactional(readOnly = true)
     public IngredientGroupResponse getById(UUID id) {
         return IngredientGroupResponse.fromEntity(findOrThrow(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<IngredientGroupResponse> getAll() {
+        return ingredientGroupRepository.findAll().stream()
+                .map(IngredientGroupResponse::fromEntity)
+                .toList();
     }
 
     @Transactional(readOnly = true)

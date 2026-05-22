@@ -26,6 +26,11 @@ public class IngredientGroupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ingredientGroupService.create(request));
     }
 
+    @GetMapping("/ingredient-groups")
+    public ResponseEntity<List<IngredientGroupResponse>> getAll() {
+        return ResponseEntity.ok(ingredientGroupService.getAll());
+    }
+
     @GetMapping("/ingredient-groups/{id}")
     public ResponseEntity<IngredientGroupResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(ingredientGroupService.getById(id));

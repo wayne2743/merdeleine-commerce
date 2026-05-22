@@ -310,11 +310,7 @@ public class ProductService {
             pi.setRequiredAmount(request.getRequiredAmount());
             pi.setUnit(request.getUnit());
             if (request.getIngredientGroupId() != null) {
-                IngredientGroup group = groupMap.get(request.getIngredientGroupId());
-                if (!group.getProduct().getId().equals(product.getId())) {
-                    throw new BadRequestException("IngredientGroup " + group.getId() + " does not belong to this product");
-                }
-                pi.setIngredientGroup(group);
+                pi.setIngredientGroup(groupMap.get(request.getIngredientGroupId()));
             }
             product.getProductIngredients().add(pi);
         }
