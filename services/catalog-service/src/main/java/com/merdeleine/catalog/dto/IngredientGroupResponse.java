@@ -7,7 +7,6 @@ import java.util.UUID;
 
 public record IngredientGroupResponse(
         UUID id,
-        UUID productId,
         String name,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
@@ -15,7 +14,6 @@ public record IngredientGroupResponse(
     public static IngredientGroupResponse fromEntity(IngredientGroup entity) {
         return new IngredientGroupResponse(
                 entity.getId(),
-                entity.getProduct().getId(),
                 entity.getName(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
