@@ -58,6 +58,7 @@ app:
       batch-created-notification: batch.created.notification.v1
       payment-created-events: payment.created.v1
       payment-paid-notification-events: payment.paid.notification.v1
+      payment-paid-events: payment.paid.v1
       order-auto-cancelled-notification-events: order.auto-cancelled.notification.v1
     consumer:
       group-id: notification-service-group
@@ -89,3 +90,9 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+line:
+  messaging:
+    channel-access-token: ${LINE_CHANNEL_ACCESS_TOKEN:}
+    channel-secret: ${LINE_CHANNEL_SECRET:}
+    webhook-path: /api/line/webhook
