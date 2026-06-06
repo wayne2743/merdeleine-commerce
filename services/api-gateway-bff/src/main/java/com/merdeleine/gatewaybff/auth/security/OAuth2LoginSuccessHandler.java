@@ -41,6 +41,7 @@ public class OAuth2LoginSuccessHandler implements ServerAuthenticationSuccessHan
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication authentication) {
+
         OAuth2User principal = (OAuth2User) authentication.getPrincipal();
         String email = principal.getAttribute("email");
 

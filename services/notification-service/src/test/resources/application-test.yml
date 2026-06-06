@@ -5,3 +5,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+
+line:
+  messaging:
+    channel-access-token: test-channel-access-token
+    channel-secret: test-channel-secret
+

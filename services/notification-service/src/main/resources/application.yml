@@ -93,6 +93,16 @@ logging:
 
 line:
   messaging:
-    channel-access-token: ${LINE_CHANNEL_ACCESS_TOKEN:}
-    channel-secret: ${LINE_CHANNEL_SECRET:}
+#    channel-access-token: ${LINE_CHANNEL_ACCESS_TOKEN}
+    channel-access-token: 0GTDeA4rxNuO7lD9AmZ6XAzQDB5Prnq6vA8TqLRcEmwmsjre6PgrgZkrlIrRuV1C3OeHpOi5o0sH0ffmy4NoatDOYB4pHQyT+fXXRtNVfYEelJsv1S1tUtPg4ESvu3Ka6kbveBIs9FcEDgnu+AmKJwdB04t89/1O/w1cDnyilFU=
+#    channel-secret: ${LINE_CHANNEL_SECRET}
+    channel-secret: a3af142a80e406dc3c263d812630962e
     webhook-path: /api/line/webhook
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

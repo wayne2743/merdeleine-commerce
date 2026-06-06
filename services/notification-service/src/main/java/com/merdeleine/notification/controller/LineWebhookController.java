@@ -6,21 +6,26 @@ import com.merdeleine.notification.dto.line.LineWebhookPayload;
 import com.merdeleine.notification.entity.LineUser;
 import com.merdeleine.notification.repository.LineUserRepository;
 import com.merdeleine.notification.service.LineMessagingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 @RestController
+@Tag(name = "LINE Webhook", description = "LINE callback endpoint")
 public class LineWebhookController {
 
     private static final Logger log = LoggerFactory.getLogger(LineWebhookController.class);
@@ -42,10 +47,23 @@ public class LineWebhookController {
 
     @PostMapping("${line.messaging.webhook-path:/api/line/webhook}")
     @Transactional
+    @Operation(summary = "Receive LINE webhook callback")
     public ResponseEntity<Void> webhook(
-            @RequestHeader("X-Line-Signature") String signature,
-            @RequestBody String rawBody
+            @RequestHeader(value = "X-Line-Signature", required = false) String signature,
+            @RequestBody(required = false) String rawBody
     ) {
+        if (!StringUtils.hasText(props.getChannelSecret())) {
+            log.error("[LINE webhook] LINE_CHANNEL_SECRET is missing; cannot verify webhook signature");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+
+        if (!StringUtils.hasText(signature)) {
+            log.warn("[LINE webhook] missing X-Line-Signature header");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        rawBody = rawBody == null ? "" : rawBody;
+
         if (!verifySignature(signature, rawBody)) {
             log.warn("[LINE webhook] invalid signature");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -64,8 +82,8 @@ public class LineWebhookController {
         }
 
         for (LineWebhookPayload.LineEvent event : payload.events()) {
-            try {
-                handleEvent(event);
+            try {                handleEvent(event);
+
             } catch (Exception e) {
                 log.error("[LINE webhook] error handling event type={}", event.type(), e);
             }
@@ -108,9 +126,12 @@ public class LineWebhookController {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(
                     props.getChannelSecret().getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            byte[] hash = mac.doFinal(requestBody.getBytes(StandardCharsets.UTF_8));
-            String computed = Base64.getEncoder().encodeToString(hash);
-            return computed.equals(lineSignature);
+            byte[] computedHash = mac.doFinal(requestBody.getBytes(StandardCharsets.UTF_8));
+            byte[] receivedHash = Base64.getDecoder().decode(lineSignature);
+            return MessageDigest.isEqual(computedHash, receivedHash);
+        } catch (IllegalArgumentException e) {
+            log.warn("[LINE webhook] malformed signature or empty channel secret", e);
+            return false;
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             log.error("[LINE webhook] signature verification error", e);
             return false;

@@ -227,6 +227,8 @@ services:
         condition: service_started
       production-planning-service:
         condition: service_started
+      notification-service:
+        condition: service_started
     ports:
       - "8089:8089"
     environment:
@@ -248,6 +250,8 @@ services:
       APP_SERVICES_CATALOG_BASE_URL: http://catalog-service:8081
       APP_SERVICES_PAYMENT_BASE_URL: http://payment-service:8084
       APP_SERVICES_PRODUCTION_PLANNING_BASE_URL: http://production-planning-service:8085
+      APP_SERVICES_NOTIFICATION_BASE_URL: http://notification-service:8082
+      NOTIFICATION_SERVICE_BASE_URL: http://notification-service:8082
 
 volumes:
   pgdata:

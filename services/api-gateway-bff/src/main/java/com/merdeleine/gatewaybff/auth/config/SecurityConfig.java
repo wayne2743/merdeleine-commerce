@@ -49,6 +49,9 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
                         .pathMatchers("/api/catalog/customer/**").permitAll()
 
+                        // LINE webhook 需要公開給 LINE 平台回呼
+                        .pathMatchers(HttpMethod.POST, "/api/line/**").permitAll()
+
                         // 管理後台限 ADMIN
                         .pathMatchers("/api/notification/**").hasRole("ADMIN")
                         .pathMatchers("/api/production-planning/**").hasRole("ADMIN")
