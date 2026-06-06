@@ -9,10 +9,11 @@ public record LineWebhookPayload(String destination, List<LineEvent> events) {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record LineEvent(
-            String type,         // "follow", "unfollow", "message"
+            String type,         // "follow", "unfollow", "message", "accountLink"
             String replyToken,
             LineSource source,
-            LineMessage message
+            LineMessage message,
+            LineLink link
     ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,4 +21,7 @@ public record LineWebhookPayload(String destination, List<LineEvent> events) {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record LineMessage(String type, String id, String text) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record LineLink(String result, String nonce) {}
 }
