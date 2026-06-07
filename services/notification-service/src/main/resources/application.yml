@@ -93,13 +93,11 @@ logging:
 
 line:
   messaging:
-#    channel-access-token: ${LINE_CHANNEL_ACCESS_TOKEN}
-    channel-access-token: 0GTDeA4rxNuO7lD9AmZ6XAzQDB5Prnq6vA8TqLRcEmwmsjre6PgrgZkrlIrRuV1C3OeHpOi5o0sH0ffmy4NoatDOYB4pHQyT+fXXRtNVfYEelJsv1S1tUtPg4ESvu3Ka6kbveBIs9FcEDgnu+AmKJwdB04t89/1O/w1cDnyilFU=
-#    channel-secret: ${LINE_CHANNEL_SECRET}
-    channel-secret: a3af142a80e406dc3c263d812630962e
+    channel-access-token: ${LINE_CHANNEL_ACCESS_TOKEN}
+    channel-secret: ${LINE_CHANNEL_SECRET}
     webhook-path: /api/line/webhook
   messaging-api:
-    channel-access-token: ${LINE_CHANNEL_ACCESS_TOKEN:}
+    channel-access-token: ${LINE_CHANNEL_ACCESS_TOKEN}
     account-link-base-url: https://access.line.me/dialog/bot/accountLink
     link-token-api-url: https://api.line.me/v2/bot/user/{lineUserId}/linkToken
     nonce-expire-minutes: 10

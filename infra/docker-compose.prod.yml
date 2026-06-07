@@ -105,6 +105,8 @@ services:
       <<: *java-service-env
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/notification_db
       SERVER_PORT: 8082
+      LINE_CHANNEL_ACCESS_TOKEN: ${LINE_CHANNEL_ACCESS_TOKEN:-}
+      LINE_CHANNEL_SECRET: ${LINE_CHANNEL_SECRET:-}
       SERVICES_ORDER_SERVICE_BASE_URL: http://order-service:8083
       SERVICES_API_GATEWAY_BASE_URL: http://api-gateway-bff:8089
 
@@ -234,6 +236,8 @@ services:
       FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET:-}
       LINE_CLIENT_ID: ${LINE_CLIENT_ID:-}
       LINE_CLIENT_SECRET: ${LINE_CLIENT_SECRET:-}
+      LINE_CHANNEL_ACCESS_TOKEN: ${LINE_CHANNEL_ACCESS_TOKEN:-}
+      LINE_CHANNEL_SECRET: ${LINE_CHANNEL_SECRET:-}
       APP_SERVICES_ORDER_BASE_URL: http://order-service:8083
       APP_SERVICES_CATALOG_BASE_URL: http://catalog-service:8081
       APP_SERVICES_PAYMENT_BASE_URL: http://payment-service:8084
