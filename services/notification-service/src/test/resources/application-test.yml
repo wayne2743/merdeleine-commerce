@@ -10,4 +10,9 @@ line:
   messaging:
     channel-access-token: test-channel-access-token
     channel-secret: test-channel-secret
+  messaging-api:
+    channel-access-token: test-channel-access-token
+    account-link-base-url: https://access.line.me/dialog/bot/accountLink
+    link-token-api-url: https://api.line.me/v2/bot/user/{lineUserId}/linkToken
+    nonce-expire-minutes: 10
 

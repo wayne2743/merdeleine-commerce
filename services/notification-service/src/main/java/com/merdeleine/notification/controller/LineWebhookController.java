@@ -2,9 +2,14 @@ package com.merdeleine.notification.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merdeleine.notification.config.LineMessagingProperties;
+import com.merdeleine.notification.dto.line.LineWebhookEvent;
+import com.merdeleine.notification.dto.line.LineWebhookLink;
 import com.merdeleine.notification.dto.line.LineWebhookPayload;
+import com.merdeleine.notification.dto.line.LineWebhookRequest;
+import com.merdeleine.notification.dto.line.LineWebhookSource;
 import com.merdeleine.notification.entity.LineUser;
 import com.merdeleine.notification.repository.LineUserRepository;
+import com.merdeleine.notification.service.LineAccountLinkService;
 import com.merdeleine.notification.service.LineMessagingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,15 +38,18 @@ public class LineWebhookController {
     private final LineMessagingProperties props;
     private final LineUserRepository lineUserRepository;
     private final LineMessagingService lineMessagingService;
+    private final LineAccountLinkService lineAccountLinkService;
     private final ObjectMapper objectMapper;
 
     public LineWebhookController(LineMessagingProperties props,
                                  LineUserRepository lineUserRepository,
                                  LineMessagingService lineMessagingService,
+                                 LineAccountLinkService lineAccountLinkService,
                                  ObjectMapper objectMapper) {
         this.props = props;
         this.lineUserRepository = lineUserRepository;
         this.lineMessagingService = lineMessagingService;
+        this.lineAccountLinkService = lineAccountLinkService;
         this.objectMapper = objectMapper;
     }
 
@@ -116,6 +124,16 @@ public class LineWebhookController {
                 if (event.replyToken() != null) {
                     lineMessagingService.replyMessage(event.replyToken(), "已收到訊息，感謝您的聯繫！");
                 }
+            }
+            case "accountLink" -> {
+                log.info("[LINE accountLink] userId={}", userId);
+                LineWebhookPayload.LineLink link = event.link();
+                LineWebhookEvent linkEvent = new LineWebhookEvent(
+                        event.type(),
+                        new LineWebhookSource(event.source().type(), userId),
+                        link == null ? null : new LineWebhookLink(link.result(), link.nonce())
+                );
+                lineAccountLinkService.handleAccountLinkWebhook(new LineWebhookRequest(java.util.List.of(linkEvent)));
             }
             default -> log.debug("[LINE webhook] unhandled event type={}", event.type());
         }

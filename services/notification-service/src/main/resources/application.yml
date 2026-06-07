@@ -98,6 +98,11 @@ line:
 #    channel-secret: ${LINE_CHANNEL_SECRET}
     channel-secret: a3af142a80e406dc3c263d812630962e
     webhook-path: /api/line/webhook
+  messaging-api:
+    channel-access-token: ${LINE_CHANNEL_ACCESS_TOKEN:}
+    account-link-base-url: https://access.line.me/dialog/bot/accountLink
+    link-token-api-url: https://api.line.me/v2/bot/user/{lineUserId}/linkToken
+    nonce-expire-minutes: 10
 
 springdoc:
   api-docs:
