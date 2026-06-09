@@ -93,7 +93,10 @@ public class PaymentCreatedConsumer {
         // 1) 建立 job（REQUESTED）
         UserLookupResponse user = apiGatewayClient.getUserByCustomerId(event.customerId());
         if (user == null || user.email() == null || user.email().isBlank()) {
-            throw new IllegalStateException("Customer email not found for customerId=" + event.customerId());
+            log.warn("[PaymentCreated] customer not found or email missing for customerId={}, paymentId={}, skip",
+                    event.customerId(), event.paymentId());
+            ack.acknowledge();
+            return;
         }
 
         String customerName = user.contactName();

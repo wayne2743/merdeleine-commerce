@@ -111,6 +111,9 @@ public class LineWebhookController {
                                 u -> { u.setFollowed(true); lineUserRepository.save(u); },
                                 () -> { LineUser u = new LineUser(); u.setUserId(userId); lineUserRepository.save(u); }
                         );
+                if (event.replyToken() != null) {
+                    lineMessagingService.replyMessage(event.replyToken(), "已收到訊息，感謝您的聯繫！");
+                }
             }
             case "unfollow" -> {
                 log.info("[LINE unfollow] userId={}", userId);

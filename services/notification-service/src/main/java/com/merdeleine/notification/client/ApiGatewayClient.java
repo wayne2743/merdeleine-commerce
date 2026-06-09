@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.net.http.HttpClient;
@@ -39,14 +40,20 @@ public class ApiGatewayClient {
     }
 
     public UserLookupResponse getUserByCustomerId(UUID customerId) {
-        return restClient.get()
-                .uri("/internal/users/{customerId}", customerId)
-                .header("X-Internal-Secret", internalSecret)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, (req, res) -> {
-                    throw new RuntimeException("api-gateway /internal/users/{customerId} failed: " + res.getStatusCode());
-                })
-                .body(UserLookupResponse.class);
+        try {
+            return restClient.get()
+                    .uri("/internal/users/{customerId}", customerId)
+                    .header("X-Internal-Secret", internalSecret)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                        throw new RuntimeException("api-gateway /internal/users/{customerId} failed: " + res.getStatusCode());
+                    })
+                    .body(UserLookupResponse.class);
+        } catch (HttpClientErrorException.NotFound ignored) {
+            return null;
+        } catch (HttpClientErrorException ex) {
+            throw new RuntimeException("api-gateway /internal/users/{customerId} failed: " + ex.getStatusCode(), ex);
+        }
     }
 }
 

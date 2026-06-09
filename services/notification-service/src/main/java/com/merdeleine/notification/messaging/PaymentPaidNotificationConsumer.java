@@ -70,7 +70,10 @@ public class PaymentPaidNotificationConsumer {
 
         UserLookupResponse user = apiGatewayClient.getUserByCustomerId(event.customerId());
         if (user == null || user.email() == null || user.email().isBlank()) {
-            throw new IllegalStateException("Customer email not found for customerId=" + event.customerId());
+            log.warn("[BankTransferApproved] customer not found or email missing for customerId={}, orderId={}, skip",
+                    event.customerId(), event.orderId());
+            ack.acknowledge();
+            return;
         }
 
         String customerName = user.contactName();
