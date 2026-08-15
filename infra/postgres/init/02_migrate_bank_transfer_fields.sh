@@ -27,13 +27,13 @@ psql -h "$DB_HOST" -p "$DB_PORT" -d "$DB_NAME" -U "$DB_USER" << EOF
 ALTER TABLE payment
 ADD COLUMN IF NOT EXISTS bank_last_five VARCHAR(5);
 
-COMMENT ON COLUMN payment.bank_last_five IS '銀行帳號後五碼 (ECPay ATM payment)';
+COMMENT ON COLUMN payment.bank_last_five IS '銀行帳號後五碼 (manual bank transfer)';
 
 -- Add transfer_at column
 ALTER TABLE payment
 ADD COLUMN IF NOT EXISTS transfer_at TIMESTAMPTZ;
 
-COMMENT ON COLUMN payment.transfer_at IS '匯款日期時間 (ECPay ATM payment callback timestamp)';
+COMMENT ON COLUMN payment.transfer_at IS '人工銀行轉帳日期時間';
 
 -- Verify columns were added
 SELECT column_name, data_type, is_nullable
@@ -48,4 +48,3 @@ echo ""
 echo "=========================================="
 echo "Migration completed successfully!"
 echo "=========================================="
-

@@ -5,6 +5,7 @@ import com.merdeleine.payment.entity.Payment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import jakarta.persistence.LockModeType;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
@@ -36,6 +39,10 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     boolean existsByOrderId(UUID uuid);
 
     Optional<Payment> findByProviderPaymentId(String providerPaymentId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Payment p WHERE p.id = :paymentId")
+    Optional<Payment> findByIdForUpdate(@Param("paymentId") UUID paymentId);
 
     @Query(value = """
         SELECT *

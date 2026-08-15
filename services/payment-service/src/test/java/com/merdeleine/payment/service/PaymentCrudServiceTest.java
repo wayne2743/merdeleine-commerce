@@ -93,10 +93,21 @@ class PaymentCrudServiceTest {
 
         assertThat(response.id()).isEqualTo(paymentId);
         assertThat(response.orderId()).isEqualTo(request.getOrderId());
-        assertThat(response.provider()).isEqualTo(PaymentProvider.PayPal);
+        assertThat(response.provider()).isEqualTo(PaymentProvider.NewebPay);
         assertThat(response.bankLastFive()).isEqualTo("12345");
         assertThat(response.transferAt()).isEqualTo(request.getTransferAt());
         verify(paymentRepository).save(any(Payment.class));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void createShouldRejectHistoricalProvider() {
+        PaymentCreateRequest request = createRequest();
+        request.setProvider(PaymentProvider.PayPal);
+
+        assertThatThrownBy(() -> paymentCrudService.create(request))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("historical and no longer supported");
     }
 
     @Test
@@ -177,7 +188,7 @@ class PaymentCrudServiceTest {
 
         Payment existing = createPayment(UUID.randomUUID(), PaymentStatus.PENDING);
         existing.setOrderId(orderId);
-        existing.setProvider(PaymentProvider.PayPal);
+        existing.setProvider(PaymentProvider.NewebPay);
 
         when(paymentRepository.findTopByOrderIdOrderByCreatedAtDesc(orderId)).thenReturn(Optional.of(existing));
         when(paymentRepository.save(existing)).thenReturn(existing);
@@ -301,7 +312,7 @@ class PaymentCrudServiceTest {
     private PaymentCreateRequest createRequest() {
         PaymentCreateRequest request = new PaymentCreateRequest();
         request.setOrderId(UUID.randomUUID());
-        request.setProvider(PaymentProvider.PayPal);
+        request.setProvider(PaymentProvider.NewebPay);
         request.setAmountCents(1280);
         request.setCurrency("TWD");
         request.setProviderPaymentId("ORDER-1");
@@ -315,7 +326,7 @@ class PaymentCrudServiceTest {
     private PaymentUpdateRequest createUpdateRequest() {
         PaymentUpdateRequest request = new PaymentUpdateRequest();
         request.setOrderId(UUID.randomUUID());
-        request.setProvider(PaymentProvider.PayPal);
+        request.setProvider(PaymentProvider.NewebPay);
         request.setStatus(PaymentStatus.PAID);
         request.setAmountCents(1280);
         request.setCurrency("TWD");
@@ -331,7 +342,7 @@ class PaymentCrudServiceTest {
         Payment payment = new Payment();
         payment.setId(paymentId);
         payment.setOrderId(UUID.randomUUID());
-        payment.setProvider(PaymentProvider.PayPal);
+        payment.setProvider(PaymentProvider.NewebPay);
         payment.setStatus(status);
         payment.setAmountCents(1280);
         payment.setCurrency("TWD");

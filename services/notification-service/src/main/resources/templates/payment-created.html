@@ -8,12 +8,13 @@
 <ul>
     <li>訂單 ID：<span th:text="${orderId}">ORDER_ID</span></li>
     <li>付款 ID：<span th:text="${paymentId}">PAYMENT_ID</span></li>
-    <li>綠界付款 ID：<span th:text="${providerPaymentId}">PROVIDER_PAYMENT_ID</span></li>
+    <li>金流訂單 ID：<span th:text="${providerPaymentId}">PROVIDER_PAYMENT_ID</span></li>
     <li>金額：<b><span th:text="${totalAmount}">0</span></b></li>
     <li>付款方式：<span th:text="${paymentProvider}">PROVIDER</span></li>
     <li>到期時間：<span th:text="${expireAtText}">YYYY-MM-DD HH:mm</span></li>
 </ul>
 
+<div th:if="${isBankTransfer}">
 <h3 style="margin: 20px 0 8px;">銀行轉帳帳戶資訊</h3>
 <ul>
     <li>中文戶名：<b><span th:text="${bankAccountName}">林明煇</span></b></li>
@@ -25,6 +26,12 @@
 <p>
     請點以下連結前往填寫「銀行帳號後 5 碼」與「匯款時間」：
     <a th:href="${paymentInputUrl}" th:text="${paymentInputUrl}">付款填寫頁面</a>
+</p>
+</div>
+
+<p th:if="${isNewebPay}">
+    請點以下連結前往藍新金流安全付款頁面：
+    <a th:href="${paymentInputUrl}" th:text="${paymentInputUrl}">前往藍新付款</a>
 </p>
 
 <p>— merdeleine.tw</p>

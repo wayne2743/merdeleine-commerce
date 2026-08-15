@@ -66,6 +66,8 @@ app:
   mail:
     from: merdeleine.tw@gmail.com
   payment:
+    newebpay:
+      public-base-url: ${PAYMENT_PUBLIC_BASE_URL:http://localhost:8084}
     bank-transfer:
       frontend-base-url: http://localhost:5173
       account-name: 林明煇

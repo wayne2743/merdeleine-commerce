@@ -1,22 +1,15 @@
 package com.merdeleine.payment.utils;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.ThreadLocalRandom;
+import java.time.Instant;
+import java.util.UUID;
 
 public final class MerchantTradeNoGenerator {
-
-    private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private MerchantTradeNoGenerator() {}
 
     public static String generate() {
-        String timestamp = LocalDateTime.now().format(FORMATTER);
-
-        int random = ThreadLocalRandom.current().nextInt(100, 1000);
-        // 100~999，確保一定 3 位數
-
-        return "M" + timestamp + random;
+        String epochSeconds = String.valueOf(Instant.now().getEpochSecond());
+        String random = UUID.randomUUID().toString().replace("-", "").substring(0, 19);
+        return "M" + epochSeconds + random; // 30 chars; only letters and digits
     }
 }

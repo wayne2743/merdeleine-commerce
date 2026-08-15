@@ -21,6 +21,11 @@
   POSTGRES_DB: postgres
 ```
 
+## NewebPay
+
+付款與退款串接設定、端點及資料庫 migration 請參考
+[`docs/NEWEBPAY_INTEGRATION.md`](docs/NEWEBPAY_INTEGRATION.md)。
+
 
 ## Email
 ### spring-boot-test

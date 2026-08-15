@@ -214,6 +214,7 @@ public class PaymentCrudService {
     }
 
     private void applyCreateRequest(Payment payment, PaymentCreateRequest request) {
+        requireActiveProvider(request.getProvider());
         payment.setOrderId(request.getOrderId());
         payment.setProvider(request.getProvider());
         payment.setStatus(request.getStatus());
@@ -229,6 +230,7 @@ public class PaymentCrudService {
     }
 
     private void applyUpdateRequest(Payment payment, PaymentUpdateRequest request) {
+        requireActiveProvider(request.getProvider());
         payment.setOrderId(request.getOrderId());
         payment.setProvider(request.getProvider());
         payment.setStatus(request.getStatus());
@@ -241,6 +243,15 @@ public class PaymentCrudService {
         payment.setTransferAt(request.getTransferAt());
         payment.setExpireAt(request.getExpireAt());
         payment.setExpiredAt(request.getExpiredAt());
+    }
+
+    private void requireActiveProvider(PaymentProvider provider) {
+        if (provider != PaymentProvider.BankTransfer && provider != PaymentProvider.NewebPay) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Payment provider is historical and no longer supported: " + provider
+            );
+        }
     }
 
     private PaymentResponse toResponse(Payment payment) {

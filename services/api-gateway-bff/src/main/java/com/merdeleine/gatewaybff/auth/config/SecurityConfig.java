@@ -52,6 +52,13 @@ public class SecurityConfig {
                         // LINE webhook 需要公開給 LINE 平台回呼
                         .pathMatchers(HttpMethod.POST, "/api/line/**").permitAll()
 
+                        // NewebPay 不會攜帶本站 JWT；付款結果仍由 payment-service 驗證 TradeSha
+                        .pathMatchers(
+                                HttpMethod.POST,
+                                "/api/payment/payments/newebpay/notify",
+                                "/api/payment/payments/newebpay/return"
+                        ).permitAll()
+
                         // 管理後台限 ADMIN
                         .pathMatchers("/api/notification/**").hasRole("ADMIN")
                         .pathMatchers("/api/production-planning/**").hasRole("ADMIN")

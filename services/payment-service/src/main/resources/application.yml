@@ -63,31 +63,19 @@ services:
   api-gateway:
     base-url: ${API_GATEWAY_BASE_URL:http://localhost:8089}
 
-paypal:
-  env: sandbox   # sandbox | live
-  client-id: ${PAYPAL_CLIENT_ID}
-  client-secret: ${PAYPAL_CLIENT_SECRET}
-  sandbox-base-url: https://api-m.sandbox.paypal.com
-  base-url: https://api-m.sandbox.paypal.com
-  live-base-url: https://api-m.paypal.com
-  brand-name: merdeleine.tw
-  return-url: http://localhost:5173/payment/paypal/success
-  cancel-url: http://localhost:5173/payment/paypal/cancel
-
-
-
-ecpay:
-  env: stage   # stage | prod
-#  merchant-id: "3490805"     # 測試用 MerchantID（你也可換成自己後台的）
-#  hash-key: "VJvftkDaKOK9hjaF"
-#  hash-iv: "a514fnShdyMpnwYx"
-  merchant-id: "3362787"     # ECPay 提供的測試 MerchantID
-  hash-key: "5tzn8qyhl9EwzwuT"
-  hash-iv: "iz8YXaAUx60tijdL"
-
-  stage-url: "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"
-  prod-url:  "https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5"
-  public-base-url: "https://4a24-2401-e180-88e0-1a4a-1d5e-ea37-798e-80e5.ngrok-free.app"  # 換成你的 ngrok 網址
+newebpay:
+  env: ${NEWEBPAY_ENV:stage} # stage | prod
+  merchant-id: ${NEWEBPAY_MERCHANT_ID:}
+  hash-key: ${NEWEBPAY_HASH_KEY:}
+  hash-iv: ${NEWEBPAY_HASH_IV:}
+  public-base-url: ${PAYMENT_PUBLIC_BASE_URL:http://localhost:8084}
+  frontend-return-url: ${PAYMENT_FRONTEND_RETURN_URL:http://localhost:5173/payment/result}
+  mpg-version: "2.3"
+  close-version: "1.1"
+  stage-mpg-url: https://ccore.newebpay.com/MPG/mpg_gateway
+  prod-mpg-url: https://core.newebpay.com/MPG/mpg_gateway
+  stage-close-url: https://ccore.newebpay.com/API/CreditCard/Close
+  prod-close-url: https://core.newebpay.com/API/CreditCard/Close
 
 logging:
   level:

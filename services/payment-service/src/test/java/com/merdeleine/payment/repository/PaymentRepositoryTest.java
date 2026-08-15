@@ -61,7 +61,7 @@ class PaymentRepositoryTest {
         testPayment = new Payment();
         testPayment.setId(UUID.randomUUID());
         testPayment.setOrderId(orderId);
-        testPayment.setProvider(PaymentProvider.ECpay);
+        testPayment.setProvider(PaymentProvider.NewebPay);
         testPayment.setStatus(PaymentStatus.INIT);
         testPayment.setAmountCents(10000);
         testPayment.setCurrency("TWD");
@@ -75,7 +75,7 @@ class PaymentRepositoryTest {
         
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getOrderId()).isEqualTo(orderId);
-        assertThat(saved.getProvider()).isEqualTo(PaymentProvider.ECpay);
+        assertThat(saved.getProvider()).isEqualTo(PaymentProvider.NewebPay);
         assertThat(saved.getStatus()).isEqualTo(PaymentStatus.INIT);
         assertThat(saved.getBankLastFive()).isEqualTo("12345");
         assertThat(saved.getTransferAt()).isEqualTo(OffsetDateTime.parse("2026-04-04T12:00:00+08:00"));

@@ -126,7 +126,7 @@ erDiagram
   PAYMENT {
     uuid id PK
     uuid order_id
-    string provider "ECpay|Newebpay|LinePay"
+    string provider "BankTransfer|NewebPay"
     string status "INIT|SUCCEEDED|FAILED|REFUNDED"
     int amount_cents
     string currency

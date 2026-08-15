@@ -90,7 +90,7 @@ public class BatchConfirmConsumer {
                             order.getTotalAmountCents(),
                             order.getCurrency(),
                             order.getPaymentDueAt(),
-                            PaymentProvider.ECpay
+                            PaymentProvider.NewebPay
                     )
             );
 

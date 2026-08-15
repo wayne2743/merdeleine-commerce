@@ -59,7 +59,7 @@ class PaymentTxnRepositoryTest {
         testPayment = new Payment();
         testPayment.setId(UUID.randomUUID());
         testPayment.setOrderId(UUID.randomUUID());
-        testPayment.setProvider(PaymentProvider.ECpay);
+        testPayment.setProvider(PaymentProvider.NewebPay);
         testPayment.setStatus(PaymentStatus.INIT);
         testPayment.setAmountCents(10000);
         testPayment.setCurrency("TWD");

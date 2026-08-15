@@ -1,6 +1,7 @@
 package com.merdeleine.notification.messaging;
 
 import com.merdeleine.notification.client.ApiGatewayClient;
+import com.merdeleine.enums.PaymentProvider;
 import com.merdeleine.notification.dto.UserLookupResponse;
 import com.merdeleine.messaging.PaymentCreatedEvent;
 import com.merdeleine.notification.entity.NotificationJob;
@@ -18,8 +19,6 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Component
 public class PaymentCreatedConsumer {
 
@@ -29,6 +28,7 @@ public class PaymentCreatedConsumer {
     private final NotificationJobRepository notificationJobRepository;
     private final ThymeleafMailService thymeleafMailService;
     private final String frontendBaseUrl;
+    private final String newebPayPublicBaseUrl;
     private final String bankAccountName;
     private final String bankCode;
     private final String bankAccountNumber;
@@ -38,6 +38,7 @@ public class PaymentCreatedConsumer {
                                   NotificationJobRepository notificationJobRepository,
                                   ThymeleafMailService thymeleafMailService,
                                   @Value("${app.payment.bank-transfer.frontend-base-url:http://localhost:5173}") String frontendBaseUrl,
+                                  @Value("${app.payment.newebpay.public-base-url:http://localhost:8084}") String newebPayPublicBaseUrl,
                                   @Value("${app.payment.bank-transfer.account-name:林明煇}") String bankAccountName,
                                   @Value("${app.payment.bank-transfer.bank-code:807}") String bankCode,
                                   @Value("${app.payment.bank-transfer.account-number:19801800501931}") String bankAccountNumber,
@@ -46,6 +47,7 @@ public class PaymentCreatedConsumer {
         this.notificationJobRepository = notificationJobRepository;
         this.thymeleafMailService = thymeleafMailService;
         this.frontendBaseUrl = frontendBaseUrl;
+        this.newebPayPublicBaseUrl = newebPayPublicBaseUrl;
         this.bankAccountName = bankAccountName;
         this.bankCode = bankCode;
         this.bankAccountNumber = bankAccountNumber;
@@ -107,7 +109,7 @@ public class PaymentCreatedConsumer {
             customerName = "Customer";
         }
 
-        String paymentInputUrl = buildPaymentInputUrl(event.orderId());
+        String paymentInputUrl = buildPaymentInputUrl(event);
         NotificationJob job = NotificationMapper.toJob(
                 event,
                 user.email(),
@@ -152,10 +154,16 @@ public class PaymentCreatedConsumer {
         }
     }
 
-    private String buildPaymentInputUrl(UUID orderId) {
-        String normalizedBase = frontendBaseUrl.endsWith("/")
-                ? frontendBaseUrl.substring(0, frontendBaseUrl.length() - 1)
-                : frontendBaseUrl;
-        return normalizedBase + "/customer/orders/" + orderId + "/payment?method=bank-transfer";
+    private String buildPaymentInputUrl(PaymentCreatedEvent event) {
+        if (event.paymentProvider() == PaymentProvider.NewebPay) {
+            return normalizeBaseUrl(newebPayPublicBaseUrl)
+                    + "/payments/newebpay/checkout/" + event.paymentId();
+        }
+        return normalizeBaseUrl(frontendBaseUrl)
+                + "/customer/orders/" + event.orderId() + "/payment?method=bank-transfer";
+    }
+
+    private static String normalizeBaseUrl(String baseUrl) {
+        return baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
     }
 }

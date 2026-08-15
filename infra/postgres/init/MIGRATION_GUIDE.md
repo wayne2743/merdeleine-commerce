@@ -1,11 +1,12 @@
 # Payment Database Migration Guide
 
 ## Overview
-This guide provides instructions for upgrading an existing payment database to include the new bank transfer fields.
+This guide provides instructions for upgrading an existing payment database. For NewebPay payment
+and refund support, run `sql/15_add_newebpay_payment.sql` against `payment_db` before deployment.
 
 ## New Fields Added
-- **bank_last_five** (VARCHAR(5)): 銀行帳號後五碼 (Bank account last 5 digits from ECPay ATM transfers)
-- **transfer_at** (TIMESTAMPTZ): 匯款日期時間 (Transfer timestamp from ECPay callback)
+- **bank_last_five** (VARCHAR(5)): 人工銀行轉帳帳號後五碼
+- **transfer_at** (TIMESTAMPTZ): 人工銀行轉帳時間
 
 ## Pre-Migration Checklist
 - [ ] Backup the existing database
@@ -30,13 +31,13 @@ psql -h <db_host> -p <db_port> -d payment_db -U merdeleine
 ALTER TABLE payment
 ADD COLUMN IF NOT EXISTS bank_last_five VARCHAR(5);
 
-COMMENT ON COLUMN payment.bank_last_five IS '銀行帳號後五碼 (ECPay ATM payment)';
+COMMENT ON COLUMN payment.bank_last_five IS '銀行帳號後五碼 (manual bank transfer)';
 
 -- Add transfer_at column
 ALTER TABLE payment
 ADD COLUMN IF NOT EXISTS transfer_at TIMESTAMPTZ;
 
-COMMENT ON COLUMN payment.transfer_at IS '匯款日期時間 (ECPay ATM payment callback timestamp)';
+COMMENT ON COLUMN payment.transfer_at IS '人工銀行轉帳日期時間';
 
 -- Verify columns were added
 SELECT column_name, data_type, is_nullable
@@ -119,7 +120,7 @@ DROP COLUMN IF EXISTS transfer_at;
 
 ## Post-Migration Steps
 1. Verify the payment-service application starts without errors
-2. Test ECPay payment callbacks to ensure new fields are being populated
+2. Test NewebPay checkout, NotifyURL and refund flows in the stage environment
 3. Query the payment table to verify data is being stored correctly
 4. Monitor logs for any issues
 

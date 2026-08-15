@@ -116,6 +116,7 @@ services:
       SERVER_PORT: 8082
       SERVICES_ORDER_SERVICE_BASE_URL: http://order-service:8083
       SERVICES_API_GATEWAY_BASE_URL: http://api-gateway-bff:8089
+      PAYMENT_PUBLIC_BASE_URL: ${PAYMENT_PUBLIC_BASE_URL:-http://localhost:8084}
 
   order-service:
     <<: *java-service
@@ -151,8 +152,12 @@ services:
       ORDER_SERVICE_BASE_URL: http://order-service:8083
       CATALOG_SERVICE_BASE_URL: http://catalog-service:8081
       API_GATEWAY_BASE_URL: http://api-gateway-bff:8089
-      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID:-}
-      PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET:-}
+      NEWEBPAY_ENV: ${NEWEBPAY_ENV:-stage}
+      NEWEBPAY_MERCHANT_ID: ${NEWEBPAY_MERCHANT_ID:-}
+      NEWEBPAY_HASH_KEY: ${NEWEBPAY_HASH_KEY:-}
+      NEWEBPAY_HASH_IV: ${NEWEBPAY_HASH_IV:-}
+      PAYMENT_PUBLIC_BASE_URL: ${PAYMENT_PUBLIC_BASE_URL:-http://localhost:8084}
+      PAYMENT_FRONTEND_RETURN_URL: ${PAYMENT_FRONTEND_RETURN_URL:-http://localhost:5173/payment/result}
 
   production-planning-service:
     <<: *java-service

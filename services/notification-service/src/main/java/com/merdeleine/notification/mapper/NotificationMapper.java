@@ -2,6 +2,7 @@ package com.merdeleine.notification.mapper;
 
 import com.merdeleine.messaging.BatchCreatedNotificationEvent;
 import com.merdeleine.messaging.PaymentCreatedEvent;
+import com.merdeleine.enums.PaymentProvider;
 import com.merdeleine.notification.entity.NotificationJob;
 import com.merdeleine.notification.enums.NotificationChannel;
 
@@ -55,6 +56,8 @@ public class NotificationMapper {
         payload.put("customerEmail", customerEmail);
         payload.put("totalAmount", event.totalAmount());
         payload.put("paymentProvider", event.paymentProvider().name());
+        payload.put("isBankTransfer", event.paymentProvider() == PaymentProvider.BankTransfer);
+        payload.put("isNewebPay", event.paymentProvider() == PaymentProvider.NewebPay);
         payload.put("expireAtText", EXPIRE_FMT.format(event.expireAt().toInstant()));
         payload.put("paymentInputUrl", paymentInputUrl);
         payload.put("bankAccountName", bankAccountName);
